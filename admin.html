@@ -235,37 +235,38 @@
         function chiudiModal() { document.getElementById('dettagliModal').style.display = 'none'; }
 
         function approvaCheckin(index) {
-    const badge = document.getElementById('badge-' + index);
-    const btn = event.target; // Il tasto cliccato
-    
-    btn.innerText = "Attendere...";
-    btn.disabled = true;
+            const badge = document.getElementById('badge-' + index);
+            const btn = event.target; 
+            
+            btn.innerText = "Attendere...";
+            btn.disabled = true;
 
-    // Calcoliamo la riga reale nel foglio (i dati sono invertiti nel sito, 
-    // quindi dobbiamo recuperare l'indice originale)
-    const rigaReale = ospitiDatabase.length - 1 - index;
+            const rigaReale = ospitiDatabase.length - 1 - index;
 
-    const formData = new FormData();
-    formData.append("action", "updateStatus");
-    formData.append("row", rigaReale);
+            // Creiamo il pacchetto nel nuovo formato che Google si aspetta (JSON)
+            const payload = {
+                action: "updateStatus",
+                row: rigaReale
+            };
 
-    fetch(LINK_GOOGLE_SCRIPT, {
-        method: "POST",
-        body: formData
-    })
-    .then(() => {
-        const card = document.getElementById('card-' + index);
-        card.classList.add('approvato');
-        badge.className = 'badge ok';
-        badge.innerText = 'Approvato';
-        btn.innerText = "✅ Completato";
-    })
-    .catch(err => {
-        alert("Errore nel salvataggio. Riprova.");
-        btn.innerText = "✅ Approva";
-        btn.disabled = false;
-    });
-}
+            fetch(LINK_GOOGLE_SCRIPT, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.text())
+            .then(() => {
+                const card = document.getElementById('card-' + index);
+                card.classList.add('approvato');
+                badge.className = 'badge ok';
+                badge.innerText = 'Approvato';
+                btn.innerText = "✅ Già Approvato";
+            })
+            .catch(err => {
+                alert("Errore nel salvataggio. Riprova.");
+                btn.innerText = "✅ Approva";
+                btn.disabled = false;
+            });
+        }
     </script>
 </body>
 </html>
