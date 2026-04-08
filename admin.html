@@ -158,12 +158,28 @@
 
                     // Crea una scheda per ogni riga del Foglio Google
                     ospitiDatabase.forEach((riga, index) => {
-                        // Indici Colonne: 1=Arrivo, 2=Partenza, 3=Ospiti, 4=Nome, 5=Cognome
+                        
+                        // Leggiamo lo stato dalla colonna N (indice 13) del foglio
+                        let statoAttuale = riga[13] || "Da Controllare";
+                        
+                        // Impostiamo i colori e i testi in base allo stato reale!
+                        let classeCard = "card";
+                        let classeBadge = "badge attesa";
+                        let testoBadge = "Da Controllare";
+                        let bottoneApprova = `<button class="btn-approva" onclick="approvaCheckin(${index})">✅ Approva</button>`;
+
+                        if (statoAttuale === "Approvato") {
+                            classeCard = "card approvato"; // Rende la scheda un po' trasparente
+                            classeBadge = "badge ok"; // Rende il badge verde
+                            testoBadge = "Approvato";
+                            bottoneApprova = `<button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">✅ Già Approvato</button>`;
+                        }
+
                         const htmlScheda = `
-                            <div class="card" id="card-${index}">
+                            <div class="${classeCard}" id="card-${index}">
                                 <div class="card-header">
                                     <h3 class="ospite-nome">${riga[4]} ${riga[5]}</h3>
-                                    <span class="badge attesa" id="badge-${index}">Da Controllare</span>
+                                    <span class="${classeBadge}" id="badge-${index}">${testoBadge}</span>
                                 </div>
                                 <div class="card-dettagli">
                                     <div><strong>Arrivo:</strong> ${riga[1]}</div>
@@ -172,7 +188,7 @@
                                 </div>
                                 <div class="btn-group">
                                     <button class="btn-dettagli" onclick="apriModal(${index})">👁️ Dettagli & Foto</button>
-                                    <button class="btn-approva" onclick="approvaCheckin(${index})">✅ Approva</button>
+                                    ${bottoneApprova}
                                 </div>
                             </div>
                         `;
