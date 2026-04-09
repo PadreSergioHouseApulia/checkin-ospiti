@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | PadreSergio House</title>
-    <link rel="icon" type="image/x-icon" href="Icona admin.ico">
-
     <style>
         :root {
             --colore-principale: #5e7153; 
@@ -16,6 +14,7 @@
             --giallo-attesa: #f39c12;
             --verde-ok: #27ae60;
             --rosso-allerta: #e74c3c;
+            --nero-blocco: #2c3e50; /* Unico colore aggiunto per il blocco */
         }
 
         body { font-family: 'Arial', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo); margin: 0; padding: 0; }
@@ -41,11 +40,13 @@
         .grid-prenotazioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--colore-card); border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--giallo-attesa); transition: transform 0.2s; }
         .card.approvato { border-top-color: var(--verde-ok); opacity: 0.8; }
+        .card.bloccato { border-top-color: var(--nero-blocco); opacity: 0.6; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ospite-nome { font-size: 18px; font-weight: bold; margin: 0; }
         .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; }
         .badge.attesa { background-color: var(--giallo-attesa); }
         .badge.ok { background-color: var(--verde-ok); }
+        .badge.nero { background-color: var(--nero-blocco); }
         .card-dettagli { font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.6; }
         .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
         .btn-group button { padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; flex: 1 1 30%; }
@@ -62,7 +63,7 @@
         /* Stili per il Form di Modifica */
         .campo-edit { margin-bottom: 10px; }
         .campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 3px; }
-        .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
+        .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
         
         #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; }
     </style>
@@ -117,13 +118,11 @@
             <div class="campo-edit"><label>Cognome</label><input type="text" id="edit-cognome"></div>
             <div class="campo-edit"><label>Documento (Tipo e Numero)</label><input type="text" id="edit-doc"></div>
             <div class="campo-edit"><label>Data di Nascita</label><input type="text" id="edit-nascita"></div>
+            <div class="campo-edit"><label>Luogo di Nascita</label><input type="text" id="edit-luogo"></div>
             <div class="campo-edit"><label>Nazionalità</label><input type="text" id="edit-nazionalita"></div>
             <div class="campo-edit"><label>Residenza</label><input type="text" id="edit-residenza"></div>
             
-            <div class="campo-edit">
-                <label>Ospiti Extra</label>
-                <textarea id="edit-ospitiExtra" rows="8" placeholder="Nessuno"></textarea>
-            </div>
+            <div class="campo-edit"><label>Ospiti Extra</label><textarea id="edit-ospitiExtra" rows="8"></textarea></div>
             
             <button onclick="salvaModifiche(event)" style="background:var(--rosso-allerta); color:white; width:100%; padding:15px; border:none; border-radius:5px; margin-top:15px; font-weight:bold; cursor:pointer;">💾 Salva e Approva</button>
         </div>
@@ -168,28 +167,35 @@
                     }
 
                     ospitiDatabase.forEach((riga, index) => {
-                        let statoAttuale = riga[13] || "Da Controllare";
+                        let statoAttuale = riga[14] || "Da Controllare";
                         
                         let classeCard = "card";
                         let classeBadge = "badge attesa";
                         let bottoniAzione = "";
 
-                        // Controllo Nuove Funzioni: Tasti Attivi o Bloccati
-                        if (statoAttuale === "Da Controllare") {
-                            bottoniAzione = `
-                                <button class="btn-rifiuta" onclick="apriModifica(${index})">✏️ Correggi</button>
-                                <button class="btn-approva" onclick="approvaCheckin(${index}, event)">✅ Approva</button>
-                            `;
-                        } else {
+                        if (statoAttuale === "Approvato" || statoAttuale === "Corretto e Approvato") {
                             classeCard = "card approvato"; 
                             classeBadge = "badge ok"; 
                             bottoniAzione = `
-                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed; opacity:0.7;">✏️ Bloccato</button>
+                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button>
                                 <button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">✅ ${statoAttuale}</button>
+                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">🚫 Bloccato</button>
+                            `;
+                        } else if (statoAttuale === "Bloccato") {
+                            classeCard = "card bloccato"; 
+                            classeBadge = "badge nero"; 
+                            bottoniAzione = `
+                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button>
+                                <button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">🚫 Bloccato</button>
+                            `;
+                        } else {
+                            bottoniAzione = `
+                                <button class="btn-rifiuta" onclick="apriModifica(${index})">✏️ Correggi</button>
+                                <button class="btn-approva" onclick="approvaEScarica(${index}, event)">✅ Approva</button>
+                                <button class="btn-rifiuta" style="background-color: var(--nero-blocco);" onclick="bloccaCheckin(${index}, event)">🚫 Blocca</button>
                             `;
                         }
 
-                        // Generazione HTML Vecchia Grafica + Info Ospiti Extra
                         const htmlScheda = `
                             <div class="${classeCard}" id="card-${index}">
                                 <div class="card-header">
@@ -200,9 +206,6 @@
                                     <div><strong>Arrivo:</strong> ${riga[1]}</div>
                                     <div><strong>Partenza:</strong> ${riga[2]}</div>
                                     <div><strong>Ospiti totali:</strong> ${riga[3]}</div>
-                                    <div style="margin-top:10px; color:var(--colore-principale); font-weight:bold;">
-                                        👥 Altri ospiti: ${riga[3] > 1 ? 'Sì (vedi dettagli)' : 'No'}
-                                    </div>
                                 </div>
                                 <div class="btn-group">
                                     <button class="btn-dettagli" onclick="apriDettagli(${index})">👁️ Dettagli & Foto</button>
@@ -216,29 +219,27 @@
                 .catch(errore => { contenitore.innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione.</div>'; });
         }
 
-        // GESTIONE MODALI
         function chiudiModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function apriDettagli(index) {
             const riga = ospitiDatabase[index];
             document.getElementById('modal-titolo').innerText = 'Dettagli: ' + riga[4] + ' ' + riga[5];
             
-            let linkFronte = riga[11] !== "Non caricata" && riga[11] !== "" ? `<a href="${riga[11]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte</a>` : '';
-            let linkRetro = riga[12] !== "Non caricata" && riga[12] !== "" ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro</a>` : '';
+            let linkFronte = riga[12] !== "Non caricata" && riga[12] !== "" && riga[12] !== undefined ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte</a>` : '';
+            let linkRetro = riga[13] !== "Non caricata" && riga[13] !== "" && riga[13] !== undefined ? `<a href="${riga[13]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro</a>` : '';
 
-            // Visualizzazione classica ma con aggiunta degli ospiti extra
             document.getElementById('contenuto-modale').innerHTML = `
                 <div class="sezione-dati">
                     <p style="font-size: 14px; line-height: 1.6;">
                         <strong>Documento:</strong> ${riga[6]}<br>
-                        <strong>Nato il:</strong> ${riga[8]}<br>
+                        <strong>Nato il:</strong> ${riga[8]} a ${riga[9]}<br>
                         <strong>Sesso:</strong> ${riga[7]}<br>
-                        <strong>Nazionalità:</strong> ${riga[9]}<br>
-                        <strong>Residenza:</strong> ${riga[10]}<br>
+                        <strong>Nazionalità:</strong> ${riga[10]}<br>
+                        <strong>Residenza:</strong> ${riga[11]}<br>
                     </p>
                     <hr style="border:0; border-top:1px solid #ccc; margin: 15px 0;">
                     <strong>👥 OSPITI EXTRA:</strong><br>
-                    <pre style="font-family:inherit; white-space:pre-wrap; margin-top:5px; font-size:13px;">${riga[14] || 'Nessuno'}</pre>
+                    <pre style="font-family:inherit; white-space:pre-wrap; font-size:13px; margin-top:5px;">${riga[15] || 'Nessuno'}</pre>
                     <hr style="border:0; border-top:1px solid #ccc; margin: 15px 0;">
                     ${linkFronte} ${linkRetro}
                 </div>
@@ -253,24 +254,72 @@
             document.getElementById('edit-cognome').value = riga[5];
             document.getElementById('edit-doc').value = riga[6];
             document.getElementById('edit-nascita').value = riga[8];
-            document.getElementById('edit-nazionalita').value = riga[9];
-            document.getElementById('edit-residenza').value = riga[10];
-            document.getElementById('edit-ospitiExtra').value = riga[14] || ""; // Campo ospiti extra precompilato
+            document.getElementById('edit-luogo').value = riga[9];
+            document.getElementById('edit-nazionalita').value = riga[10];
+            document.getElementById('edit-residenza').value = riga[11];
+            document.getElementById('edit-ospitiExtra').value = riga[15] || "";
             
             document.getElementById('modificaModal').style.display = 'flex';
         }
 
-        // SALVATAGGI AL DATABASE
-        function approvaCheckin(index, event) {
+        function approvaEScarica(index, event) {
+            const btn = event.target; 
+            btn.innerText = "Attendere..."; btn.disabled = true;
+
+            const riga = ospitiDatabase[index];
+            const rigaReale = ospitiDatabase.length - 1 - index;
+            const payload = { action: "updateStatus", row: rigaReale, status: "Approvato" };
+
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
+            .then(() => {
+                generaCSVCompleto(riga);
+                caricaDati(); 
+            })
+            .catch(err => { alert("Errore nel salvataggio."); btn.innerText = "✅ Approva"; btn.disabled = false; });
+        }
+
+        function bloccaCheckin(index, event) {
+            if(!confirm("Sei sicuro di voler bloccare questo check-in?")) return;
             const btn = event.target; 
             btn.innerText = "Attendere..."; btn.disabled = true;
 
             const rigaReale = ospitiDatabase.length - 1 - index;
-            const payload = { action: "updateStatus", row: rigaReale };
+            const payload = { action: "updateStatus", row: rigaReale, status: "Bloccato" };
 
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
-            .then(() => caricaDati()) // Ricarica i dati per vedere l'aggiornamento grafico
-            .catch(err => { alert("Errore nel salvataggio."); btn.innerText = "✅ Approva"; btn.disabled = false; });
+            .then(() => caricaDati()) 
+            .catch(err => { alert("Errore nel salvataggio."); btn.innerText = "🚫 Blocca"; btn.disabled = false; });
+        }
+
+        function generaCSVCompleto(riga) {
+            let csvRows = ["Arrivo;Partenza;Cognome;Nome;Sesso;DataNascita;LuogoNascita;Cittadinanza"];
+            
+            // 1. Riga Capogruppo
+            csvRows.push(`${riga[1]};${riga[2]};${riga[5]};${riga[4]};${riga[7]};${riga[8]};${riga[9]};${riga[10]}`);
+            
+            // 2. Righe Ospiti Extra
+            let extraStr = riga[15] || "";
+            if (extraStr.includes("--- OSPITE")) {
+                let blocchi = extraStr.split("--- OSPITE").slice(1);
+                blocchi.forEach(blocco => {
+                    let cognome = blocco.match(/Cognome: (.*)/)?.[1] || "";
+                    let nome = blocco.match(/Nome: (.*)/)?.[1] || "";
+                    let sesso = blocco.match(/Sesso: (.*)/)?.[1] || "";
+                    let nascitaMatch = blocco.match(/Nascita: (.*?) a (.*)/);
+                    let dataNascita = nascitaMatch?.[1] || "";
+                    let luogoNascita = nascitaMatch?.[2] || "";
+                    let nazionalita = blocco.match(/Nazionalità: (.*)/)?.[1] || "";
+                    
+                    csvRows.push(`${riga[1]};${riga[2]};${cognome.trim()};${nome.trim()};${sesso.trim()};${dataNascita.trim()};${luogoNascita.trim()};${nazionalita.trim()}`);
+                });
+            }
+
+            const blob = new Blob(["\ufeff" + csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `Checkin_${riga[5]}.csv`;
+            link.click();
         }
 
         function salvaModifiche(event) {
@@ -280,6 +329,7 @@
 
             const index = document.getElementById('edit-index').value;
             const rigaReale = ospitiDatabase.length - 1 - index;
+            const rigaOriginale = ospitiDatabase[index]; // Prendiamo i dati vecchi (come le date di arrivo/partenza)
 
             const payload = {
                 action: "editDati",
@@ -288,13 +338,26 @@
                 cognome: document.getElementById('edit-cognome').value,
                 documento: document.getElementById('edit-doc').value,
                 nascita: document.getElementById('edit-nascita').value,
+                luogoNascita: document.getElementById('edit-luogo').value,
                 nazionalita: document.getElementById('edit-nazionalita').value,
                 residenza: document.getElementById('edit-residenza').value,
-                ospitiExtra: document.getElementById('edit-ospitiExtra').value // Salva ospiti extra
+                ospitiExtra: document.getElementById('edit-ospitiExtra').value
             };
+
+            // Creiamo un pacchetto "misto" con i dati vecchi intatti e le tue nuove correzioni pronte per il CSV
+            let rigaAggiornata = [...rigaOriginale];
+            rigaAggiornata[4] = payload.nome;
+            rigaAggiornata[5] = payload.cognome;
+            rigaAggiornata[8] = payload.nascita;
+            rigaAggiornata[9] = payload.luogoNascita;
+            rigaAggiornata[10] = payload.nazionalita;
+            rigaAggiornata[15] = payload.ospitiExtra;
 
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
             .then(() => {
+                // IL MAGICO COMANDO AGGIUNTO: Genera il CSV con i dati appena corretti!
+                generaCSVCompleto(rigaAggiornata); 
+                
                 chiudiModal('modificaModal');
                 caricaDati(); 
                 btn.innerText = "💾 Salva e Approva";
