@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | PadreSergio House</title>
+    <link rel="icon" type="image/x-icon" href="Icona admin.ico">
+
     <style>
         :root {
             --colore-principale: #5e7153; 
@@ -23,8 +25,10 @@
         .login-box h1 { font-family: 'Georgia', serif; color: var(--colore-principale); margin-top: 0; margin-bottom: 10px; }
         .login-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
         .password-container { position: relative; width: 100%; margin-bottom: 15px; }
-        .password-container input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-align: center; }
+        .password-container input { width: 100%; padding: 12px; padding-right: 40px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-align: center; }
         .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none; opacity: 0.7; }
+        .toggle-password:hover { opacity: 1; }
+        .login-box button { width: 100%; background-color: var(--colore-principale); color: white; border: none; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         
         #main-content { display: none; }
 
@@ -34,32 +38,33 @@
         .header-sezione { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
         .header-sezione h2 { margin: 0; color: var(--colore-principale); }
 
-        .grid-prenotazioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: var(--colore-card); border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid var(--giallo-attesa); transition: 0.3s; }
-        .card.approvato { border-top-color: var(--verde-ok); opacity: 0.85; }
+        .grid-prenotazioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: var(--colore-card); border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--giallo-attesa); transition: transform 0.2s; }
+        .card.approvato { border-top-color: var(--verde-ok); opacity: 0.8; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .ospite-nome { font-size: 18px; font-weight: bold; margin: 0; color: var(--colore-principale); }
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; }
+        .ospite-nome { font-size: 18px; font-weight: bold; margin: 0; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; }
         .badge.attesa { background-color: var(--giallo-attesa); }
         .badge.ok { background-color: var(--verde-ok); }
-        .card-dettagli { font-size: 14px; color: #555; margin-bottom: 15px; line-height: 1.6; }
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-group button { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
-        
+        .card-dettagli { font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.6; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn-group button { padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; flex: 1 1 30%; }
         .btn-dettagli { background-color: #e0e6ed; color: #333; }
         .btn-approva { background-color: var(--verde-ok); color: white; }
         .btn-rifiuta { background-color: var(--rosso-allerta); color: white; }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
-        .modal { background: white; width: 95%; max-width: 600px; border-radius: 12px; padding: 25px; max-height: 90vh; overflow-y: auto; position: relative; }
-        .chiudi-modal { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #888; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; }
+        .modal { background: white; width: 90%; max-width: 600px; border-radius: 10px; padding: 30px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .chiudi-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; }
+        .sezione-dati { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #eee; }
+        .foto-doc-link { display: inline-block; background: var(--colore-principale); color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; margin-right: 10px; margin-top: 10px; }
         
-        .campo-edit { margin-bottom: 12px; }
-        .campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 4px; }
-        .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
+        /* Stili per il Form di Modifica */
+        .campo-edit { margin-bottom: 10px; }
+        .campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 3px; }
+        .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit; }
         
-        #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 40px; }
-        .foto-doc-link { display: inline-block; background: var(--colore-principale); color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-size: 13px; margin-right: 10px; margin-top: 15px; font-weight: bold; }
+        #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; }
     </style>
 </head>
 <body>
@@ -67,25 +72,26 @@
     <div id="login-screen">
         <div class="login-box">
             <h1>PadreSergio</h1>
-            <p>Accesso Amministratore</p>
+            <p>Pannello di Amministrazione</p>
             <div class="password-container">
-                <input type="password" id="passwordInput" placeholder="Password" onkeypress="gestisciInvio(event)">
+                <input type="password" id="passwordInput" placeholder="Inserisci Password" onkeypress="gestisciInvio(event)">
+                <span class="toggle-password" onclick="mostraNascondiPassword()">👁️</span>
             </div>
-            <button onclick="verificaPassword()">Accedi ora</button>
-            <div id="messaggioErrore" style="color:red; font-size:13px; display:none; margin-top:15px;">Password non corretta.</div>
+            <button onclick="verificaPassword()">Accedi</button>
+            <div class="errore-login" id="messaggioErrore" style="color:red; font-size:13px; display:none; margin-top:10px;">Password errata.</div>
         </div>
     </div>
 
     <div id="main-content">
         <div class="navbar">
             <h1>PadreSergio Admin</h1>
-            <button style="background:none; border:1px solid white; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;" onclick="location.reload()">Esci</button>
+            <div class="user-profile">Gestione Check-in</div>
         </div>
 
         <div class="container">
             <div class="header-sezione">
-                <h2>Gestione Prenotazioni</h2>
-                <button style="padding: 10px 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; background: var(--colore-secondario); color: white;" onclick="caricaDati()">🔄 Aggiorna Lista</button>
+                <h2>Check-in Ricevuti</h2>
+                <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: var(--colore-secondario); color: white;" onclick="caricaDati()">🔄 Aggiorna Dati</button>
             </div>
             <div class="grid-prenotazioni" id="contenitore-schede"></div>
         </div>
@@ -94,7 +100,7 @@
     <div class="modal-overlay" id="dettagliModal">
         <div class="modal">
             <span class="chiudi-modal" onclick="chiudiModal('dettagliModal')">×</span>
-            <h2 style="color: var(--colore-principale); margin-top: 0;" id="modal-titolo">Dettagli Gruppo</h2>
+            <h2 style="color: var(--colore-principale); margin-top: 0;" id="modal-titolo">Dettagli Ospite</h2>
             <div id="contenuto-modale"></div>
         </div>
     </div>
@@ -103,26 +109,36 @@
         <div class="modal">
             <span class="chiudi-modal" onclick="chiudiModal('modificaModal')">×</span>
             <h2 style="color: var(--rosso-allerta); margin-top: 0;">✏️ Correggi Dati</h2>
+            <p style="font-size:13px; color:#666; margin-top:-10px;">Modifica i campi errati. Salvando, il check-in verrà automaticamente approvato.</p>
             
             <input type="hidden" id="edit-index">
-            <div class="campo-edit"><label>Nome Capogruppo</label><input type="text" id="edit-nome"></div>
-            <div class="campo-edit"><label>Cognome Capogruppo</label><input type="text" id="edit-cognome"></div>
+            
+            <div class="campo-edit"><label>Nome</label><input type="text" id="edit-nome"></div>
+            <div class="campo-edit"><label>Cognome</label><input type="text" id="edit-cognome"></div>
             <div class="campo-edit"><label>Documento (Tipo e Numero)</label><input type="text" id="edit-doc"></div>
             <div class="campo-edit"><label>Data di Nascita</label><input type="text" id="edit-nascita"></div>
             <div class="campo-edit"><label>Nazionalità</label><input type="text" id="edit-nazionalita"></div>
             <div class="campo-edit"><label>Residenza</label><input type="text" id="edit-residenza"></div>
+            
             <div class="campo-edit">
-                <label>Ospiti Extra (Dettagli)</label>
-                <textarea id="edit-ospitiExtra" rows="4" placeholder="Inserisci qui i dati degli altri ospiti..."></textarea>
+                <label>Ospiti Extra</label>
+                <textarea id="edit-ospitiExtra" rows="8" placeholder="Nessuno"></textarea>
             </div>
             
-            <button id="btnSalvaModifiche" onclick="salvaModifiche(event)" style="background:var(--rosso-allerta); color:white; width:100%; padding:15px; border:none; border-radius:6px; margin-top:10px; font-weight:bold; cursor:pointer;">💾 Salva e Approva</button>
+            <button onclick="salvaModifiche(event)" style="background:var(--rosso-allerta); color:white; width:100%; padding:15px; border:none; border-radius:5px; margin-top:15px; font-weight:bold; cursor:pointer;">💾 Salva e Approva</button>
         </div>
     </div>
 
     <script>
         const LINK_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec";
         let ospitiDatabase = []; 
+
+        function mostraNascondiPassword() {
+            const input = document.getElementById('passwordInput');
+            const icona = document.querySelector('.toggle-password');
+            if (input.type === 'password') { input.type = 'text'; icona.innerText = '🙈'; } 
+            else { input.type = 'password'; icona.innerText = '👁️'; }
+        }
 
         function verificaPassword() {
             if (document.getElementById('passwordInput').value === "PadreSergio26") {
@@ -138,7 +154,7 @@
 
         function caricaDati() {
             const contenitore = document.getElementById('contenitore-schede');
-            contenitore.innerHTML = '<div id="loading-message">Caricamento database in corso... ⏳</div>';
+            contenitore.innerHTML = '<div id="loading-message">Recupero dati dal database... ⏳</div>';
 
             fetch(LINK_GOOGLE_SCRIPT)
                 .then(response => response.json())
@@ -147,17 +163,18 @@
                     contenitore.innerHTML = ''; 
 
                     if(ospitiDatabase.length === 0) {
-                        contenitore.innerHTML = '<div id="loading-message">Nessuna prenotazione trovata.</div>';
+                        contenitore.innerHTML = '<div id="loading-message">Nessun check-in ricevuto al momento.</div>';
                         return;
                     }
 
                     ospitiDatabase.forEach((riga, index) => {
                         let statoAttuale = riga[13] || "Da Controllare";
+                        
                         let classeCard = "card";
                         let classeBadge = "badge attesa";
                         let bottoniAzione = "";
 
-                        // --- LOGICA BOTTONI (BLOCCO SE APPROVATO) ---
+                        // Controllo Nuove Funzioni: Tasti Attivi o Bloccati
                         if (statoAttuale === "Da Controllare") {
                             bottoniAzione = `
                                 <button class="btn-rifiuta" onclick="apriModifica(${index})">✏️ Correggi</button>
@@ -172,21 +189,23 @@
                             `;
                         }
 
+                        // Generazione HTML Vecchia Grafica + Info Ospiti Extra
                         const htmlScheda = `
-                            <div class="${classeCard}">
+                            <div class="${classeCard}" id="card-${index}">
                                 <div class="card-header">
                                     <h3 class="ospite-nome">${riga[4]} ${riga[5]}</h3>
-                                    <span class="${classeBadge}">${statoAttuale}</span>
+                                    <span class="${classeBadge}" id="badge-${index}">${statoAttuale}</span>
                                 </div>
                                 <div class="card-dettagli">
-                                    <div><strong>📅 Check-in:</strong> ${riga[1]}</div>
-                                    <div><strong>🏠 Persone:</strong> ${riga[3]}</div>
-                                    <div style="margin-top:8px; color:#5e7153; font-weight:bold;">
-                                        ${riga[3] > 1 ? '👥 Include ospiti extra' : '👤 Viaggiatore singolo'}
+                                    <div><strong>Arrivo:</strong> ${riga[1]}</div>
+                                    <div><strong>Partenza:</strong> ${riga[2]}</div>
+                                    <div><strong>Ospiti totali:</strong> ${riga[3]}</div>
+                                    <div style="margin-top:10px; color:var(--colore-principale); font-weight:bold;">
+                                        👥 Altri ospiti: ${riga[3] > 1 ? 'Sì (vedi dettagli)' : 'No'}
                                     </div>
                                 </div>
                                 <div class="btn-group">
-                                    <button class="btn-dettagli" onclick="apriDettagli(${index})">👁️ Foto e Info</button>
+                                    <button class="btn-dettagli" onclick="apriDettagli(${index})">👁️ Dettagli & Foto</button>
                                     ${bottoniAzione}
                                 </div>
                             </div>
@@ -194,28 +213,34 @@
                         contenitore.innerHTML += htmlScheda;
                     });
                 })
-                .catch(err => { contenitore.innerHTML = '<div id="loading-message" style="color:red;">Errore nel caricamento. Riprova.</div>'; });
+                .catch(errore => { contenitore.innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione.</div>'; });
         }
 
+        // GESTIONE MODALI
         function chiudiModal(id) { document.getElementById(id).style.display = 'none'; }
 
         function apriDettagli(index) {
             const riga = ospitiDatabase[index];
-            document.getElementById('modal-titolo').innerText = riga[4] + ' ' + riga[5];
+            document.getElementById('modal-titolo').innerText = 'Dettagli: ' + riga[4] + ' ' + riga[5];
             
-            let foto1 = riga[11] && riga[11].startsWith('http') ? `<a href="${riga[11]}" target="_blank" class="foto-doc-link">📷 Foto Fronte</a>` : '';
-            let foto2 = riga[12] && riga[12].startsWith('http') ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📷 Foto Retro</a>` : '';
+            let linkFronte = riga[11] !== "Non caricata" && riga[11] !== "" ? `<a href="${riga[11]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte</a>` : '';
+            let linkRetro = riga[12] !== "Non caricata" && riga[12] !== "" ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro</a>` : '';
 
+            // Visualizzazione classica ma con aggiunta degli ospiti extra
             document.getElementById('contenuto-modale').innerHTML = `
-                <div style="line-height:1.8;">
-                    <strong>Documento Capo:</strong> ${riga[6]}<br>
-                    <strong>Nascita:</strong> ${riga[8]} | <strong>Nazionalità:</strong> ${riga[9]}<br>
-                    <strong>Residenza:</strong> ${riga[10]}
-                    <div style="margin-top:20px; padding:15px; background:#f0f4f0; border-radius:8px; border-left:4px solid #5e7153;">
-                        <strong style="color:#5e7153;">👥 OSPITI EXTRA:</strong><br>
-                        <div style="white-space:pre-wrap; font-size:13px; margin-top:5px;">${riga[14] || 'Nessuno inserito.'}</div>
-                    </div>
-                    ${foto1} ${foto2}
+                <div class="sezione-dati">
+                    <p style="font-size: 14px; line-height: 1.6;">
+                        <strong>Documento:</strong> ${riga[6]}<br>
+                        <strong>Nato il:</strong> ${riga[8]}<br>
+                        <strong>Sesso:</strong> ${riga[7]}<br>
+                        <strong>Nazionalità:</strong> ${riga[9]}<br>
+                        <strong>Residenza:</strong> ${riga[10]}<br>
+                    </p>
+                    <hr style="border:0; border-top:1px solid #ccc; margin: 15px 0;">
+                    <strong>👥 OSPITI EXTRA:</strong><br>
+                    <pre style="font-family:inherit; white-space:pre-wrap; margin-top:5px; font-size:13px;">${riga[14] || 'Nessuno'}</pre>
+                    <hr style="border:0; border-top:1px solid #ccc; margin: 15px 0;">
+                    ${linkFronte} ${linkRetro}
                 </div>
             `;
             document.getElementById('dettagliModal').style.display = 'flex';
@@ -230,26 +255,28 @@
             document.getElementById('edit-nascita').value = riga[8];
             document.getElementById('edit-nazionalita').value = riga[9];
             document.getElementById('edit-residenza').value = riga[10];
-            document.getElementById('edit-ospitiExtra').value = riga[14] || "";
+            document.getElementById('edit-ospitiExtra').value = riga[14] || ""; // Campo ospiti extra precompilato
+            
             document.getElementById('modificaModal').style.display = 'flex';
         }
 
+        // SALVATAGGI AL DATABASE
         function approvaCheckin(index, event) {
-            const btn = event.target;
-            btn.innerText = "Invio..."; btn.disabled = true;
-            const rigaReale = ospitiDatabase.length - 1 - index;
+            const btn = event.target; 
+            btn.innerText = "Attendere..."; btn.disabled = true;
 
-            fetch(LINK_GOOGLE_SCRIPT, {
-                method: "POST",
-                body: JSON.stringify({ action: "updateStatus", row: rigaReale })
-            })
-            .then(() => caricaDati())
-            .catch(() => alert("Errore di rete."));
+            const rigaReale = ospitiDatabase.length - 1 - index;
+            const payload = { action: "updateStatus", row: rigaReale };
+
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
+            .then(() => caricaDati()) // Ricarica i dati per vedere l'aggiornamento grafico
+            .catch(err => { alert("Errore nel salvataggio."); btn.innerText = "✅ Approva"; btn.disabled = false; });
         }
 
         function salvaModifiche(event) {
-            const btn = document.getElementById('btnSalvaModifiche');
-            btn.innerText = "Salvataggio..."; btn.disabled = true;
+            const btn = event.target;
+            btn.innerText = "Salvataggio in corso... ⏳";
+            btn.disabled = true;
 
             const index = document.getElementById('edit-index').value;
             const rigaReale = ospitiDatabase.length - 1 - index;
@@ -263,19 +290,21 @@
                 nascita: document.getElementById('edit-nascita').value,
                 nazionalita: document.getElementById('edit-nazionalita').value,
                 residenza: document.getElementById('edit-residenza').value,
-                ospitiExtra: document.getElementById('edit-ospitiExtra').value
+                ospitiExtra: document.getElementById('edit-ospitiExtra').value // Salva ospiti extra
             };
 
-            fetch(LINK_GOOGLE_SCRIPT, {
-                method: "POST",
-                body: JSON.stringify(payload)
-            })
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
             .then(() => {
                 chiudiModal('modificaModal');
-                caricaDati();
-                btn.innerText = "💾 Salva e Approva"; btn.disabled = false;
+                caricaDati(); 
+                btn.innerText = "💾 Salva e Approva";
+                btn.disabled = false;
             })
-            .catch(() => { alert("Errore nel salvataggio."); btn.disabled = false; });
+            .catch(err => {
+                alert("Errore durante la modifica.");
+                btn.innerText = "💾 Salva e Approva";
+                btn.disabled = false;
+            });
         }
     </script>
 </body>
