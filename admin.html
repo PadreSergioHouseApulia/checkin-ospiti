@@ -16,7 +16,7 @@
             --giallo-attesa: #f39c12;
             --verde-ok: #27ae60;
             --rosso-allerta: #e74c3c;
-            --nero-blocco: #2c3e50; /* Unico colore aggiunto per il blocco */
+            --nero-blocco: #2c3e50; 
         }
 
         body { font-family: 'Arial', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo); margin: 0; padding: 0; }
@@ -62,7 +62,6 @@
         .sezione-dati { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #eee; }
         .foto-doc-link { display: inline-block; background: var(--colore-principale); color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; margin-right: 10px; margin-top: 10px; }
         
-        /* Stili per il Form di Modifica */
         .campo-edit { margin-bottom: 10px; }
         .campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 3px; }
         .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
@@ -299,20 +298,18 @@
 
             let csvRows = [];
             
-            // Funzione per pulire e rendere maiuscolo
             function pulisci(testo) {
                 if (!testo) return "";
                 return testo.trim().toUpperCase();
             }
 
-            // Converte data da AAAA-MM-GG a GG/MM/AAAA
             function formatData(d) {
                 if (!d) return "";
                 let p = d.split("-");
                 return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
             }
 
-	    function formatSesso(s) {
+            function formatSesso(s) {
                 if (!s) return "";
                 let sesso = s.trim().toUpperCase();
                 if (sesso.startsWith('M')) return "1";
@@ -324,24 +321,21 @@
             let checkout = formatData(riga[2]);
             let idGruppo = "1";
             
-            // --- 1. RIGA CAPOGRUPPO ---
-            // Seguiamo l'ordine: GROUP, NAME, SURNAME, CHECK-IN, CHECK-OUT, AMOUNT PAID, LICENSE
+            // LA VIRGOLA MANCANTE ERA QUI SOTTO: dopo CODICE_LICENZA
             let rowCapo = [
                 idGruppo, 
-                pulisci(riga[4]), // NAME
-                pulisci(riga[5]), // SURNAME
-                checkin,          // CHECK-IN
-                checkout,         // CHECK-OUT
-                "",               // AMOUNT PAID (vuoto come da tuo esempio)
-                CODICE_LICENZA    // STRUCTURE LICENSE
-		formatSesso(riga[7]), // GENDER (1 o 2)
-                formatData(riga[8])   // DATE OF BIRTH
+                pulisci(riga[4]), 
+                pulisci(riga[5]), 
+                checkin,          
+                checkout,         
+                "",               
+                CODICE_LICENZA,   
+                formatSesso(riga[7]), 
+                formatData(riga[8])   
             ];
             
-            // Aggiungiamo la virgola finale come richiesto dal tuo esempio
-            csvRows.push(rowCapo.join(",") + ",");
+            csvRows.push(rowCapo.join(","));
             
-            // --- 2. RIGHE OSPITI EXTRA ---
             let extraStr = riga[15] || "";
             if (extraStr.includes("--- OSPITE")) {
                 let blocchi = extraStr.split("--- OSPITE").slice(1);
@@ -367,7 +361,6 @@
                 });
             }
 
-            // Creazione del file con codifica UTF-8
             const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -383,7 +376,7 @@
 
             const index = document.getElementById('edit-index').value;
             const rigaReale = ospitiDatabase.length - 1 - index;
-            const rigaOriginale = ospitiDatabase[index]; // Prendiamo i dati vecchi (come le date di arrivo/partenza)
+            const rigaOriginale = ospitiDatabase[index]; 
 
             const payload = {
                 action: "editDati",
@@ -398,7 +391,6 @@
                 ospitiExtra: document.getElementById('edit-ospitiExtra').value
             };
 
-            // Creiamo un pacchetto "misto" con i dati vecchi intatti e le tue nuove correzioni pronte per il CSV
             let rigaAggiornata = [...rigaOriginale];
             rigaAggiornata[4] = payload.nome;
             rigaAggiornata[5] = payload.cognome;
@@ -409,7 +401,6 @@
 
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
             .then(() => {
-                // IL MAGICO COMANDO AGGIUNTO: Genera il CSV con i dati appena corretti!
                 generaCSVCompleto(rigaAggiornata); 
                 
                 chiudiModal('modificaModal');
