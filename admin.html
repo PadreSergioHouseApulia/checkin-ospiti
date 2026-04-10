@@ -295,7 +295,7 @@
 
         function generaCSVCompleto(riga) {
             // Inserisci qui il tuo codice licenza esatto
-            const CODICE_LICENZA = "BA000982-0018"; 
+            const CODICE_LICENZA = "SLBA000982-0018"; 
 
             let csvRows = [];
             
@@ -312,9 +312,17 @@
                 return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
             }
 
+	    function formatSesso(s) {
+                if (!s) return "";
+                let sesso = s.trim().toUpperCase();
+                if (sesso.startsWith('M')) return "1";
+                if (sesso.startsWith('F')) return "2";
+                return "";
+            }
+
             let checkin = formatData(riga[1]);
             let checkout = formatData(riga[2]);
-            let idGruppo = "1"; // ID raggruppamento (di solito 1 per la stessa prenotazione)
+            let idGruppo = "1";
             
             // --- 1. RIGA CAPOGRUPPO ---
             // Seguiamo l'ordine: GROUP, NAME, SURNAME, CHECK-IN, CHECK-OUT, AMOUNT PAID, LICENSE
@@ -326,6 +334,8 @@
                 checkout,         // CHECK-OUT
                 "",               // AMOUNT PAID (vuoto come da tuo esempio)
                 CODICE_LICENZA    // STRUCTURE LICENSE
+		formatSesso(riga[7]), // GENDER (1 o 2)
+                formatData(riga[8])   // DATE OF BIRTH
             ];
             
             // Aggiungiamo la virgola finale come richiesto dal tuo esempio
@@ -338,6 +348,9 @@
                 blocchi.forEach(blocco => {
                     let cognome = blocco.match(/Cognome: (.*)/)?.[1] || "";
                     let nome = blocco.match(/Nome: (.*)/)?.[1] || "";
+                    let sesso = blocco.match(/Sesso: (.*)/)?.[1] || "";
+                    let nascitaMatch = blocco.match(/Nascita: (.*?) a (.*)/);
+                    let dataNascita = nascitaMatch?.[1] || "";
                     
                     let rowExtra = [
                         idGruppo, 
@@ -346,13 +359,15 @@
                         checkin, 
                         checkout, 
                         "", 
-                        CODICE_LICENZA
+                        CODICE_LICENZA,
+                        formatSesso(sesso),
+                        formatData(dataNascita.trim())
                     ];
-                    csvRows.push(rowExtra.join(",") + ",");
+                    csvRows.push(rowExtra.join(","));
                 });
             }
 
-            // Creazione del file
+            // Creazione del file con codifica UTF-8
             const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
