@@ -245,7 +245,36 @@
             </div>
             
             <label><span class="it">Luogo rilascio documento *</span><span class="en">Place of Issue (City or Country) *</span></label>
-            <input type="text" name="rilascioDoc" required placeholder="...">
+            <select name="rilascioDoc" required>
+    <option value="" disabled selected>-- Select --</option>
+    <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+</select>
             
             <div style="background: rgba(94, 113, 83, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; border: 1px dashed var(--colore-principale);">
                 <label style="color: var(--colore-principale); font-size: 15px; margin-top: 0;">
@@ -311,7 +340,36 @@
 </div>
             </div>
             <label><span class="it">Luogo di residenza *</span><span class="en">Home Address *</span></label>
-            <input type="text" name="residenzaCapo" required>
+            <select name="residenzaCapo" required>
+    <option value="" disabled selected>-- Select --</option>
+    <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+</select>
         </div>
 
         <div class="section" id="sezioneOspitiExtra" style="display:none;">
@@ -382,21 +440,73 @@
                         <div><label><span class="it">Data di nascita</span><span class="en">Date of Birth</span></label><input type="date" name="nascita_${i}" required></div>
                     </div>
                     <div class="grid">
-                        <div><label><span class="it">Luogo di nascita</span><span class="en">Place of Birth</span></label><input type="text" name="luogoNascita_${i}" required></div>
-                        <div>
-    <label><span class="it">Nazionalità</span><span class="en">Nationality</span></label>
-    <select name="nazionalita_${i}" required>
-        <option value="" disabled selected>-- Select --</option>
-        <option value="ITALIA">ITALIA / ITALY</option>
-        <option value="FRANCIA">FRANCIA / FRANCE</option>
-        <option value="GERMANIA">GERMANIA / GERMANY</option>
-        <option value="SPAGNA">SPAGNA / SPAIN</option>
-        <option value="REGNO UNITO">REGNO UNITO / UK</option>
-        <option value="STATI UNITI">STATI UNITI / USA</option>
-        <option value="ALTRO">ALTRO / OTHER</option>
-    </select>
+    <div>
+        <label><span class="it">Luogo di nascita</span><span class="en">Place of Birth (Country)</span></label>
+        <select name="luogoNascita_${i}" required>
+            <option value="" disabled selected>-- Select --</option>
+            <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+        </select>
+    </div>
+    <div>
+        <label><span class="it">Nazionalità</span><span class="en">Nationality</span></label>
+        <select name="nazionalita_${i}" required>
+            <option value="" disabled selected>-- Select --</option>
+            <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+        </select>
+    </div>
 </div>
-                    </div>
                 </div>`;
             }
             container.innerHTML = htmlGenerato;
