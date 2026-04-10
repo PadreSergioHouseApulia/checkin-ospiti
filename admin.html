@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | PadreSergio House</title>
     <link rel="icon" type="image/x-icon" href="icona admin.ico">
+
     <style>
         :root {
             --colore-principale: #5e7153; 
@@ -293,12 +294,38 @@
         }
 
         function generaCSVCompleto(riga) {
-            let csvRows = ["Arrivo;Partenza;Cognome;Nome;Sesso;DataNascita;LuogoNascita;Cittadinanza"];
+            const CODICE_LICENZA = "BA000982-0018"; 
+
+            let csvRows = [];
             
-            // 1. Riga Capogruppo
-            csvRows.push(`${riga[1]};${riga[2]};${riga[5]};${riga[4]};${riga[7]};${riga[8]};${riga[9]};${riga[10]}`);
+            // PayTourist vuole le date in formato GG/MM/AAAA
+            function formatData(d) {
+                if (!d) return "";
+                let p = d.split("-");
+                return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+            }
+
+            // PayTourist vuole 1 per Maschio e 2 per Femmina
+            function formatSesso(s) {
+                if (!s) return "";
+                if (s.toLowerCase().startsWith('m')) return "1";
+                if (s.toLowerCase().startsWith('f')) return "2";
+                return "";
+            }
+
+            let checkin = formatData(riga[1]);
+            let checkout = formatData(riga[2]);
+            let idGruppo = "1"; // Identifica che queste persone viaggiano insieme
             
-            // 2. Righe Ospiti Extra
+            // 1. COMPILA RIGA CAPOGRUPPO
+            let rowCapo = [
+                idGruppo, riga[4], riga[5], checkin, checkout, "", 
+                CODICE_LICENZA, formatSesso(riga[7]), formatData(riga[8]), 
+                "", "", "", riga[9], "", riga[11], riga[10]
+            ];
+            csvRows.push(rowCapo.join(","));
+            
+            // 2. COMPILA RIGHE OSPITI EXTRA
             let extraStr = riga[15] || "";
             if (extraStr.includes("--- OSPITE")) {
                 let blocchi = extraStr.split("--- OSPITE").slice(1);
@@ -311,15 +338,21 @@
                     let luogoNascita = nascitaMatch?.[2] || "";
                     let nazionalita = blocco.match(/Nazionalità: (.*)/)?.[1] || "";
                     
-                    csvRows.push(`${riga[1]};${riga[2]};${cognome.trim()};${nome.trim()};${sesso.trim()};${dataNascita.trim()};${luogoNascita.trim()};${nazionalita.trim()}`);
+                    let rowExtra = [
+                        idGruppo, nome.trim(), cognome.trim(), checkin, checkout, "", 
+                        CODICE_LICENZA, formatSesso(sesso.trim()), formatData(dataNascita.trim()), 
+                        "", "", "", luogoNascita.trim(), "", "", nazionalita.trim()
+                    ];
+                    csvRows.push(rowExtra.join(","));
                 });
             }
 
-            const blob = new Blob(["\ufeff" + csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            // PayTourist richiede la codifica UTF-8 base
+            const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = `Checkin_${riga[5]}.csv`;
+            link.download = `PayTourist_${riga[5]}.csv`;
             link.click();
         }
 
