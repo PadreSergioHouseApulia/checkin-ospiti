@@ -2,247 +2,575 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta property="og:title" content="B&B PadreSergio House Apulia - Soggiorno Indimenticabile">
-    <meta property="og:description" content="Vieni a trovarci nella città di Monopoli. Camere accoglienti, colazione inclusa e wifi gratuito. Prenota ora!">
-    <meta property="og:image:alt" content="https://padresergiohouseapulia.github.io/Padresergio_Web/anteprima.jpg">
-    <meta property="og:url" content="https://padresergiohouseapulia.github.io/Padresergio_Web/">
-    <meta property="og:type" content="website">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PadreSergio House Apulia | B&B di Charme</title>
-    <link rel="icon" type="image/x-icon" href="icona.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Check-in Online | PadreSergio House Apulia</title>
+    <link rel="icon" type="image/x-icon" href="Icona.ico">
 
     <style>
-        /* COLORI E STILI BASE */
         :root {
-            --verde-primario: #5e7153;
-            --verde-chiaro: #8c9c83;
-            --crema-sfondo: #faf9f6;
-            --testo-scuro: #333333;
-            --testo-chiaro: #666666;
+            --colore-principale: #5e7153; 
+            --colore-secondario: #8c9c83; 
+            --colore-testo: #3e3e3e;      
+            --colore-box-semi: rgba(255, 255, 255, 0.96); 
+            --colore-bordi: #dcdcdc;       
         }
 
-        body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: var(--crema-sfondo); color: var(--testo-scuro); overflow-x: hidden; }
-        h1, h2, h3 { font-family: 'Georgia', serif; font-weight: normal; margin: 0; }
-        a { text-decoration: none; color: inherit; }
-        
-        /* BARRA DI NAVIGAZIONE */
-        header { background-color: white; padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .logo { font-size: 24px; font-family: 'Georgia', serif; color: var(--verde-primario); font-weight: bold; }
-        .nav-links { display: flex; gap: 25px; }
-        .nav-links a { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--verde-primario); }
-        .btn-nav { background-color: var(--verde-primario); color: white !important; padding: 8px 15px; border-radius: 4px; font-weight: bold; }
-
-        /* SEZIONE COPERTINA (HERO) */
-        .hero { 
-            height: 80vh; 
-            /* Sostituisci questo link con l'URL di una tua foto di copertina */
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('foto_copertina.jpg'); 
-            background-size: cover; background-position: center; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 0 20px;
-        }
-        .hero h1 { font-size: 50px; margin-bottom: 15px; letter-spacing: 2px; }
-        .hero p { font-size: 20px; margin-bottom: 30px; font-weight: 300; max-width: 600px; }
-        .btn-prenota { background-color: white; color: var(--verde-primario); padding: 15px 30px; font-size: 16px; font-weight: bold; text-transform: uppercase; border-radius: 5px; transition: 0.3s; }
-        .btn-prenota:hover { background-color: var(--verde-primario); color: white; }
-
-        /* SEZIONI GENERICHE */
-        .sezione { padding: 80px 5%; text-align: center; max-width: 1200px; margin: 0 auto; }
-        .sezione-titolo { font-size: 36px; color: var(--verde-primario); margin-bottom: 20px; }
-        .sezione-desc { font-size: 16px; color: var(--testo-chiaro); line-height: 1.8; max-width: 800px; margin: 0 auto 50px auto; }
-
-        /* SERVIZI */
-        .griglia-servizi { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
-        .servizio-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .servizio-icona { font-size: 40px; margin-bottom: 15px; }
-
-        /* GALLERIA FOTOGRAFICA */
-        .griglia-foto { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
-        .foto { 
-    width: 100%; 
-    height: 300px; /* Altezza fissa per tutte */
-    object-fit: cover; /* Taglia le foto senza schiacciarle */
-    border-radius: 5px; 
-    transition: transform 0.3s; 
-}
-        .foto:hover { transform: scale(1.03); }
-
-        /* MAPPA E CONTATTI */
-        .mappa-container { width: 100%; height: 400px; background-color: #eee; margin-top: 40px; border-radius: 8px; overflow: hidden; }
-        
-        /* FOOTER */
-        footer { background-color: var(--verde-primario); color: white; text-align: center; padding: 40px 20px; margin-top: 50px; }
-        footer p { margin: 10px 0; opacity: 0.8; font-size: 14px; }
-
-        /* RESPONSIVE PER CELLULARI */
-        @media (max-width: 768px) {
-            .nav-links { display: none; /* In una versione avanzata potremmo aggiungere un menu ad hamburger */ }
-            .hero h1 { font-size: 36px; }
-            .sezione { padding: 50px 20px; }
-        }
-	/* --- EFFETTO LIGHTBOX (FOTO INGRANDITE) --- */
-        .foto { 
-            cursor: pointer; /* Fa comparire la manina quando passi sulla foto */
+        body { 
+            font-family: 'Arial', sans-serif;
+            background-image: url('Foto sfondo.jpg');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-color: #f0f4f8;
+            padding: 40px 20px; 
+            color: var(--colore-testo); 
+            line-height: 1.6; 
+            margin: 0;
+            min-height: 100vh;
         }
         
-        .lightbox {
-            display: none; /* Nascosto di default */
-            position: fixed;
-            z-index: 2000; /* Lo fa stare sopra a tutto il resto */
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9); /* Sfondo nero semitrasparente */
-            justify-content: center;
-            align-items: center;
+        .container { 
+            max-width: 850px; 
+            margin: 0 auto;
+            background: var(--colore-box-semi); 
+            border-radius: 12px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            overflow: hidden; 
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
         }
-        
-        .lightbox-img {
-            max-width: 90%;
-            max-height: 90vh;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            animation: zoomIn 0.3s ease; /* Piccolo effetto di entrata */
-        }
-        
-        .chiudi-lightbox {
+
+        /* SISTEMA MULTILINGUA */
+        .en { display: none; }
+        body.lang-en .it { display: none !important; }
+        body.lang-en .en { display: inline !important; }
+
+        /* PULSANTI LINGUA */
+        .lang-switch {
             position: absolute;
             top: 20px;
-            right: 35px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
+            right: 20px;
+            z-index: 20;
+            display: flex;
+            gap: 10px;
+        }
+        .lang-switch button {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: 0.2s;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            width: auto;
+            margin: 0;
+            text-transform: none;
+        }
+        .lang-switch button.active {
+            background: var(--colore-principale);
+            color: white;
+            border-color: var(--colore-principale);
         }
         
-        .chiudi-lightbox:hover { color: var(--verde-chiaro); }
+        .header-img {
+            background-image: url('Foto copertina.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 250px;
+            width: 100%;
+            position: relative;
+        }
+
+        .header-img::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .header-content { 
+            position: absolute; 
+            bottom: 20px; 
+            left: 30px; 
+            z-index: 10; 
+            color: white; 
+        }
         
-        @keyframes zoomIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        h1 { 
+            margin: 0; 
+            font-size: 30px; 
+            font-family: 'Georgia', serif;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+        }
+
+        .intro-text {
+            padding: 20px;
+            text-align: center;
+            color: #555;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 15px;
+        }
+
+        h2 { 
+            color: var(--colore-principale); 
+            margin-top: 30px; 
+            border-bottom: 1px solid var(--colore-secondario); 
+            padding-bottom: 10px; 
+            font-weight: normal;
+            font-family: 'Georgia', serif;
+            font-size: 22px;
+        }
+        
+        .section { padding: 10px 40px 30px 40px; }
+        
+        label { 
+            display: block; 
+            margin-top: 18px; 
+            font-size: 13px; 
+            color: #666; 
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        
+        input, select { 
+            width: 100%; 
+            padding: 14px; 
+            border: 1px solid var(--colore-bordi); 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            background-color: #fff;
+            -webkit-appearance: none; 
+        }
+        
+        input[type="file"] {
+            padding: 10px;
+            font-size: 14px;
+            background-color: #f9fbf8;
+            border: 1px dashed var(--colore-principale);
+            cursor: pointer;
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .extra-guest { 
+            background-color: rgba(94, 113, 83, 0.05); 
+            padding: 20px; 
+            border-left: 4px solid var(--colore-secondario); 
+            margin-top: 20px; 
+            border-radius: 4px;
+        }
+        
+        button { 
+            background-color: var(--colore-principale); 
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 6px; 
+            width: 100%; 
+            margin-top: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #ospitiAggiuntiviContainer { margin-bottom: 20px; }
+
+        @media (max-width: 600px) { 
+            body { padding: 10px; }
+            .grid { grid-template-columns: 1fr; gap: 5px; }
+            .section { padding: 10px 20px 25px 20px; }
+            .header-img { height: 160px; }
+            .header-content { left: 20px; bottom: 15px; }
+            h1 { font-size: 24px; }
+            .intro-text { font-size: 14px; padding: 15px; }
+            .lang-switch { top: 10px; right: 10px; }
+            .lang-switch button { padding: 6px 8px; font-size: 12px; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">PadreSergio House</div>
-        <nav class="nav-links">
-            <a href="#struttura">La Struttura</a>
-            <a href="#galleria">Galleria</a>
-            <a href="#dovesiamo">Dove Siamo</a>
-            <a href="https://padresergiohouseapulia.github.io/checkin-ospiti/" target="_blank" class="btn-nav">Check-in Online</a>
-        </nav>
-    </header>
-
-    <section class="hero">
-        <h1>Benvenuti in Apulia</h1>
-        <p>Un'oasi di relax e charme per le tue vacanze indimenticabili, a due passi dalle bellezze della nostra terra.</p>
-        <a href="https://www.airbnb.it/rooms/660983193087442876?" target="_blank" class="btn-prenota">Prenota Ora</a>
-    </section>
-
-    <section id="struttura" class="sezione">
-        <h2 class="sezione-titolo">Il tuo rifugio perfetto</h2>
-        <p class="sezione-desc">PadreSergio House è stata pensata per offrire il massimo del comfort unito all'autentica ospitalità pugliese. Spazi luminosi, dettagli curati e un'atmosfera calda ti faranno sentire subito a casa.</p>
-        
-        <div class="griglia-servizi">
-            <div class="servizio-card">
-                <div class="servizio-icona">📶</div>
-                <h3>Wi-Fi Veloce</h3>
-                <p style="color:var(--testo-chiaro); font-size:14px;">Connessione gratuita in tutta la struttura per navigare o lavorare.</p>
-            </div>
-            <div class="servizio-card">
-                <div class="servizio-icona">❄️</div>
-                <h3>Aria Condizionata</h3>
-                <p style="color:var(--testo-chiaro); font-size:14px;">Ambienti sempre freschi e climatizzati per il massimo riposo.</p>
-            </div>
-            <div class="servizio-card">
-                <div class="servizio-icona">🅿️</div>
-                <h3>Parcheggio</h3>
-                <p style="color:var(--testo-chiaro); font-size:14px;">Posto auto comodo e sicuro a pochi passi dall'ingresso.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="galleria" class="sezione" style="background-color: white;">
-        <h2 class="sezione-titolo">Galleria</h2>
-        <p class="sezione-desc">Scopri in anteprima gli spazi che ti accoglieranno.</p>
-        
-        <div class="griglia-foto">
-            <img src="foto_giardino.jpg" alt="Giardino" class="foto">
-            <img src="foto_ingresso_esterno.jpg" alt="Ingresso esterno" class="foto">
-            <img src="foto_ingresso_interno.jpg" alt="Ingresso interno" class="foto">
-            <img src="prima_camera_da_letto_n_1.jpg" alt="Prima camera" class="foto">
-            <img src="prima_camera_da_letto_n_2.jpg" alt="Prima camera" class="foto">
-            <img src="prima_camera_da_letto_n_3.jpg" alt="Prima camera" class="foto">
-            <img src="seconda_camera_da_letto_n_1.jpg" alt="Seconda camera" class="foto">
-            <img src="seconda_camera_da_letto_n_2.jpg" alt="Seconda camera" class="foto">
-            <img src="seconda_camera_da_letto_n_3.jpg" alt="Seconda camera" class="foto">
-            <img src="bagno_n_1.jpg" alt="Bagno" class="foto">
-            <img src="bagno_n_2.jpg" alt="Bagno" class="foto">
-            <img src="bagno_n_3.jpg" alt="Bagno" class="foto">
-            <img src="bagno_n_4.jpg" alt="Bagno" class="foto">
-        </div>
-    </section>
-
-    <section id="dovesiamo" class="sezione">
-        <h2 class="sezione-titolo">Dove Siamo</h2>
-        <p class="sezione-desc">Ci troviamo in una posizione strategica per esplorare le meraviglie del territorio.</p>
-        
-        <div class="mappa-container">
-    <iframe 
-        src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d744.6458046547098!2d17.2205409!3d40.9191685!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1347b56b7fa24647%3A0x4149e0b036b7bcc8!2sPadresergio%20house%20Apulia!5e1!3m2!1sit!2sit!4v1775743901566!5m2!1sit!2sit" 
-        width="100%" 
-        height="100%" 
-        style="border:0;" 
-        allowfullscreen="" 
-        loading="lazy" 
-        referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
-</div>
-    </section>
-
-    <footer>
-        <h2 style="margin-bottom: 10px;">PadreSergio House Apulia</h2>
-        <p>Contrada Padresergio, Monopoli (BA) - Italia</p>
-        <p>Email: padresergiohouse@gmail.com | Tel: +39 3384699286</p>
-        <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
-            <p>&copy; 2026 PadreSergio House. Tutti i diritti riservati.</p>
-        </div>
-    </footer>
-	<div id="lightbox" class="lightbox">
-        <span class="chiudi-lightbox" onclick="chiudiLightbox()">&times;</span>
-        <img class="lightbox-img" id="lightbox-img" src="">
+<div class="container">
+    
+    <div class="lang-switch">
+        <button type="button" id="btn-it" class="active" onclick="cambiaLingua('it')">🇮🇹 ITA</button>
+        <button type="button" id="btn-en" onclick="cambiaLingua('en')">🇬🇧 ENG</button>
     </div>
-	<script>
-        // Trova tutte le foto e il lightbox
-        const fotoGalleria = document.querySelectorAll('.foto');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
 
-        // Quando clicchi su una foto, aprila nel lightbox
-        fotoGalleria.forEach(foto => {
-            foto.addEventListener('click', function() {
-                lightbox.style.display = 'flex';
-                lightboxImg.src = this.src; // Prende l'immagine esatta che hai cliccato
-            });
-        });
+    <div class="header-img">
+        <div class="header-content">
+            <h1>PadreSergio House Apulia</h1>
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Fast Check-in Online</div>
+        </div>
+    </div>
 
-        // Funzione per chiudere con la X
-        function chiudiLightbox() {
-            lightbox.style.display = 'none';
+    <div class="intro-text">
+        <span class="it">Benvenuti! Inserite i vostri dati personali e allegate le foto del documento d'identità per completare il check-in online.</span>
+        <span class="en">Welcome! Please enter your details and upload the photos of your ID document to complete the online check-in.</span>
+    </div>
+
+    <form id="checkinForm">
+        
+        <div class="section">
+            <h2><span class="it">1. Prenotazione</span><span class="en">1. Booking</span></h2>
+            <div class="grid">
+                <div><label><span class="it">Data Arrivo *</span><span class="en">Arrival Date *</span></label><input type="date" name="checkin" required></div>
+                <div><label><span class="it">Data Partenza *</span><span class="en">Departure Date *</span></label><input type="date" name="checkout" required></div>
+            </div>
+            <label><span class="it">Numero totale di ospiti *</span><span class="en">Total number of guests *</span></label>
+            <input type="number" id="numPersone" name="numPersone" min="1" max="10" value="1" required onchange="generaOspiti()">
+        </div>
+
+        <div class="section">
+            <h2><span class="it">2. Dati Capogruppo</span><span class="en">2. Main Guest</span></h2>
+            <div class="grid">
+                <div><label><span class="it">Nome *</span><span class="en">First Name *</span></label><input type="text" name="nomeCapo" required></div>
+                <div><label><span class="it">Cognome *</span><span class="en">Last Name *</span></label><input type="text" name="cognomeCapo" required></div>
+            </div>
+            <div class="grid">
+                <div>
+                    <label><span class="it">Tipo documento *</span><span class="en">Document Type *</span></label>
+                    <select name="tipoDocCapo" required>
+                        <option value="CARTA D'IDENTITA">Carta d'Identità / ID Card</option>
+                        <option value="PASSAPORTO">Passaporto / Passport</option>
+                        <option value="PATENTE">Patente / Driving License</option>
+                    </select>
+                </div>
+                <div><label><span class="it">Numero documento *</span><span class="en">Document Number *</span></label><input type="text" name="numDocCapo" required></div>
+            </div>
+            
+            <label><span class="it">Luogo rilascio documento *</span><span class="en">Place of Issue (City or Country) *</span></label>
+            <select name="rilascioDoc" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
+    <option value="" disabled selected>-- Select --</option>
+    <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+</select>
+            
+            <div style="background: rgba(94, 113, 83, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; border: 1px dashed var(--colore-principale);">
+                <label style="color: var(--colore-principale); font-size: 15px; margin-top: 0;">
+                    <span class="it">📸 Foto del Documento (Obbligatorio)</span>
+                    <span class="en">📸 Document Photos (Mandatory)</span>
+                </label>
+                <div class="grid" style="margin-top: 10px;">
+                    <div>
+                        <label style="margin-top:0"><span class="it">Fronte *</span><span class="en">Front *</span></label>
+                        <input type="file" name="foto_documento_fronte" accept="image/*" required>
+                    </div>
+                    <div>
+                        <label style="margin-top:0"><span class="it">Retro *</span><span class="en">Back *</span></label>
+                        <input type="file" name="foto_documento_retro" accept="image/*" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid">
+                <div>
+                    <label><span class="it">Sesso *</span><span class="en">Gender *</span></label>
+                    <select name="sessoCapo" required>
+                        <option value="Femmina">Femmina / Female</option>
+                        <option value="Maschio">Maschio / Male</option>
+                    </select>
+                </div>
+                <div><label><span class="it">Data di nascita *</span><span class="en">Date of Birth *</span></label><input type="date" name="nascitaCapo" required></div>
+            </div>
+            <div class="grid">
+                <div><label><span class="it">Luogo di nascita *</span><span class="en">Place of Birth *</span></label><input type="text" name="luogoNascita" required></div>
+                <div>
+    <label><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
+    <select name="cittadinanza" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
+        <option value="" disabled selected>-- Select --</option>
+        <option value="ITALIA">ITALIA / ITALY</option>
+        <option value="ALBANIA">ALBANIA</option>
+        <option value="ARGENTINA">ARGENTINA</option>
+        <option value="AUSTRIA">AUSTRIA</option>
+        <option value="BELGIO">BELGIO / BELGIUM</option>
+        <option value="BRASILE">BRASILE / BRAZIL</option>
+        <option value="CANADA">CANADA</option>
+        <option value="CINA">CINA / CHINA</option>
+        <option value="CROAZIA">CROAZIA / CROATIA</option>
+        <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+        <option value="FRANCIA">FRANCIA / FRANCE</option>
+        <option value="GERMANIA">GERMANIA / GERMANY</option>
+        <option value="GRECIA">GRECIA / GREECE</option>
+        <option value="IRLANDA">IRLANDA / IRELAND</option>
+        <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+        <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+        <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+        <option value="POLONIA">POLONIA / POLAND</option>
+        <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+        <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+        <option value="ROMANIA">ROMANIA</option>
+        <option value="SPAGNA">SPAGNA / SPAIN</option>
+        <option value="STATI UNITI">STATI UNITI / USA</option>
+        <option value="SVEZIA">SVEZIA / SWEDEN</option>
+        <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+        <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+        <option value="ALTRO">ALTRO / OTHER</option>
+    </select>
+</div>
+            </div>
+            <label><span class="it">Luogo di residenza *</span><span class="en">Home Address *</span></label>
+            <select name="residenzaCapo" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
+    <option value="" disabled selected>-- Select --</option>
+    <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+</select>
+        </div>
+
+        <div class="section" id="sezioneOspitiExtra" style="display:none;">
+            <h2><span class="it">3. Altri Ospiti</span><span class="en">3. Other Guests</span></h2>
+            <div id="ospitiAggiuntiviContainer"></div>
+        </div>
+
+        <div class="section">
+            <label style="display:flex; align-items:flex-start; font-weight: normal; text-transform: none; line-height: 1.4; cursor: pointer;">
+                <input type="checkbox" name="privacy" required style="width:24px; height:24px; margin-right:12px; margin-top: 2px; -webkit-appearance: auto; appearance: auto;">
+                <span class="it">Accetto il trattamento dei dati personali e dei documenti allegati per fini di legge (Alloggiati Web).</span>
+                <span class="en">I accept the processing of personal data and attached documents for legal purposes (Italian Police Registration).</span>
+            </label>
+            
+            <button type="button" onclick="inviaDatiSicuri()" id="btnInvia">
+                <span class="it">INVIA DATI CHECK-IN</span>
+                <span class="en">SUBMIT CHECK-IN</span>
+            </button>
+            <div id="loadingMsg" style="display:none; text-align:center; color:var(--colore-principale); font-weight:bold; margin-top:15px;">
+                Invio in corso, attendere... (potrebbe richiedere qualche secondo)
+            </div>
+        </div>
+    </form>
+    </div>
+
+<script>
+    function cambiaLingua(lang) {
+        if(lang === 'en') {
+            document.body.classList.add('lang-en');
+            document.getElementById('btn-en').classList.add('active');
+            document.getElementById('btn-it').classList.remove('active');
+        } else {
+            document.body.classList.remove('lang-en');
+            document.getElementById('btn-it').classList.add('active');
+            document.getElementById('btn-en').classList.remove('active');
+        }
+    }
+
+    function generaOspiti() {
+        const num = parseInt(document.getElementById('numPersone').value);
+        const container = document.getElementById('ospitiAggiuntiviContainer');
+        const sezione = document.getElementById('sezioneOspitiExtra');
+        
+        container.innerHTML = ''; 
+        
+        if (num > 1) {
+            sezione.style.display = 'block';
+            let htmlGenerato = ''; 
+            
+            for (let i = 2; i <= num; i++) {
+                htmlGenerato += `
+                <div class="extra-guest">
+                    <strong style="color:var(--colore-principale); font-size: 18px;">
+                        <span class="it">Ospite ${i}</span><span class="en">Guest ${i}</span>
+                    </strong>
+                    <div class="grid">
+                        <div><label><span class="it">Nome</span><span class="en">First Name</span></label><input type="text" name="nome_${i}" required></div>
+                        <div><label><span class="it">Cognome</span><span class="en">Last Name</span></label><input type="text" name="cognome_${i}" required></div>
+                    </div>
+                    <div class="grid">
+                        <div>
+                            <label><span class="it">Sesso</span><span class="en">Gender</span></label>
+                            <select name="sesso_${i}">
+                                <option value="Femmina">Femmina / Female</option>
+                                <option value="Maschio">Maschio / Male</option>
+                            </select>
+                        </div>
+                        <div><label><span class="it">Data di nascita</span><span class="en">Date of Birth</span></label><input type="date" name="nascita_${i}" required></div>
+                    </div>
+                    <div class="grid">
+    <div>
+        <label><span class="it">Luogo di nascita</span><span class="en">Place of Birth (Country)</span></label>
+        <select name="luogoNascita_${i}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
+            <option value="" disabled selected>-- Select --</option>
+            <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+        </select>
+    </div>
+    <div>
+        <label><span class="it">Nazionalità</span><span class="en">Nationality</span></label>
+        <select name="nazionalita_${i}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
+            <option value="" disabled selected>-- Select --</option>
+            <option value="ITALIA">ITALIA / ITALY</option>
+    <option value="ALBANIA">ALBANIA</option>
+    <option value="ARGENTINA">ARGENTINA</option>
+    <option value="AUSTRIA">AUSTRIA</option>
+    <option value="BELGIO">BELGIO / BELGIUM</option>
+    <option value="BRASILE">BRASILE / BRAZIL</option>
+    <option value="CANADA">CANADA</option>
+    <option value="CINA">CINA / CHINA</option>
+    <option value="CROAZIA">CROAZIA / CROATIA</option>
+    <option value="DANIMARCA">DANIMARCA / DENMARK</option>
+    <option value="FRANCIA">FRANCIA / FRANCE</option>
+    <option value="GERMANIA">GERMANIA / GERMANY</option>
+    <option value="GRECIA">GRECIA / GREECE</option>
+    <option value="IRLANDA">IRLANDA / IRELAND</option>
+    <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
+    <option value="NORVEGIA">NORVEGIA / NORWAY</option>
+    <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
+    <option value="POLONIA">POLONIA / POLAND</option>
+    <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
+    <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
+    <option value="ROMANIA">ROMANIA</option>
+    <option value="SPAGNA">SPAGNA / SPAIN</option>
+    <option value="STATI UNITI">STATI UNITI / USA</option>
+    <option value="SVEZIA">SVEZIA / SWEDEN</option>
+    <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
+    <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
+    <option value="ALTRO">ALTRO / OTHER</option>
+        </select>
+    </div>
+</div>
+                </div>`;
+            }
+            container.innerHTML = htmlGenerato;
+        } else {
+            sezione.style.display = 'none';
+        }
+    }
+
+    function inviaDatiSicuri() {
+        const form = document.getElementById('checkinForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
         }
 
-        // Extra: Chiudi anche se l l'ospite clicca fuori dalla foto (sullo sfondo nero)
-        lightbox.addEventListener('click', function(event) {
-            if (event.target !== lightboxImg) {
-                chiudiLightbox();
-            }
+        document.getElementById('btnInvia').style.display = 'none';
+        document.getElementById('loadingMsg').style.display = 'block';
+
+        const fileFronte = document.querySelector('input[name="foto_documento_fronte"]').files[0];
+        const fileRetro = document.querySelector('input[name="foto_documento_retro"]').files[0];
+
+        const getBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]); 
+                reader.onerror = error => reject(error);
+            });
+        };
+
+        const formDataObj = {};
+        new FormData(form).forEach((value, key) => { 
+    // Se il campo è un testo (e non un file), lo trasformiamo in MAIUSCOLO
+    if (typeof value === 'string') {
+        formDataObj[key] = value.toUpperCase().trim(); 
+    } else {
+        formDataObj[key] = value;
+    }
+});
+
+        Promise.all([getBase64(fileFronte), getBase64(fileRetro)]).then(risultati => {
+            formDataObj.foto_fronte_base64 = risultati[0];
+            formDataObj.foto_retro_base64 = risultati[1];
+            formDataObj.mime_fronte = fileFronte.type;
+            formDataObj.mime_retro = fileRetro.type;
+
+            const LINK_GOOGLE = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec";
+
+            fetch(LINK_GOOGLE, {
+                method: "POST",
+                body: JSON.stringify(formDataObj)
+            })
+            .then(response => response.text())
+            .then(testo => {
+                document.body.innerHTML = "<div style='text-align:center; margin-top:50px; font-family:Arial;'><h2 style='color:#000000'>Grazie! Check-in inviato.</h2><p>Puoi chiudere questa finestra.</p></div>";
+            })
+            .catch(err => {
+                alert("Errore di connessione. Riprova.");
+                document.getElementById('btnInvia').style.display = 'block';
+                document.getElementById('loadingMsg').style.display = 'none';
+            });
         });
-    </script>
+    }
+</script>
+
 </body>
 </html>
