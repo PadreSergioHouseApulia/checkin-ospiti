@@ -294,60 +294,65 @@
         }
 
         function generaCSVCompleto(riga) {
+            // Inserisci qui il tuo codice licenza esatto
             const CODICE_LICENZA = "BA000982-0018"; 
 
             let csvRows = [];
             
-            // PayTourist vuole le date in formato GG/MM/AAAA
+            // Funzione per pulire e rendere maiuscolo
+            function pulisci(testo) {
+                if (!testo) return "";
+                return testo.trim().toUpperCase();
+            }
+
+            // Converte data da AAAA-MM-GG a GG/MM/AAAA
             function formatData(d) {
                 if (!d) return "";
                 let p = d.split("-");
                 return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
             }
 
-            // PayTourist vuole 1 per Maschio e 2 per Femmina
-            function formatSesso(s) {
-                if (!s) return "";
-                if (s.toLowerCase().startsWith('m')) return "1";
-                if (s.toLowerCase().startsWith('f')) return "2";
-                return "";
-            }
-
             let checkin = formatData(riga[1]);
             let checkout = formatData(riga[2]);
-            let idGruppo = "1"; // Identifica che queste persone viaggiano insieme
+            let idGruppo = "1"; // ID raggruppamento (di solito 1 per la stessa prenotazione)
             
-            // 1. COMPILA RIGA CAPOGRUPPO
+            // --- 1. RIGA CAPOGRUPPO ---
+            // Seguiamo l'ordine: GROUP, NAME, SURNAME, CHECK-IN, CHECK-OUT, AMOUNT PAID, LICENSE
             let rowCapo = [
-                idGruppo, riga[4], riga[5], checkin, checkout, "", 
-                CODICE_LICENZA, formatSesso(riga[7]), formatData(riga[8]), 
-                "", "", "", riga[9], "", riga[11], riga[10]
+                idGruppo, 
+                pulisci(riga[4]), // NAME
+                pulisci(riga[5]), // SURNAME
+                checkin,          // CHECK-IN
+                checkout,         // CHECK-OUT
+                "",               // AMOUNT PAID (vuoto come da tuo esempio)
+                CODICE_LICENZA    // STRUCTURE LICENSE
             ];
-            csvRows.push(rowCapo.join(","));
             
-            // 2. COMPILA RIGHE OSPITI EXTRA
+            // Aggiungiamo la virgola finale come richiesto dal tuo esempio
+            csvRows.push(rowCapo.join(",") + ",");
+            
+            // --- 2. RIGHE OSPITI EXTRA ---
             let extraStr = riga[15] || "";
             if (extraStr.includes("--- OSPITE")) {
                 let blocchi = extraStr.split("--- OSPITE").slice(1);
                 blocchi.forEach(blocco => {
                     let cognome = blocco.match(/Cognome: (.*)/)?.[1] || "";
                     let nome = blocco.match(/Nome: (.*)/)?.[1] || "";
-                    let sesso = blocco.match(/Sesso: (.*)/)?.[1] || "";
-                    let nascitaMatch = blocco.match(/Nascita: (.*?) a (.*)/);
-                    let dataNascita = nascitaMatch?.[1] || "";
-                    let luogoNascita = nascitaMatch?.[2] || "";
-                    let nazionalita = blocco.match(/Nazionalità: (.*)/)?.[1] || "";
                     
                     let rowExtra = [
-                        idGruppo, nome.trim(), cognome.trim(), checkin, checkout, "", 
-                        CODICE_LICENZA, formatSesso(sesso.trim()), formatData(dataNascita.trim()), 
-                        "", "", "", luogoNascita.trim(), "", "", nazionalita.trim()
+                        idGruppo, 
+                        pulisci(nome), 
+                        pulisci(cognome), 
+                        checkin, 
+                        checkout, 
+                        "", 
+                        CODICE_LICENZA
                     ];
-                    csvRows.push(rowExtra.join(","));
+                    csvRows.push(rowExtra.join(",") + ",");
                 });
             }
 
-            // PayTourist richiede la codifica UTF-8 base
+            // Creazione del file
             const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
