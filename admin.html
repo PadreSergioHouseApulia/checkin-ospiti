@@ -67,6 +67,14 @@
         .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
         
         #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; }
+
+        /* --- STILI AGGIUNTI SOLO PER LE RICHIESTE E I TABS --- */
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 25px; }
+        .tab-btn { background-color: #e0e6ed; color: #333; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; font-family: 'Arial', sans-serif; transition: 0.2s; }
+        .tab-btn.active { background-color: var(--colore-principale); color: white; }
+        .btn-whatsapp { background-color: #25d366; color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; text-decoration: none; flex: 1 1 30%; font-family: 'Arial', sans-serif; }
+        .btn-email { background-color: #3498db; color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; text-decoration: none; flex: 1 1 30%; font-family: 'Arial', sans-serif; }
+        .badge.blu { background-color: #3498db; }
     </style>
 </head>
 <body>
@@ -91,11 +99,28 @@
         </div>
 
         <div class="container">
-            <div class="header-sezione">
-                <h2>Check-in Ricevuti</h2>
-                <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: var(--colore-secondario); color: white;" onclick="caricaDati()">🔄 Aggiorna Dati</button>
+            
+            <div class="tabs-container">
+                <button class="tab-btn active" id="btn-tab-checkin" onclick="mostraCheckin()">📝 Check-in</button>
+                <button class="tab-btn" id="btn-tab-richieste" onclick="mostraRichieste()">📩 Richieste dal Sito</button>
             </div>
-            <div class="grid-prenotazioni" id="contenitore-schede"></div>
+
+            <div id="sezione-checkin">
+                <div class="header-sezione">
+                    <h2>Check-in Ricevuti</h2>
+                    <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: var(--colore-secondario); color: white;" onclick="caricaDati()">🔄 Aggiorna Dati</button>
+                </div>
+                <div class="grid-prenotazioni" id="contenitore-schede"></div>
+            </div>
+
+            <div id="sezione-richieste" style="display: none;">
+                <div class="header-sezione">
+                    <h2 style="color: #3498db;">Richieste di Disponibilità</h2>
+                    <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: #3498db; color: white;" onclick="caricaRichieste()">🔄 Aggiorna Richieste</button>
+                </div>
+                <div class="grid-prenotazioni" id="contenitore-richieste"></div>
+            </div>
+
         </div>
     </div>
 
@@ -144,7 +169,7 @@
             if (document.getElementById('passwordInput').value === "PadreSergio2026!") {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
-                caricaDati(); 
+                mostraCheckin(); 
             } else {
                 document.getElementById('messaggioErrore').style.display = 'block';
             }
@@ -152,6 +177,24 @@
 
         function gestisciInvio(event) { if (event.key === "Enter") verificaPassword(); }
 
+        // --- FUNZIONI AGGIUNTE PER I TABS ---
+        function mostraCheckin() {
+            document.getElementById('sezione-checkin').style.display = 'block';
+            document.getElementById('sezione-richieste').style.display = 'none';
+            document.getElementById('btn-tab-checkin').classList.add('active');
+            document.getElementById('btn-tab-richieste').classList.remove('active');
+            caricaDati();
+        }
+
+        function mostraRichieste() {
+            document.getElementById('sezione-checkin').style.display = 'none';
+            document.getElementById('sezione-richieste').style.display = 'block';
+            document.getElementById('btn-tab-checkin').classList.remove('active');
+            document.getElementById('btn-tab-richieste').classList.add('active');
+            caricaRichieste();
+        }
+
+        // IL TUO CODICE ORIGINALE INIZIA QUI
         function caricaDati() {
             const contenitore = document.getElementById('contenitore-schede');
             contenitore.innerHTML = '<div id="loading-message">Recupero dati dal database... ⏳</div>';
@@ -293,7 +336,6 @@
         }
 
         function generaCSVCompleto(riga) {
-            // Inserisci qui il tuo codice licenza esatto
             const CODICE_LICENZA = "SLBA000982-0018"; 
 
             let csvRows = [];
@@ -321,7 +363,6 @@
             let checkout = formatData(riga[2]);
             let idGruppo = "1";
             
-            // LA VIRGOLA MANCANTE ERA QUI SOTTO: dopo CODICE_LICENZA
             let rowCapo = [
                 idGruppo, 
                 pulisci(riga[4]), 
@@ -402,7 +443,6 @@
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
             .then(() => {
                 generaCSVCompleto(rigaAggiornata); 
-                
                 chiudiModal('modificaModal');
                 caricaDati(); 
                 btn.innerText = "💾 Salva e Approva";
@@ -413,6 +453,47 @@
                 btn.innerText = "💾 Salva e Approva";
                 btn.disabled = false;
             });
+        }
+
+        // --- FUNZIONE AGGIUNTA PER SCARICARE LE RICHIESTE ---
+        function caricaRichieste() {
+            const contenitore = document.getElementById('contenitore-richieste');
+            contenitore.innerHTML = '<div id="loading-message">Recupero richieste dal database... ⏳</div>';
+
+            fetch(LINK_GOOGLE_SCRIPT + "?tipo=richieste")
+                .then(response => response.json())
+                .then(dati => {
+                    let richiesteDatabase = dati.reverse(); 
+                    contenitore.innerHTML = ''; 
+
+                    if(richiesteDatabase.length === 0) {
+                        contenitore.innerHTML = '<div id="loading-message">Nessuna richiesta ricevuta.</div>';
+                        return;
+                    }
+
+                    richiesteDatabase.forEach((riga, index) => {
+                        const htmlScheda = `
+                            <div class="card" style="border-top-color: #3498db;">
+                                <div class="card-header">
+                                    <h3 class="ospite-nome">${riga[1]} ${riga[2]}</h3>
+                                    <span class="badge blu">RICHIESTA</span>
+                                </div>
+                                <div class="card-dettagli">
+                                    <div><strong>Arrivo:</strong> ${riga[5]}</div>
+                                    <div><strong>Partenza:</strong> ${riga[6]}</div>
+                                    <div><strong>Ospiti:</strong> ${riga[7]}</div>
+                                    <div style="margin-top:5px;"><strong>Note:</strong> <i>"${riga[8] || ''}"</i></div>
+                                </div>
+                                <div class="btn-group">
+                                    <a href="mailto:${riga[3]}" class="btn-email">📧 Email</a>
+                                    <a href="https://wa.me/${riga[4].replace(/\D/g, '')}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
+                                </div>
+                            </div>
+                        `;
+                        contenitore.innerHTML += htmlScheda;
+                    });
+                })
+                .catch(errore => { contenitore.innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione.</div>'; });
         }
     </script>
 </body>
