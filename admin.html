@@ -17,6 +17,7 @@
             --verde-ok: #27ae60;
             --rosso-allerta: #e74c3c;
             --nero-blocco: #2c3e50; 
+            --blu-info: #3498db;
         }
 
         body { font-family: 'Arial', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo); margin: 0; padding: 0; }
@@ -28,7 +29,6 @@
         .password-container { position: relative; width: 100%; margin-bottom: 15px; }
         .password-container input { width: 100%; padding: 12px; padding-right: 40px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-align: center; }
         .toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none; opacity: 0.7; }
-        .toggle-password:hover { opacity: 1; }
         .login-box button { width: 100%; background-color: var(--colore-principale); color: white; border: none; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         
         #main-content { display: none; }
@@ -36,45 +36,71 @@
         .navbar { background-color: var(--colore-principale); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .navbar h1 { margin: 0; font-family: 'Georgia', serif; font-size: 24px; }
         .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-        .header-sezione { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 20px; }
+
+        .tab-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .tab-button { background: none; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; color: #888; border-radius: 5px; font-size: 14px; transition: 0.3s; font-family: inherit; }
+        .tab-button.active { background-color: var(--colore-principale); color: white; }
+
+        .header-sezione { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-sezione h2 { margin: 0; color: var(--colore-principale); }
 
         .grid-prenotazioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--colore-card); border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--giallo-attesa); transition: transform 0.2s; }
-        .card.approvato { border-top-color: var(--verde-ok); opacity: 0.8; }
+        .card.approvato { border-top-color: var(--verde-ok); }
         .card.bloccato { border-top-color: var(--nero-blocco); opacity: 0.6; }
+        .card.richiesta-accettata { border-top-color: var(--blu-info); }
+        .card.richiesta-rifiutata { border-top-color: var(--rosso-allerta); }
+        .card.archivio { border-top-color: #95a5a6; opacity: 0.7; }
+
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .ospite-nome { font-size: 18px; font-weight: bold; margin: 0; }
+        
         .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; }
         .badge.attesa { background-color: var(--giallo-attesa); }
         .badge.ok { background-color: var(--verde-ok); }
         .badge.nero { background-color: var(--nero-blocco); }
+        .badge.blu { background-color: var(--blu-info); }
+        .badge.rosso { background-color: var(--rosso-allerta); }
+        .badge.grigio { background-color: #95a5a6; }
+
         .card-dettagli { font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.6; }
+        
         .btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
-        .btn-group button { padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; flex: 1 1 30%; }
+        .btn-group button, .btn-group a { padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; flex: 1 1 30%; font-family: inherit; display: inline-block; text-align: center; text-decoration: none; }
         .btn-dettagli { background-color: #e0e6ed; color: #333; }
         .btn-approva { background-color: var(--verde-ok); color: white; }
         .btn-rifiuta { background-color: var(--rosso-allerta); color: white; }
+        .btn-whatsapp { background-color: #25d366; color: white; }
+        .btn-email { background-color: var(--blu-info); color: white; }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; }
+        /* CALENDARIO VISIVO */
+        .calendario-wrapper { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .calendario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+        .giorno-nome { font-weight: bold; color: #666; padding: 10px 0; border-bottom: 2px solid #eee; }
+        .giorno-box { padding: 15px 5px; border-radius: 5px; background: #f9f9f9; font-size: 14px; position: relative; overflow: hidden; min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .giorno-box.vuoto { background: transparent; border: none; }
+        
+        /* Modifiche per i giorni LIBERI */
+        .giorno-box.libero { background: #e8f8f5; color: #27ae60; font-weight: bold; border: 1px solid #27ae60; }
+        
+        .giorno-box.occupato { background: #fadbd8; color: #c0392b; font-weight: bold; border: 1px solid #e74c3c; cursor: pointer; transition: 0.2s; }
+        .giorno-box.occupato:hover { background: #f5b7b1; }
+        .giorno-box.richiesta { background: #d6eaf8; color: #2980b9; font-weight: bold; border: 1px solid #3498db; cursor: pointer; transition: 0.2s; }
+        .giorno-box.richiesta:hover { background: #aed6f1; }
+        
+        .nome-calendario { font-size: 11px; display: block; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: normal; color: inherit; width: 100%;}
+
+        /* MODALI */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal { background: white; width: 90%; max-width: 600px; border-radius: 10px; padding: 30px; max-height: 85vh; overflow-y: auto; position: relative; }
         .chiudi-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; }
         .sezione-dati { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #eee; }
         .foto-doc-link { display: inline-block; background: var(--colore-principale); color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; margin-right: 10px; margin-top: 10px; }
-        
         .campo-edit { margin-bottom: 10px; }
         .campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 3px; }
         .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
-        
         #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; }
-
-        /* --- STILI AGGIUNTI SOLO PER LE RICHIESTE E I TABS --- */
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 25px; }
-        .tab-btn { background-color: #e0e6ed; color: #333; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 14px; font-family: 'Arial', sans-serif; transition: 0.2s; }
-        .tab-btn.active { background-color: var(--colore-principale); color: white; }
-        .btn-whatsapp { background-color: #25d366; color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; text-decoration: none; flex: 1 1 30%; font-family: 'Arial', sans-serif; }
-        .btn-email { background-color: #3498db; color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center; text-decoration: none; flex: 1 1 30%; font-family: 'Arial', sans-serif; }
-        .badge.blu { background-color: #3498db; }
     </style>
 </head>
 <body>
@@ -88,37 +114,38 @@
                 <span class="toggle-password" onclick="mostraNascondiPassword()">👁️</span>
             </div>
             <button onclick="verificaPassword()">Accedi</button>
-            <div class="errore-login" id="messaggioErrore" style="color:red; font-size:13px; display:none; margin-top:10px;">Password errata.</div>
+            <div id="messaggioErrore" style="color:red; font-size:13px; display:none; margin-top:10px;">Password errata.</div>
         </div>
     </div>
 
     <div id="main-content">
         <div class="navbar">
             <h1>PadreSergio Admin</h1>
-            <div class="user-profile">Gestione Check-in</div>
+            <div class="user-profile">Gestione Struttura</div>
         </div>
 
         <div class="container">
+            <div class="tab-container">
+                <button class="tab-button active" id="tab-checkin" onclick="cambiaVista('checkin')">📝 Check-in Attivi</button>
+                <button class="tab-button" id="tab-richieste" onclick="cambiaVista('richieste')">📩 Richieste dal Sito</button>
+                <button class="tab-button" id="tab-calendario" onclick="cambiaVista('calendario')">📅 Calendario</button>
+                <button class="tab-button" id="tab-archivio" onclick="cambiaVista('archivio')">🗄️ Archivio Passati</button>
+            </div>
+
+            <div class="header-sezione">
+                <h2 id="titolo-sezione">Check-in Ricevuti</h2>
+                <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: var(--colore-secondario); color: white;" onclick="caricaDati()">🔄 Aggiorna Dati</button>
+            </div>
             
-            <div class="tabs-container">
-                <button class="tab-btn active" id="btn-tab-checkin" onclick="mostraCheckin()">📝 Check-in</button>
-                <button class="tab-btn" id="btn-tab-richieste" onclick="mostraRichieste()">📩 Richieste dal Sito</button>
-            </div>
-
-            <div id="sezione-checkin">
-                <div class="header-sezione">
-                    <h2>Check-in Ricevuti</h2>
-                    <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: var(--colore-secondario); color: white;" onclick="caricaDati()">🔄 Aggiorna Dati</button>
+            <div class="grid-prenotazioni" id="contenitore-schede"></div>
+            
+            <div id="contenitore-calendario" class="calendario-wrapper" style="display:none;">
+                <div class="calendario-header">
+                    <button onclick="cambiaMese(-1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">❮ Mese Prec.</button>
+                    <h2 id="mese-anno-titolo" style="color: var(--colore-principale); margin: 0; min-width: 150px; text-align: center;"></h2>
+                    <button onclick="cambiaMese(1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">Mese Succ. ❯</button>
                 </div>
-                <div class="grid-prenotazioni" id="contenitore-schede"></div>
-            </div>
-
-            <div id="sezione-richieste" style="display: none;">
-                <div class="header-sezione">
-                    <h2 style="color: #3498db;">Richieste di Disponibilità</h2>
-                    <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: #3498db; color: white;" onclick="caricaRichieste()">🔄 Aggiorna Richieste</button>
-                </div>
-                <div class="grid-prenotazioni" id="contenitore-richieste"></div>
+                <div class="calendario-grid" id="griglia-giorni"></div>
             </div>
 
         </div>
@@ -127,8 +154,23 @@
     <div class="modal-overlay" id="dettagliModal">
         <div class="modal">
             <span class="chiudi-modal" onclick="chiudiModal('dettagliModal')">×</span>
-            <h2 style="color: var(--colore-principale); margin-top: 0;" id="modal-titolo">Dettagli Ospite</h2>
+            <h2 style="color: var(--colore-principale); margin-top: 0;" id="modal-titolo">Dettagli</h2>
             <div id="contenuto-modale"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="anteprimaCalendarioModal">
+        <div class="modal" style="text-align: center; max-width: 400px; padding-top: 40px;">
+            <span class="chiudi-modal" onclick="chiudiModal('anteprimaCalendarioModal')">×</span>
+            <h2 style="color: var(--colore-principale); margin-top: 0; margin-bottom: 20px;">📅 Riepilogo</h2>
+            <div class="sezione-dati" style="font-size: 16px; line-height: 2; text-align: left;">
+                <strong>Ospite:</strong> <span id="anteprima-nome" style="color: var(--colore-principale); font-weight: bold;"></span><br>
+                <strong>Numero totale ospiti:</strong> <span id="anteprima-ospiti"></span><br>
+                <strong>Data Arrivo:</strong> <span id="anteprima-arrivo"></span><br>
+                <strong>Data Partenza:</strong> <span id="anteprima-partenza"></span><br>
+                <strong>Stato:</strong> <span id="anteprima-stato" style="font-weight:bold;"></span>
+            </div>
+            <button onclick="chiudiModal('anteprimaCalendarioModal')" style="background:var(--colore-secondario); color:white; width:100%; padding:12px; border:none; border-radius:5px; margin-top:10px; font-weight:bold; cursor:pointer;">Chiudi</button>
         </div>
     </div>
 
@@ -136,163 +178,373 @@
         <div class="modal">
             <span class="chiudi-modal" onclick="chiudiModal('modificaModal')">×</span>
             <h2 style="color: var(--rosso-allerta); margin-top: 0;">✏️ Correggi Dati</h2>
-            <p style="font-size:13px; color:#666; margin-top:-10px;">Modifica i campi errati. Salvando, il check-in verrà automaticamente approvato.</p>
-            
             <input type="hidden" id="edit-index">
-            
             <div class="campo-edit"><label>Nome</label><input type="text" id="edit-nome"></div>
             <div class="campo-edit"><label>Cognome</label><input type="text" id="edit-cognome"></div>
             <div class="campo-edit"><label>Documento (Tipo e Numero)</label><input type="text" id="edit-doc"></div>
             <div class="campo-edit"><label>Data di Nascita</label><input type="text" id="edit-nascita"></div>
-            <div class="campo-edit"><label>Luogo di Nascita</label><input type="text" id="edit-luogo"></div>
-            <div class="campo-edit"><label>Nazionalità</label><input type="text" id="edit-nazionalita"></div>
+            <div class="campo-edit"><label>Luogo di Nascita</label><input type="text" id="edit-nazionalita"></div>
             <div class="campo-edit"><label>Residenza</label><input type="text" id="edit-residenza"></div>
-            
             <div class="campo-edit"><label>Ospiti Extra</label><textarea id="edit-ospitiExtra" rows="8"></textarea></div>
-            
             <button onclick="salvaModifiche(event)" style="background:var(--rosso-allerta); color:white; width:100%; padding:15px; border:none; border-radius:5px; margin-top:15px; font-weight:bold; cursor:pointer;">💾 Salva e Approva</button>
         </div>
     </div>
 
     <script>
         const LINK_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec";
-        let ospitiDatabase = []; 
+        const MESI = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+        
+        let dbCheckin = []; 
+        let dbRichieste = []; 
+        let vistaAttuale = "checkin";
+        
+        let meseCorrente = new Date().getMonth();
+        let annoCorrente = new Date().getFullYear();
 
         function mostraNascondiPassword() {
             const input = document.getElementById('passwordInput');
-            const icona = document.querySelector('.toggle-password');
-            if (input.type === 'password') { input.type = 'text'; icona.innerText = '🙈'; } 
-            else { input.type = 'password'; icona.innerText = '👁️'; }
+            input.type = (input.type === 'password') ? 'text' : 'password';
         }
-
         function verificaPassword() {
             if (document.getElementById('passwordInput').value === "PadreSergio2026!") {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
-                mostraCheckin(); 
-            } else {
-                document.getElementById('messaggioErrore').style.display = 'block';
-            }
+                caricaDati(); 
+            } else { document.getElementById('messaggioErrore').style.display = 'block'; }
         }
-
         function gestisciInvio(event) { if (event.key === "Enter") verificaPassword(); }
 
-        // --- FUNZIONI AGGIUNTE PER I TABS ---
-        function mostraCheckin() {
-            document.getElementById('sezione-checkin').style.display = 'block';
-            document.getElementById('sezione-richieste').style.display = 'none';
-            document.getElementById('btn-tab-checkin').classList.add('active');
-            document.getElementById('btn-tab-richieste').classList.remove('active');
-            caricaDati();
+        function cambiaVista(tipo) {
+            vistaAttuale = tipo;
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tipo).classList.add('active');
+            
+            document.getElementById('contenitore-schede').style.display = (tipo === 'calendario') ? 'none' : 'grid';
+            document.getElementById('contenitore-calendario').style.display = (tipo === 'calendario') ? 'block' : 'none';
+
+            if(tipo === 'checkin') document.getElementById('titolo-sezione').innerText = "Check-in Attivi";
+            else if(tipo === 'richieste') document.getElementById('titolo-sezione').innerText = "Richieste di Prenotazione";
+            else if(tipo === 'archivio') document.getElementById('titolo-sezione').innerText = "Archivio Check-in Passati";
+            else if(tipo === 'calendario') document.getElementById('titolo-sezione').innerText = "Calendario Completo";
+
+            if (tipo === 'calendario') generaCalendario();
+            else caricaDati();
         }
 
-        function mostraRichieste() {
-            document.getElementById('sezione-checkin').style.display = 'none';
-            document.getElementById('sezione-richieste').style.display = 'block';
-            document.getElementById('btn-tab-checkin').classList.remove('active');
-            document.getElementById('btn-tab-richieste').classList.add('active');
-            caricaRichieste();
+        // COPIA MESSAGGIO WHATSAPP (CHECK-IN)
+        function copiaMessaggio(nome, dataArrivo) {
+            const msg = `Ciao ${nome}, ti aspettiamo a PadreSergio House il ${dataArrivo}!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!`;
+            navigator.clipboard.writeText(msg).then(() => alert("Messaggio copiato!"));
         }
 
-        // IL TUO CODICE ORIGINALE INIZIA QUI
-        function caricaDati() {
-            const contenitore = document.getElementById('contenitore-schede');
-            contenitore.innerHTML = '<div id="loading-message">Recupero dati dal database... ⏳</div>';
+        // GENERA LINK PER EMAIL E WHATSAPP (RICHIESTE)
+        function generaLinkMessaggio(nome, arrivo, partenza, telefono, email, tipo, esito) {
+            let testo = "";
+            let url = "";
+            if (esito === 'accettata') {
+                testo = `Ciao ${nome},\nsiamo felici di confermarti la disponibilità per le date dal ${arrivo} al ${partenza}!\n\nPer confermare la prenotazione e ricevere i dettagli sul pagamento, rispondi a questo messaggio.\n\nTi aspettiamo a PadreSergio House!`;
+            } else {
+                testo = `Gentile ${nome},\nti ringraziamo per aver scelto PadreSergio House. Purtroppo per le date dal ${arrivo} al ${partenza} non abbiamo disponibilità in quanto la struttura è già occupata.\n\nSperiamo di poterti accogliere in futuro!\n\nCordiali saluti,\nPadreSergio House`;
+            }
 
-            fetch(LINK_GOOGLE_SCRIPT)
-                .then(response => response.json())
-                .then(dati => {
-                    ospitiDatabase = dati.reverse(); 
-                    contenitore.innerHTML = ''; 
+            if (tipo === 'whatsapp') {
+                url = `https://wa.me/${String(telefono || '').replace(/\D/g, '')}?text=${encodeURIComponent(testo)}`;
+            } else if (tipo === 'email') {
+                const soggetto = esito === 'accettata' ? "Disponibilità Confermata - PadreSergio House" : "Aggiornamento Disponibilità - PadreSergio House";
+                url = `mailto:${email || ''}?subject=${encodeURIComponent(soggetto)}&body=${encodeURIComponent(testo)}`;
+            }
+            return url;
+        }
 
-                    if(ospitiDatabase.length === 0) {
-                        contenitore.innerHTML = '<div id="loading-message">Nessun check-in ricevuto al momento.</div>';
-                        return;
+        // CONTROLLO DATE (OVERBOOKING) E SALVATAGGIO STATO
+        function cambiaStatoRichiesta(index, nuovoStato, event) {
+            if (nuovoStato === 'Accettata') {
+                let req = dbRichieste[index];
+                let dReqIn = parseData(req[5]);
+                let dReqOut = parseData(req[6]);
+                
+                if (dReqIn && dReqOut) {
+                    let overlap = false;
+
+                    // 1. Controlla nei Check-in (ignorando i bloccati)
+                    for (let i = 0; i < dbCheckin.length; i++) {
+                        let c = dbCheckin[i];
+                        if (c[14] === "Bloccato") continue;
+                        let dIn = parseData(c[1]);
+                        let dOut = parseData(c[2]);
+                        
+                        if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
                     }
 
-                    ospitiDatabase.forEach((riga, index) => {
-                        let statoAttuale = riga[14] || "Da Controllare";
-                        
-                        let classeCard = "card";
-                        let classeBadge = "badge attesa";
-                        let bottoniAzione = "";
-
-                        if (statoAttuale === "Approvato" || statoAttuale === "Corretto e Approvato") {
-                            classeCard = "card approvato"; 
-                            classeBadge = "badge ok"; 
-                            bottoniAzione = `
-                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button>
-                                <button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">✅ ${statoAttuale}</button>
-                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">🚫 Bloccato</button>
-                            `;
-                        } else if (statoAttuale === "Bloccato") {
-                            classeCard = "card bloccato"; 
-                            classeBadge = "badge nero"; 
-                            bottoniAzione = `
-                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button>
-                                <button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">🚫 Bloccato</button>
-                            `;
-                        } else {
-                            bottoniAzione = `
-                                <button class="btn-rifiuta" onclick="apriModifica(${index})">✏️ Correggi</button>
-                                <button class="btn-approva" onclick="approvaEScarica(${index}, event)">✅ Approva</button>
-                                <button class="btn-rifiuta" style="background-color: var(--nero-blocco);" onclick="bloccaCheckin(${index}, event)">🚫 Blocca</button>
-                            `;
+                    // 2. Controlla nelle altre Richieste (già accettate)
+                    if (!overlap) {
+                        for (let i = 0; i < dbRichieste.length; i++) {
+                            if (i === index) continue;
+                            let c = dbRichieste[i];
+                            if (c[9] !== "Accettata") continue;
+                            let dIn = parseData(c[5]);
+                            let dOut = parseData(c[6]);
+                            
+                            if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
                         }
+                    }
 
-                        const htmlScheda = `
-                            <div class="${classeCard}" id="card-${index}">
-                                <div class="card-header">
-                                    <h3 class="ospite-nome">${riga[4]} ${riga[5]}</h3>
-                                    <span class="${classeBadge}" id="badge-${index}">${statoAttuale}</span>
-                                </div>
-                                <div class="card-dettagli">
-                                    <div><strong>Arrivo:</strong> ${riga[1]}</div>
-                                    <div><strong>Partenza:</strong> ${riga[2]}</div>
-                                    <div><strong>Ospiti totali:</strong> ${riga[3]}</div>
-                                </div>
-                                <div class="btn-group">
-                                    <button class="btn-dettagli" onclick="apriDettagli(${index})">👁️ Dettagli & Foto</button>
-                                    ${bottoniAzione}
-                                </div>
-                            </div>
-                        `;
-                        contenitore.innerHTML += htmlScheda;
-                    });
-                })
-                .catch(errore => { contenitore.innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione.</div>'; });
+                    if (overlap) {
+                        alert("⚠️ IMPOSSIBILE ACCETTARE:\n\nLe date richieste si sovrappongono con un'altra prenotazione o richiesta confermata! Scegli 'Rifiuta' per questa richiesta.");
+                        return; 
+                    }
+                }
+            }
+
+            const btn = event.target; btn.innerText = "..."; btn.disabled = true;
+            const rigaReale = dbRichieste.length - 1 - index;
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: rigaReale, status: nuovoStato }) })
+            .then(() => caricaDati());
         }
 
-        function chiudiModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        function apriDettagli(index) {
-            const riga = ospitiDatabase[index];
-            document.getElementById('modal-titolo').innerText = 'Dettagli: ' + riga[4] + ' ' + riga[5];
-            
-            let linkFronte = riga[12] !== "Non caricata" && riga[12] !== "" && riga[12] !== undefined ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte</a>` : '';
-            let linkRetro = riga[13] !== "Non caricata" && riga[13] !== "" && riga[13] !== undefined ? `<a href="${riga[13]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro</a>` : '';
-
+        function apriInfoRichiesta(index) {
+            const r = dbRichieste[index];
+            document.getElementById('modal-titolo').innerText = `Richiesta: ${r[1]} ${r[2]}`;
             document.getElementById('contenuto-modale').innerHTML = `
                 <div class="sezione-dati">
-                    <p style="font-size: 14px; line-height: 1.6;">
-                        <strong>Documento:</strong> ${riga[6]}<br>
-                        <strong>Nato il:</strong> ${riga[8]} a ${riga[9]}<br>
-                        <strong>Sesso:</strong> ${riga[7]}<br>
-                        <strong>Nazionalità:</strong> ${riga[10]}<br>
-                        <strong>Residenza:</strong> ${riga[11]}<br>
-                    </p>
-                    <hr style="border:0; border-top:1px solid #ccc; margin: 15px 0;">
-                    <strong>👥 OSPITI EXTRA:</strong><br>
-                    <pre style="font-family:inherit; white-space:pre-wrap; font-size:13px; margin-top:5px;">${riga[15] || 'Nessuno'}</pre>
-                    <hr style="border:0; border-top:1px solid #ccc; margin: 15px 0;">
-                    ${linkFronte} ${linkRetro}
+                    <p><strong>Periodo:</strong> dal ${r[5]} al ${r[6]}</p>
+                    <p><strong>Ospiti:</strong> ${r[7]}</p>
+                    <p><strong>Contatti:</strong> ${r[3]} | Tel. ${r[4]}</p>
+                    <p><strong>Messaggio dell'ospite:</strong><br><i>"${r[8] || 'Nessun messaggio'}"</i></p>
                 </div>
             `;
             document.getElementById('dettagliModal').style.display = 'flex';
         }
 
+        // CARICAMENTO E RENDERING SCHEDE
+        function caricaDati() {
+            if(vistaAttuale !== 'calendario') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message">Sincronizzazione dati in corso... ⏳</div>';
+            
+            Promise.all([
+                fetch(LINK_GOOGLE_SCRIPT).then(r => r.json()),
+                fetch(LINK_GOOGLE_SCRIPT + "?tipo=richieste").then(r => r.json())
+            ]).then(([checkins, richieste]) => {
+                dbCheckin = checkins.reverse();
+                dbRichieste = richieste.reverse();
+                renderSchedeO_Calendario();
+            }).catch(() => {
+                if(vistaAttuale !== 'calendario') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione al database.</div>';
+            });
+        }
+
+        function renderSchedeO_Calendario() {
+            if (vistaAttuale === 'calendario') {
+                generaCalendario();
+                return;
+            }
+
+            const cont = document.getElementById('contenitore-schede');
+            cont.innerHTML = ''; 
+            let oggi = new Date(); oggi.setHours(0,0,0,0);
+            let elementiMostrati = 0;
+
+            // --- DISEGNO CHECK-IN E ARCHIVIO (TUTTI I PULSANTI) ---
+            if (vistaAttuale === "checkin" || vistaAttuale === "archivio") {
+                dbCheckin.forEach((riga, index) => {
+                    let dOut = parseData(riga[2]);
+                    if(!dOut) return;
+                    
+                    let isArchivio = (dOut < oggi);
+                    if ((vistaAttuale === 'checkin' && isArchivio) || (vistaAttuale === 'archivio' && !isArchivio)) return;
+                    
+                    elementiMostrati++;
+                    let stato = riga[14] || "Da Controllare";
+                    let clCard = (stato.includes("Approvato")) ? "card approvato" : (stato === "Bloccato" ? "card bloccato" : "card");
+                    if(vistaAttuale === 'archivio') clCard = "card archivio";
+                    
+                    let clBadge = (stato.includes("Approvato")) ? "badge ok" : (stato === "Bloccato" ? "badge nero" : "badge attesa");
+                    if(vistaAttuale === 'archivio') clBadge = "badge grigio";
+
+                    let bottoni = "";
+                    if(vistaAttuale !== 'archivio') {
+                        if (stato.includes("Approvato")) {
+                            let nomePulito = String(riga[4] || "").replace(/'/g, "\\'");
+                            bottoni = `
+                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button>
+                                <button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">✅ ${stato}</button>
+                                <button class="btn-email" onclick="copiaMessaggio('${nomePulito}', '${riga[1]}')">💬 Copia Benvenuto</button>
+                            `;
+                        } else if (stato === "Bloccato") {
+                            bottoni = `
+                                <button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button>
+                                <button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">🚫 Bloccato</button>
+                            `;
+                        } else {
+                            bottoni = `
+                                <button class="btn-rifiuta" onclick="apriModifica(${index})">✏️ Correggi</button>
+                                <button class="btn-approva" onclick="approvaEScarica(${index}, event)">✅ Approva</button>
+                                <button class="btn-rifiuta" style="background-color: var(--nero-blocco);" onclick="bloccaCheckin(${index}, event)">🚫 Blocca</button>
+                            `;
+                        }
+                    }
+
+                    cont.innerHTML += `
+                        <div class="${clCard}">
+                            <div class="card-header"><h3 class="ospite-nome">${riga[4]} ${riga[5]}</h3><span class="${clBadge}">${vistaAttuale==='archivio' ? 'ARCHIVIATO' : stato}</span></div>
+                            <div class="card-dettagli"><div><strong>Arrivo:</strong> ${riga[1]}</div><div><strong>Partenza:</strong> ${riga[2]}</div><div><strong>Ospiti:</strong> ${riga[3]}</div></div>
+                            <div class="btn-group">
+                                <button class="btn-dettagli" onclick="apriDettagli(${index})">👁️ Foto / Info</button>
+                                ${bottoni}
+                            </div>
+                        </div>`;
+                });
+
+            // --- DISEGNO RICHIESTE (TUTTI I PULSANTI) ---
+            } else if (vistaAttuale === "richieste") {
+                dbRichieste.forEach((riga, index) => {
+                    elementiMostrati++;
+                    let statoRichiesta = riga[9] || "Da Contattare";
+                    let clCardRichiesta = "card";
+                    let clBadgeRichiesta = "badge attesa";
+                    
+                    if (statoRichiesta === "Accettata") { clCardRichiesta = "card richiesta-accettata"; clBadgeRichiesta = "badge blu"; }
+                    else if (statoRichiesta === "Rifiutata") { clCardRichiesta = "card richiesta-rifiutata"; clBadgeRichiesta = "badge rosso"; }
+
+                    let bottoniRichiesta = "";
+                    if (statoRichiesta === "Da Contattare") {
+                        bottoniRichiesta = `
+                            <button class="btn-approva" onclick="cambiaStatoRichiesta(${index}, 'Accettata', event)">✅ Accetta</button>
+                            <button class="btn-rifiuta" onclick="cambiaStatoRichiesta(${index}, 'Rifiutata', event)">❌ Rifiuta</button>
+                        `;
+                    } else {
+                        let esito = statoRichiesta.toLowerCase();
+                        let linkWa = generaLinkMessaggio(riga[1], riga[5], riga[6], riga[4], riga[3], 'whatsapp', esito);
+                        let linkMail = generaLinkMessaggio(riga[1], riga[5], riga[6], riga[4], riga[3], 'email', esito);
+                        
+                        bottoniRichiesta = `
+                            <a href="${linkMail}" class="btn-email">📧 Mail Proposta</a>
+                            <a href="${linkWa}" target="_blank" class="btn-whatsapp">💬 WA Proposta</a>
+                        `;
+                    }
+
+                    cont.innerHTML += `
+                        <div class="${clCardRichiesta}">
+                            <div class="card-header"><h3 class="ospite-nome">${riga[1]} ${riga[2]}</h3><span class="${clBadgeRichiesta}">${statoRichiesta.toUpperCase()}</span></div>
+                            <div class="card-dettagli"><div><strong>Periodo:</strong> ${riga[5]} ➔ ${riga[6]}</div><div><strong>Ospiti:</strong> ${riga[7]}</div></div>
+                            <div class="btn-group">
+                                <button class="btn-dettagli" onclick="apriInfoRichiesta(${index})">👁️ Vedi Info</button>
+                                ${bottoniRichiesta}
+                            </div>
+                        </div>`;
+                });
+            }
+
+            if(elementiMostrati === 0) cont.innerHTML = '<div id="loading-message">Nessun dato presente in questa sezione.</div>';
+        }
+
+        // --- FUNZIONI CALENDARIO ---
+        function cambiaMese(dir) {
+            meseCorrente += dir;
+            if(meseCorrente > 11) { meseCorrente = 0; annoCorrente++; }
+            if(meseCorrente < 0) { meseCorrente = 11; annoCorrente--; }
+            generaCalendario();
+        }
+
+        function generaCalendario() {
+            document.getElementById('mese-anno-titolo').innerText = MESI[meseCorrente] + " " + annoCorrente;
+            const griglia = document.getElementById('griglia-giorni');
+            griglia.innerHTML = `<div class="giorno-nome">Lun</div><div class="giorno-nome">Mar</div><div class="giorno-nome">Mer</div><div class="giorno-nome">Gio</div><div class="giorno-nome">Ven</div><div class="giorno-nome">Sab</div><div class="giorno-nome">Dom</div>`;
+
+            let primoGiorno = new Date(annoCorrente, meseCorrente, 1).getDay();
+            if(primoGiorno === 0) primoGiorno = 7; 
+            let giorniNelMese = new Date(annoCorrente, meseCorrente + 1, 0).getDate();
+
+            for(let i=1; i<primoGiorno; i++) griglia.innerHTML += '<div class="giorno-box vuoto"></div>';
+
+            for(let g=1; g<=giorniNelMese; g++) {
+                let dataCorrente = new Date(annoCorrente, meseCorrente, g);
+                let statoGiorno = "libero";
+                let nomeOspite = ""; let infoOspiti = ""; let infoArrivo = ""; let infoPartenza = ""; let infoTipologia = "";
+
+                // Cerca nei Check-in
+                for(let i=0; i<dbCheckin.length; i++) {
+                    let r = dbCheckin[i];
+                    if(r[14] === "Bloccato") continue;
+                    let dIn = parseData(r[1]); let dOut = parseData(r[2]);
+                    
+                    if(dIn && dOut && dataCorrente >= dIn && dataCorrente < dOut) {
+                        statoGiorno = "occupato"; 
+                        nomeOspite = String(r[4]||"") + " " + String(r[5]||""); 
+                        infoOspiti = String(r[3]||"");
+                        infoArrivo = String(r[1]||""); infoPartenza = String(r[2]||""); 
+                        infoTipologia = "Check-in Registrato";
+                        break;
+                    }
+                }
+
+                // Se libero, cerca nelle Richieste
+                if(statoGiorno === "libero") {
+                    for(let i=0; i<dbRichieste.length; i++) {
+                        let r = dbRichieste[i];
+                        if(r[9] !== "Accettata") continue;
+                        let dIn = parseData(r[5]); let dOut = parseData(r[6]);
+                        
+                        if(dIn && dOut && dataCorrente >= dIn && dataCorrente < dOut) {
+                            statoGiorno = "richiesta"; 
+                            nomeOspite = String(r[1]||"") + " " + String(r[2]||""); 
+                            infoOspiti = String(r[7]||"");
+                            infoArrivo = String(r[5]||""); infoPartenza = String(r[6]||""); 
+                            infoTipologia = "Prenotazione dal Sito";
+                            break;
+                        }
+                    }
+                }
+
+                let boxHtml = "";
+                if (statoGiorno === 'occupato' || statoGiorno === 'richiesta') {
+                    let nomeSafe = nomeOspite.replace(/'/g, "\\'").replace(/"/g, '&quot;'); 
+                    let tipoSafe = infoTipologia.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    boxHtml = `
+                        <div class="giorno-box ${statoGiorno}" onclick="mostraAnteprimaCalendario('${nomeSafe}', '${infoOspiti}', '${infoArrivo}', '${infoPartenza}', '${tipoSafe}')">
+                            ${g}<br>
+                            <span style="font-size:9px; text-transform:uppercase;">${statoGiorno === 'occupato' ? 'Occupato' : 'Richiesta'}</span><br>
+                            <span class="nome-calendario">${nomeOspite}</span>
+                        </div>`;
+                } else {
+                    // IL GIORNO LIBERO MOSTRA LA SCRITTA LIBERO CON SFONDO VERDE (Definito nel CSS in alto)
+                    boxHtml = `
+                        <div class="giorno-box libero">
+                            ${g}<br>
+                            <span style="font-size:9px; text-transform:uppercase;">Libero</span>
+                        </div>`;
+                }
+                
+                griglia.innerHTML += boxHtml;
+            }
+        }
+
+        function mostraAnteprimaCalendario(nome, ospiti, arrivo, partenza, stato) {
+            document.getElementById('anteprima-nome').innerText = nome;
+            document.getElementById('anteprima-ospiti').innerText = ospiti;
+            document.getElementById('anteprima-arrivo').innerText = arrivo;
+            document.getElementById('anteprima-partenza').innerText = partenza;
+            document.getElementById('anteprima-stato').innerText = stato;
+            
+            if(stato.includes("Sito")) document.getElementById('anteprima-stato').style.color = "var(--blu-info)";
+            else document.getElementById('anteprima-stato').style.color = "var(--rosso-allerta)";
+
+            document.getElementById('anteprimaCalendarioModal').style.display = 'flex';
+        }
+
+        // --- FUNZIONI MODALI E AZIONI CHECK-IN (Immutate e Sicure) ---
+        function chiudiModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function apriDettagli(index) {
+            const riga = dbCheckin[index];
+            document.getElementById('modal-titolo').innerText = 'Dettagli: ' + riga[4] + ' ' + riga[5];
+            let f1 = riga[12] ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte</a>` : '';
+            let f2 = riga[13] ? `<a href="${riga[13]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro</a>` : '';
+            document.getElementById('contenuto-modale').innerHTML = `<div class="sezione-dati"><p style="font-size:14px;"><strong>Doc:</strong> ${riga[6]}<br><strong>Nato:</strong> ${riga[8]} a ${riga[9]}<br><strong>Naz:</strong> ${riga[10]} | <strong>Res:</strong> ${riga[11]}</p><hr><strong>Extra:</strong><pre style="white-space:pre-wrap; font-size:13px;">${riga[15] || 'Nessuno'}</pre>${f1} ${f2}</div>`;
+            document.getElementById('dettagliModal').style.display = 'flex';
+        }
+
         function apriModifica(index) {
-            const riga = ospitiDatabase[index];
+            const riga = dbCheckin[index];
             document.getElementById('edit-index').value = index;
             document.getElementById('edit-nome').value = riga[4];
             document.getElementById('edit-cognome').value = riga[5];
@@ -302,198 +554,70 @@
             document.getElementById('edit-nazionalita').value = riga[10];
             document.getElementById('edit-residenza').value = riga[11];
             document.getElementById('edit-ospitiExtra').value = riga[15] || "";
-            
             document.getElementById('modificaModal').style.display = 'flex';
         }
 
         function approvaEScarica(index, event) {
-            const btn = event.target; 
-            btn.innerText = "Attendere..."; btn.disabled = true;
-
-            const riga = ospitiDatabase[index];
-            const rigaReale = ospitiDatabase.length - 1 - index;
-            const payload = { action: "updateStatus", row: rigaReale, status: "Approvato" };
-
-            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
-            .then(() => {
-                generaCSVCompleto(riga);
-                caricaDati(); 
-            })
-            .catch(err => { alert("Errore nel salvataggio."); btn.innerText = "✅ Approva"; btn.disabled = false; });
+            const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true;
+            const rigaReale = dbCheckin.length - 1 - index;
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: rigaReale, status: "Approvato" }) })
+            .then(() => { generaCSVCompleto(dbCheckin[index]); caricaDati(); });
         }
 
         function bloccaCheckin(index, event) {
-            if(!confirm("Sei sicuro di voler bloccare questo check-in?")) return;
-            const btn = event.target; 
-            btn.innerText = "Attendere..."; btn.disabled = true;
-
-            const rigaReale = ospitiDatabase.length - 1 - index;
-            const payload = { action: "updateStatus", row: rigaReale, status: "Bloccato" };
-
-            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
-            .then(() => caricaDati()) 
-            .catch(err => { alert("Errore nel salvataggio."); btn.innerText = "🚫 Blocca"; btn.disabled = false; });
-        }
-
-        function generaCSVCompleto(riga) {
-            const CODICE_LICENZA = "SLBA000982-0018"; 
-
-            let csvRows = [];
-            
-            function pulisci(testo) {
-                if (!testo) return "";
-                return testo.trim().toUpperCase();
-            }
-
-            function formatData(d) {
-                if (!d) return "";
-                let p = d.split("-");
-                return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
-            }
-
-            function formatSesso(s) {
-                if (!s) return "";
-                let sesso = s.trim().toUpperCase();
-                if (sesso.startsWith('M')) return "1";
-                if (sesso.startsWith('F')) return "2";
-                return "";
-            }
-
-            let checkin = formatData(riga[1]);
-            let checkout = formatData(riga[2]);
-            let idGruppo = "1";
-            
-            let rowCapo = [
-                idGruppo, 
-                pulisci(riga[4]), 
-                pulisci(riga[5]), 
-                checkin,          
-                checkout,         
-                "",               
-                CODICE_LICENZA,   
-                formatSesso(riga[7]), 
-                formatData(riga[8])   
-            ];
-            
-            csvRows.push(rowCapo.join(","));
-            
-            let extraStr = riga[15] || "";
-            if (extraStr.includes("--- OSPITE")) {
-                let blocchi = extraStr.split("--- OSPITE").slice(1);
-                blocchi.forEach(blocco => {
-                    let cognome = blocco.match(/Cognome: (.*)/)?.[1] || "";
-                    let nome = blocco.match(/Nome: (.*)/)?.[1] || "";
-                    let sesso = blocco.match(/Sesso: (.*)/)?.[1] || "";
-                    let nascitaMatch = blocco.match(/Nascita: (.*?) a (.*)/);
-                    let dataNascita = nascitaMatch?.[1] || "";
-                    
-                    let rowExtra = [
-                        idGruppo, 
-                        pulisci(nome), 
-                        pulisci(cognome), 
-                        checkin, 
-                        checkout, 
-                        "", 
-                        CODICE_LICENZA,
-                        formatSesso(sesso),
-                        formatData(dataNascita.trim())
-                    ];
-                    csvRows.push(rowExtra.join(","));
-                });
-            }
-
-            const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `PayTourist_${riga[5]}.csv`;
-            link.click();
+            if(!confirm("Sei sicuro di voler bloccare?")) return;
+            const btn = event.target; btn.innerText = "Attendere..."; btn.disabled = true;
+            const rigaReale = dbCheckin.length - 1 - index;
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: rigaReale, status: "Bloccato" }) })
+            .then(() => caricaDati());
         }
 
         function salvaModifiche(event) {
-            const btn = event.target;
-            btn.innerText = "Salvataggio in corso... ⏳";
-            btn.disabled = true;
-
+            const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true;
             const index = document.getElementById('edit-index').value;
-            const rigaReale = ospitiDatabase.length - 1 - index;
-            const rigaOriginale = ospitiDatabase[index]; 
-
+            const rigaReale = dbCheckin.length - 1 - index;
             const payload = {
-                action: "editDati",
-                row: rigaReale,
-                nome: document.getElementById('edit-nome').value,
-                cognome: document.getElementById('edit-cognome').value,
-                documento: document.getElementById('edit-doc').value,
-                nascita: document.getElementById('edit-nascita').value,
-                luogoNascita: document.getElementById('edit-luogo').value,
-                nazionalita: document.getElementById('edit-nazionalita').value,
-                residenza: document.getElementById('edit-residenza').value,
-                ospitiExtra: document.getElementById('edit-ospitiExtra').value
+                action: "editDati", row: rigaReale, nome: document.getElementById('edit-nome').value, cognome: document.getElementById('edit-cognome').value,
+                documento: document.getElementById('edit-doc').value, nascita: document.getElementById('edit-nascita').value,
+                luogoNascita: document.getElementById('edit-luogo').value, nazionalita: document.getElementById('edit-nazionalita').value,
+                residenza: document.getElementById('edit-residenza').value, ospitiExtra: document.getElementById('edit-ospitiExtra').value
             };
-
-            let rigaAggiornata = [...rigaOriginale];
-            rigaAggiornata[4] = payload.nome;
-            rigaAggiornata[5] = payload.cognome;
-            rigaAggiornata[8] = payload.nascita;
-            rigaAggiornata[9] = payload.luogoNascita;
-            rigaAggiornata[10] = payload.nazionalita;
-            rigaAggiornata[15] = payload.ospitiExtra;
-
-            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) })
-            .then(() => {
-                generaCSVCompleto(rigaAggiornata); 
-                chiudiModal('modificaModal');
-                caricaDati(); 
-                btn.innerText = "💾 Salva e Approva";
-                btn.disabled = false;
-            })
-            .catch(err => {
-                alert("Errore durante la modifica.");
-                btn.innerText = "💾 Salva e Approva";
-                btn.disabled = false;
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) }).then(() => { 
+                let rAgg = [...dbCheckin[index]]; rAgg[4]=payload.nome; rAgg[5]=payload.cognome; rAgg[8]=payload.nascita; rAgg[15]=payload.ospitiExtra;
+                generaCSVCompleto(rAgg); chiudiModal('modificaModal'); caricaDati(); 
             });
         }
 
-        // --- FUNZIONE AGGIUNTA PER SCARICARE LE RICHIESTE ---
-        function caricaRichieste() {
-            const contenitore = document.getElementById('contenitore-richieste');
-            contenitore.innerHTML = '<div id="loading-message">Recupero richieste dal database... ⏳</div>';
+        function generaCSVCompleto(riga) {
+            const LICENZA = "SLBA000982-0018"; let csv = [];
+            const fmtS = (s) => s.toUpperCase().startsWith('M') ? "1" : "2";
+            csv.push([1, String(riga[4]||"").toUpperCase(), String(riga[5]||"").toUpperCase(), parseDataString(riga[1]), parseDataString(riga[2]), "", LICENZA, fmtS(riga[7]||""), parseDataString(riga[8])].join(","));
+            let extraStr = riga[15] || "";
+            if (extraStr.includes("--- OSPITE")) {
+                extraStr.split("--- OSPITE").slice(1).forEach(blocco => {
+                    let c = blocco.match(/Cognome: (.*)/)?.[1] || ""; let n = blocco.match(/Nome: (.*)/)?.[1] || "";
+                    let s = blocco.match(/Sesso: (.*)/)?.[1] || ""; let d = (blocco.match(/Nascita: (.*?) a /) || [])[1] || "";
+                    csv.push([1, n.trim().toUpperCase(), c.trim().toUpperCase(), parseDataString(riga[1]), parseDataString(riga[2]), "", LICENZA, fmtS(s), parseDataString(d.trim())].join(","));
+                });
+            }
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(new Blob([csv.join("\n")], { type: 'text/csv;charset=utf-8;' }));
+            link.download = `PayTourist_${riga[5]}.csv`; link.click();
+        }
 
-            fetch(LINK_GOOGLE_SCRIPT + "?tipo=richieste")
-                .then(response => response.json())
-                .then(dati => {
-                    let richiesteDatabase = dati.reverse(); 
-                    contenitore.innerHTML = ''; 
-
-                    if(richiesteDatabase.length === 0) {
-                        contenitore.innerHTML = '<div id="loading-message">Nessuna richiesta ricevuta.</div>';
-                        return;
-                    }
-
-                    richiesteDatabase.forEach((riga, index) => {
-                        const htmlScheda = `
-                            <div class="card" style="border-top-color: #3498db;">
-                                <div class="card-header">
-                                    <h3 class="ospite-nome">${riga[1]} ${riga[2]}</h3>
-                                    <span class="badge blu">RICHIESTA</span>
-                                </div>
-                                <div class="card-dettagli">
-                                    <div><strong>Arrivo:</strong> ${riga[5]}</div>
-                                    <div><strong>Partenza:</strong> ${riga[6]}</div>
-                                    <div><strong>Ospiti:</strong> ${riga[7]}</div>
-                                    <div style="margin-top:5px;"><strong>Note:</strong> <i>"${riga[8] || ''}"</i></div>
-                                </div>
-                                <div class="btn-group">
-                                    <a href="mailto:${riga[3]}" class="btn-email">📧 Email</a>
-                                    <a href="https://wa.me/${riga[4].replace(/\D/g, '')}" target="_blank" class="btn-whatsapp">💬 WhatsApp</a>
-                                </div>
-                            </div>
-                        `;
-                        contenitore.innerHTML += htmlScheda;
-                    });
-                })
-                .catch(errore => { contenitore.innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione.</div>'; });
+        // Funzione sicura per analizzare la data
+        function parseData(s) {
+            if(!s) return null;
+            let p = String(s).includes('-') ? String(s).split('-') : (String(s).includes('/') ? String(s).split('/') : []);
+            if(p.length !== 3) return null;
+            return p[0].length === 4 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[2], p[1]-1, p[0]);
+        }
+        
+        function parseDataString(s) {
+            if(!s) return "";
+            let p = String(s).includes('-') ? String(s).split('-') : (String(s).includes('/') ? String(s).split('/') : []);
+            if(p.length !== 3) return s;
+            return p[0].length === 4 ? `${p[2]}/${p[1]}/${p[0]}` : s;
         }
     </script>
 </body>
