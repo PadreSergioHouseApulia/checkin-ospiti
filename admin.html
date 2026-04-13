@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | PadreSergio House</title>
     <link rel="icon" type="image/x-icon" href="icona_admin.ico">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -76,26 +75,43 @@
         .btn-whatsapp { background-color: #25d366; color: white; }
         .btn-email { background-color: var(--blu-info); color: white; }
 
-        /* DASHBOARD */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; grid-column: 1 / -1; }
+        /* DASHBOARD & GRAFICO */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; grid-column: 1 / -1; margin-bottom: 30px; }
         .dash-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid var(--colore-principale); }
         .dash-icon { font-size: 40px; margin-bottom: 10px; }
         .dash-value { font-size: 32px; font-weight: bold; color: var(--colore-principale); margin-bottom: 5px; }
         .dash-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
+        
+        .grafico-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; }
 
         /* CALENDARIO VISIVO */
         .calendario-wrapper { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .calendario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .giorno-nome { font-weight: bold; color: #666; padding: 10px 0; border-bottom: 2px solid #eee; }
-        .giorno-box { padding: 15px 5px; border-radius: 5px; background: #f9f9f9; font-size: 14px; position: relative; overflow: hidden; min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .giorno-box { padding: 10px 5px; border-radius: 5px; background: #f9f9f9; font-size: 14px; position: relative; overflow: hidden; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; }
         .giorno-box.vuoto { background: transparent; border: none; }
+        
+        /* Stili avanzati per checkin/checkout a metà giornata */
         .giorno-box.libero { background: #e8f8f5; color: #27ae60; font-weight: bold; border: 1px solid #27ae60; }
-        .giorno-box.occupato { background: #fadbd8; color: #c0392b; font-weight: bold; border: 1px solid #e74c3c; cursor: pointer; transition: 0.2s; }
-        .giorno-box.occupato:hover { background: #f5b7b1; }
-        .giorno-box.richiesta { background: #d6eaf8; color: #2980b9; font-weight: bold; border: 1px solid #3498db; cursor: pointer; transition: 0.2s; }
-        .giorno-box.richiesta:hover { background: #aed6f1; }
-        .nome-calendario { font-size: 11px; display: block; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: normal; color: inherit; width: 100%;}
+        .giorno-box.occupato-full { background: #fadbd8; color: #c0392b; font-weight: bold; border: 1px solid #e74c3c; cursor: pointer; transition: 0.2s; }
+        .giorno-box.occupato-full:hover { background: #f5b7b1; }
+        
+        /* Metà verde e metà rossa */
+        .giorno-box.occupato-pm { 
+            color: #c0392b; font-weight: bold; cursor: pointer;
+            border: 1px solid transparent;
+            background: linear-gradient(to right, #e8f8f5 50%, #fadbd8 50%) padding-box,
+                        linear-gradient(to right, #27ae60 50%, #e74c3c 50%) border-box;
+        }
+        .giorno-box.occupato-am { 
+            color: #c0392b; font-weight: bold; cursor: pointer;
+            border: 1px solid transparent;
+            background: linear-gradient(to right, #fadbd8 50%, #e8f8f5 50%) padding-box,
+                        linear-gradient(to right, #e74c3c 50%, #27ae60 50%) border-box;
+        }
+        
+        .nome-calendario { font-size: 10px; display: block; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: normal; color: inherit; width: 100%; box-sizing: border-box;}
 
         /* MODALI */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
@@ -197,7 +213,7 @@
                 <strong>Numero totale ospiti:</strong> <span id="anteprima-ospiti"></span><br>
                 <strong>Data Arrivo:</strong> <span id="anteprima-arrivo"></span><br>
                 <strong>Data Partenza:</strong> <span id="anteprima-partenza"></span><br>
-                <strong>Stato:</strong> <span id="anteprima-stato" style="font-weight:bold;"></span>
+                <strong>Stato:</strong> <span id="anteprima-stato" style="font-weight:bold; color: var(--rosso-allerta);"></span>
             </div>
             <button onclick="chiudiModal('anteprimaCalendarioModal')" style="background:var(--colore-secondario); color:white; width:100%; padding:12px; border:none; border-radius:5px; margin-top:10px; font-weight:bold; cursor:pointer;">Chiudi</button>
         </div>
@@ -229,7 +245,7 @@
         let vistaAttuale = "dashboard"; 
         let meseCorrente = new Date().getMonth();
         let annoCorrente = new Date().getFullYear();
-        let graficoOccupazione = null;
+        let graficoOccupazione = null; 
 
         // --- PASSWORD E LOGIN ---
         function mostraNascondiPassword() { document.getElementById('passwordInput').type = (document.getElementById('passwordInput').type === 'password') ? 'text' : 'password'; }
@@ -377,7 +393,7 @@
                     else if (statoRichiesta === "Rifiutata") { clCardRichiesta = "card richiesta-rifiutata"; clBadgeRichiesta = "badge rosso"; }
 
                     let bottoniRichiesta = "";
-                    if (statoRichiesta === "Da Contattare") {
+                    if (statoRichiesta !== "Accettata" && statoRichiesta !== "Rifiutata") {
                         bottoniRichiesta = `<button class="btn-approva" onclick="cambiaStatoRichiesta(${index}, 'Accettata', event)">✅ Accetta</button><button class="btn-rifiuta" onclick="cambiaStatoRichiesta(${index}, 'Rifiutata', event)">❌ Rifiuta</button>`;
                     } else {
                         let esito = statoRichiesta.toLowerCase();
@@ -398,7 +414,7 @@
             if(elementiMostrati === 0) cont.innerHTML = '<div id="loading-message">Nessun dato presente in questa sezione.</div>';
         }
 
-        // --- DASHBOARD E GRAFICO INIETTATI SOTTO ---
+        // --- DASHBOARD ---
         function generaDashboard() {
             const cont = document.getElementById('contenitore-schede');
             let oggi = new Date(); oggi.setHours(0,0,0,0);
@@ -456,13 +472,18 @@
             let tassoOccupazione = Math.round((nottiOccupateMeseScelto / giorniNelMeseScelto) * 100);
             if (tassoOccupazione > 100) tassoOccupazione = 100;
 
-            // RESTITUIAMO LA STRUTTURA DELLE SCHEDE ESATTAMENTE COME NELLA TUA GRAFICA, SENZA TOCCARE IL GRID
             cont.innerHTML = `
-                <div class="dashboard-grid">
+                <div class="calendario-header" style="grid-column: 1 / -1; background:white; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05); margin-bottom: -10px;">
+                    <button onclick="cambiaMese(-1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">❮ Mese Prec.</button>
+                    <h2 style="color: var(--colore-principale); margin: 0; min-width: 150px; text-align: center;">${MESI[meseCorrente]} ${annoCorrente}</h2>
+                    <button onclick="cambiaMese(1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">Mese Succ. ❯</button>
+                </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
                     <div class="dash-card">
                         <div class="dash-icon">📈</div>
                         <div class="dash-value">${tassoOccupazione}%</div>
-                        <div class="dash-label">Occupazione (${MESI[meseCorrente]})</div>
+                        <div class="dash-label">Occupazione Mensile</div>
                     </div>
                     <div class="dash-card">
                         <div class="dash-icon">👥</div>
@@ -512,7 +533,7 @@
             }, 100);
         }
 
-        // --- CALENDARIO CONDIVISO ---
+        // --- CALENDARIO ---
         function cambiaMese(dir) { 
             meseCorrente += dir; 
             if(meseCorrente > 11) { meseCorrente = 0; annoCorrente++; } 
@@ -533,48 +554,80 @@
 
             for(let i=1; i<primoGiorno; i++) griglia.innerHTML += '<div class="giorno-box vuoto"></div>';
 
+            const escapeStr = (str) => String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
             for(let g=1; g<=giorniNelMese; g++) {
                 let dataCorrente = new Date(annoCorrente, meseCorrente, g);
-                let statoGiorno = "libero";
-                let nomeOspite = ""; let infoOspiti = ""; let infoArrivo = ""; let infoPartenza = ""; let infoTipologia = "";
+                
+                let occupantiAM = []; 
+                let occupantiPM = []; 
 
-                // Cerca nei Check-in (Solo Approvati)
                 for(let i=0; i<dbCheckin.length; i++) {
                     let r = dbCheckin[i];
                     if(!r[14] || !r[14].includes("Approvato")) continue;
                     let dIn = parseData(r[1]); let dOut = parseData(r[2]);
+                    if(!dIn || !dOut) continue;
+                    dIn.setHours(0,0,0,0); dOut.setHours(0,0,0,0);
                     
-                    if(dIn && dOut && dataCorrente >= dIn && dataCorrente < dOut) {
-                        statoGiorno = "occupato"; nomeOspite = String(r[4]||"") + " " + String(r[5]||""); 
-                        infoOspiti = String(r[3]||""); infoArrivo = String(r[1]||""); infoPartenza = String(r[2]||""); 
-                        infoTipologia = "Check-in Registrato"; break;
-                    }
+                    let ospiteObj = {n: String(r[4]||"")+" "+String(r[5]||""), o: String(r[3]||""), i: String(r[1]||""), f: String(r[2]||""), t: "Check-in Registrato"};
+                    
+                    if(dataCorrente > dIn && dataCorrente < dOut) { occupantiAM.push(ospiteObj); occupantiPM.push(ospiteObj); }
+                    else if (dataCorrente.getTime() === dIn.getTime()) { occupantiPM.push(ospiteObj); }
+                    else if (dataCorrente.getTime() === dOut.getTime()) { occupantiAM.push(ospiteObj); }
                 }
 
-                // Se libero, cerca nelle Richieste
-                if(statoGiorno === "libero") {
-                    for(let i=0; i<dbRichieste.length; i++) {
-                        let r = dbRichieste[i];
-                        if(r[9] !== "Accettata") continue;
-                        let dIn = parseData(r[5]); let dOut = parseData(r[6]);
-                        
-                        if(dIn && dOut && dataCorrente >= dIn && dataCorrente < dOut) {
-                            statoGiorno = "richiesta"; nomeOspite = String(r[1]||"") + " " + String(r[2]||""); 
-                            infoOspiti = String(r[7]||""); infoArrivo = String(r[5]||""); infoPartenza = String(r[6]||""); 
-                            infoTipologia = "Prenotazione dal Sito"; break;
-                        }
-                    }
+                for(let i=0; i<dbRichieste.length; i++) {
+                    let r = dbRichieste[i];
+                    if(r[9] !== "Accettata") continue;
+                    let dIn = parseData(r[5]); let dOut = parseData(r[6]);
+                    if(!dIn || !dOut) continue;
+                    dIn.setHours(0,0,0,0); dOut.setHours(0,0,0,0);
+                    
+                    let ospiteObj = {n: String(r[1]||"")+" "+String(r[2]||""), o: String(r[7]||""), i: String(r[5]||""), f: String(r[6]||""), t: "Prenotazione dal Sito"};
+                    
+                    if(dataCorrente > dIn && dataCorrente < dOut) { occupantiAM.push(ospiteObj); occupantiPM.push(ospiteObj); }
+                    else if (dataCorrente.getTime() === dIn.getTime()) { occupantiPM.push(ospiteObj); }
+                    else if (dataCorrente.getTime() === dOut.getTime()) { occupantiAM.push(ospiteObj); }
                 }
 
+                let isAM = occupantiAM.length > 0;
+                let isPM = occupantiPM.length > 0;
                 let boxHtml = "";
-                if (statoGiorno === 'occupato' || statoGiorno === 'richiesta') {
-                    let nomeSafe = nomeOspite.replace(/'/g, "\\'").replace(/"/g, '&quot;'); 
-                    let tipoSafe = infoTipologia.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                if (isAM && isPM) {
+                    if (occupantiAM[0].n === occupantiPM[0].n) {
+                        let o = occupantiAM[0];
+                        boxHtml = `
+                            <div class="giorno-box occupato-full" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">
+                                ${g}<br>
+                                <span style="font-size:9px; text-transform:uppercase;">Occupato</span><br>
+                                <span class="nome-calendario">${o.n}</span>
+                            </div>`;
+                    } else {
+                        let oIn = occupantiPM[0];
+                        boxHtml = `
+                            <div class="giorno-box occupato-full" onclick="mostraAnteprimaCalendario('${escapeStr(oIn.n)}', '${escapeStr(oIn.o)}', '${escapeStr(oIn.i)}', '${escapeStr(oIn.f)}', '${escapeStr(oIn.t)}')">
+                                ${g}<br>
+                                <span style="font-size:9px; text-transform:uppercase;">Cambio</span><br>
+                                <span class="nome-calendario">↑ ${occupantiAM[0].n}</span>
+                                <span class="nome-calendario">↓ ${occupantiPM[0].n}</span>
+                            </div>`;
+                    }
+                } else if (isPM) {
+                    let o = occupantiPM[0];
                     boxHtml = `
-                        <div class="giorno-box ${statoGiorno}" onclick="mostraAnteprimaCalendario('${nomeSafe}', '${infoOspiti}', '${infoArrivo}', '${infoPartenza}', '${tipoSafe}')">
+                        <div class="giorno-box occupato-pm" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">
                             ${g}<br>
-                            <span style="font-size:9px; text-transform:uppercase;">${statoGiorno === 'occupato' ? 'Occupato' : 'Richiesta'}</span><br>
-                            <span class="nome-calendario">${nomeOspite}</span>
+                            <span style="font-size:9px; text-transform:uppercase;">Check-in</span><br>
+                            <span class="nome-calendario" style="text-align:right; padding-right:4px;">${o.n}</span>
+                        </div>`;
+                } else if (isAM) {
+                    let o = occupantiAM[0];
+                    boxHtml = `
+                        <div class="giorno-box occupato-am" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">
+                            ${g}<br>
+                            <span style="font-size:9px; text-transform:uppercase;">Check-out</span><br>
+                            <span class="nome-calendario" style="text-align:left; padding-left:4px;">${o.n}</span>
                         </div>`;
                 } else {
                     boxHtml = `
@@ -620,24 +673,27 @@
             if (nuovoStato === 'Accettata') {
                 let req = dbRichieste[index]; let dReqIn = parseData(req[5]); let dReqOut = parseData(req[6]);
                 if (dReqIn && dReqOut) {
-                    let overlap = false;
+                    let overlap = false; let overlapNome = "";
                     for (let c of dbCheckin) {
                         if (c[14] === "Bloccato" || !c[14].includes("Approvato")) continue;
                         let dIn = parseData(c[1]); let dOut = parseData(c[2]);
-                        if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
+                        if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (c[4]||"")+" "+(c[5]||""); break; }
                     }
                     if (!overlap) {
                         for (let i = 0; i < dbRichieste.length; i++) {
                             if (i === index || dbRichieste[i][9] !== "Accettata") continue;
                             let c = dbRichieste[i]; let dIn = parseData(c[5]); let dOut = parseData(c[6]);
-                            if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
+                            if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (c[1]||"")+" "+(c[2]||""); break; }
                         }
                     }
-                    if (overlap) { alert("⚠️ IMPOSSIBILE ACCETTARE:\n\nLe date richieste si sovrappongono con un'altra prenotazione o richiesta confermata! Scegli 'Rifiuta' per questa richiesta."); return; }
+                    if (overlap) { 
+                        alert(`⛔ IMPOSSIBILE ACCETTARE: SOVRAPPOSIZIONE DATE!\n\nQuesta richiesta coincide con le date di: ${overlapNome}.\n\nDevi rifiutarla per evitare sovrapposizioni.`); 
+                        return; 
+                    }
                 }
             }
 
-            const btn = event.target; btn.innerText = "Attendere"; btn.disabled = true;
+            const btn = event.target; btn.innerText = "Attendere..."; btn.disabled = true;
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: dbRichieste.length - 1 - index, status: nuovoStato }) })
             .then(() => caricaDati());
         }
@@ -690,7 +746,8 @@
                     }
                 }
                 if (overlap) {
-                    if(!confirm(`⚠️ ATTENZIONE: SOVRAPPOSIZIONE DATE!\n\nQuesto check-in coincide con le date di: ${overlapNome}.\n\nSe è la stessa persona (la richiesta si trasforma in check-in), premi OK per approvare.\nSe è un errore, premi ANNULLA e bloccalo.`)) return;
+                    alert(`⛔ IMPOSSIBILE PROCEDERE: SOVRAPPOSIZIONE DATE!\n\nQuesto check-in coincide con le date di: ${overlapNome}.\n\nDevi prima liberare le date (rifiutando la vecchia richiesta o bloccando il vecchio check-in) per poter approvare questo.`); 
+                    return;
                 }
             }
 
@@ -727,7 +784,8 @@
                     }
                 }
                 if (overlap) {
-                    if(!confirm(`⚠️ ATTENZIONE: SOVRAPPOSIZIONE DATE!\n\nQuesto check-in coincide con le date di: ${overlapNome}.\n\nPremi OK per confermare, o ANNULLA per fermarti.`)) return;
+                    alert(`⛔ IMPOSSIBILE PROCEDERE: SOVRAPPOSIZIONE DATE!\n\nI nuovi dati coincidono con le date di: ${overlapNome}.\n\nModifica le date o libera il calendario prima di salvare.`); 
+                    return;
                 }
             }
 
