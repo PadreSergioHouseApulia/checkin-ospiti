@@ -76,14 +76,12 @@
         .btn-whatsapp { background-color: #25d366; color: white; }
         .btn-email { background-color: var(--blu-info); color: white; }
 
-        /* DASHBOARD & GRAFICO */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; grid-column: 1 / -1; margin-bottom: 30px; }
+        /* DASHBOARD */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; grid-column: 1 / -1; }
         .dash-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid var(--colore-principale); }
         .dash-icon { font-size: 40px; margin-bottom: 10px; }
         .dash-value { font-size: 32px; font-weight: bold; color: var(--colore-principale); margin-bottom: 5px; }
         .dash-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
-        
-        .grafico-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; }
 
         /* CALENDARIO VISIVO */
         .calendario-wrapper { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -214,7 +212,8 @@
             <div class="campo-edit"><label>Cognome</label><input type="text" id="edit-cognome"></div>
             <div class="campo-edit"><label>Documento (Tipo e Numero)</label><input type="text" id="edit-doc"></div>
             <div class="campo-edit"><label>Data di Nascita</label><input type="text" id="edit-nascita"></div>
-            <div class="campo-edit"><label>Luogo di Nascita</label><input type="text" id="edit-nazionalita"></div>
+            <div class="campo-edit"><label>Luogo di Nascita</label><input type="text" id="edit-luogo"></div>
+            <div class="campo-edit"><label>Nazionalità</label><input type="text" id="edit-nazionalita"></div>
             <div class="campo-edit"><label>Residenza</label><input type="text" id="edit-residenza"></div>
             <div class="campo-edit"><label>Ospiti Extra</label><textarea id="edit-ospitiExtra" rows="8"></textarea></div>
             <button onclick="salvaModifiche(event)" style="background:var(--rosso-allerta); color:white; width:100%; padding:15px; border:none; border-radius:5px; margin-top:15px; font-weight:bold; cursor:pointer;">💾 Salva e Approva</button>
@@ -230,8 +229,7 @@
         let vistaAttuale = "dashboard"; 
         let meseCorrente = new Date().getMonth();
         let annoCorrente = new Date().getFullYear();
-
-        let graficoOccupazione = null; // Variabile per tenere in memoria il grafico
+        let graficoOccupazione = null;
 
         // --- PASSWORD E LOGIN ---
         function mostraNascondiPassword() { document.getElementById('passwordInput').type = (document.getElementById('passwordInput').type === 'password') ? 'text' : 'password'; }
@@ -400,26 +398,23 @@
             if(elementiMostrati === 0) cont.innerHTML = '<div id="loading-message">Nessun dato presente in questa sezione.</div>';
         }
 
-        // --- DASHBOARD E GRAFICO ---
+        // --- DASHBOARD E GRAFICO INIETTATI SOTTO ---
         function generaDashboard() {
             const cont = document.getElementById('contenitore-schede');
             let oggi = new Date(); oggi.setHours(0,0,0,0);
             
-            // Usiamo il meseCorrente che può essere cambiato dalle freccette
             let giorniNelMeseScelto = new Date(annoCorrente, meseCorrente + 1, 0).getDate();
             
-            let ospitiTotaliStorico = 0; // Totale di sempre
+            let ospitiTotaliStorico = 0; 
             let nottiOccupateMeseScelto = 0;
             let prossimiArrivi = 0;
 
-            // Arrays per il grafico
             let labelsGiorni = [];
             let dataOccupazione = [];
             
-            // Inizializza i giorni del mese
             for(let i=1; i<=giorniNelMeseScelto; i++) {
                 labelsGiorni.push(i);
-                dataOccupazione.push(0); // 0 = libero, 1 = occupato
+                dataOccupazione.push(0); 
             }
 
             function calcolaNottiEPopolaGrafico(dIn, dOut) {
@@ -428,15 +423,14 @@
                     let date = new Date(annoCorrente, meseCorrente, d);
                     if(date >= dIn && date < dOut) {
                         count++;
-                        dataOccupazione[d-1] = 1; // Segna come occupato nel grafico
+                        dataOccupazione[d-1] = 1; 
                     }
                 }
                 return count;
             }
 
-            // Analizza Checkin 
             dbCheckin.forEach(c => {
-                if(c[14] === "Bloccato") return;
+                if(c[14] === "Bloccato" || !c[14].includes("Approvato")) return;
                 let dIn = parseData(c[1]); let dOut = parseData(c[2]);
                 if(!dIn || !dOut) return;
 
@@ -447,7 +441,6 @@
                 if(diffGiorni >= 0 && diffGiorni <= 7) prossimiArrivi++;
             });
 
-            // Analizza Richieste (solo accettate)
             dbRichieste.forEach(r => {
                 if(r[9] !== "Accettata") return;
                 let dIn = parseData(r[5]); let dOut = parseData(r[6]);
@@ -463,18 +456,13 @@
             let tassoOccupazione = Math.round((nottiOccupateMeseScelto / giorniNelMeseScelto) * 100);
             if (tassoOccupazione > 100) tassoOccupazione = 100;
 
+            // RESTITUIAMO LA STRUTTURA DELLE SCHEDE ESATTAMENTE COME NELLA TUA GRAFICA, SENZA TOCCARE IL GRID
             cont.innerHTML = `
-                <div class="calendario-header" style="grid-column: 1 / -1; background:white; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05); margin-bottom: -10px;">
-                    <button onclick="cambiaMese(-1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">❮ Mese Prec.</button>
-                    <h2 style="color: var(--colore-principale); margin: 0; min-width: 150px; text-align: center;">${MESI[meseCorrente]} ${annoCorrente}</h2>
-                    <button onclick="cambiaMese(1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">Mese Succ. ❯</button>
-                </div>
-
-                <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <div class="dashboard-grid">
                     <div class="dash-card">
                         <div class="dash-icon">📈</div>
                         <div class="dash-value">${tassoOccupazione}%</div>
-                        <div class="dash-label">Occupazione Mensile</div>
+                        <div class="dash-label">Occupazione (${MESI[meseCorrente]})</div>
                     </div>
                     <div class="dash-card">
                         <div class="dash-icon">👥</div>
@@ -488,20 +476,19 @@
                     </div>
                 </div>
 
-                <div class="grafico-container">
-                    <h3 style="text-align:center; color:var(--colore-principale); margin-top:0;">Andamento Occupazione (${MESI[meseCorrente]})</h3>
+                <div class="grafico-container" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <button onclick="cambiaMese(-1)" style="padding: 8px 12px; cursor: pointer; border: none; background: #f4f7f6; border-radius: 5px; font-weight: bold; color: var(--colore-principale);">❮ Prec</button>
+                        <h3 style="margin: 0; color: var(--colore-principale); text-align: center;">Andamento Mensile (${MESI[meseCorrente]} ${annoCorrente})</h3>
+                        <button onclick="cambiaMese(1)" style="padding: 8px 12px; cursor: pointer; border: none; background: #f4f7f6; border-radius: 5px; font-weight: bold; color: var(--colore-principale);">Succ ❯</button>
+                    </div>
                     <canvas id="occupazioneChart" height="80"></canvas>
                 </div>
             `;
 
-            // DISEGNA IL GRAFICO CON CHART.JS
             setTimeout(() => {
                 const ctx = document.getElementById('occupazioneChart').getContext('2d');
-                
-                // Distruggi il grafico vecchio se esiste, per non sovrapporli
-                if (graficoOccupazione != null) {
-                    graficoOccupazione.destroy();
-                }
+                if (graficoOccupazione != null) { graficoOccupazione.destroy(); }
 
                 graficoOccupazione = new Chart(ctx, {
                     type: 'bar',
@@ -518,40 +505,21 @@
                     },
                     options: {
                         responsive: true,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.raw === 1 ? "Occupato" : "Libero";
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 1,
-                                ticks: { stepSize: 1, callback: function(value) { return value === 1 ? 'Sì' : 'No'; } }
-                            }
-                        }
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return c.raw === 1 ? "Occupato" : "Libero"; } } } },
+                        scales: { y: { beginAtZero: true, max: 1, ticks: { stepSize: 1, callback: function(v) { return v === 1 ? 'Sì' : 'No'; } } } }
                     }
                 });
             }, 100);
         }
 
-        // --- CALENDARIO CONDIVISO (SIA PER DASHBOARD CHE PER TAB CALENDARIO) ---
+        // --- CALENDARIO CONDIVISO ---
         function cambiaMese(dir) { 
             meseCorrente += dir; 
             if(meseCorrente > 11) { meseCorrente = 0; annoCorrente++; } 
             if(meseCorrente < 0) { meseCorrente = 11; annoCorrente--; } 
             
-            // Se siamo nella dashboard, ricarica la dashboard per aggiornare il grafico
-            if (vistaAttuale === 'dashboard') {
-                generaDashboard();
-            } else if (vistaAttuale === 'calendario') {
-                generaCalendario();
-            }
+            if (vistaAttuale === 'dashboard') generaDashboard();
+            else if (vistaAttuale === 'calendario') generaCalendario();
         }
 
         function generaCalendario() {
@@ -570,10 +538,10 @@
                 let statoGiorno = "libero";
                 let nomeOspite = ""; let infoOspiti = ""; let infoArrivo = ""; let infoPartenza = ""; let infoTipologia = "";
 
-                // Cerca nei Check-in
+                // Cerca nei Check-in (Solo Approvati)
                 for(let i=0; i<dbCheckin.length; i++) {
                     let r = dbCheckin[i];
-                    if(r[14] === "Bloccato") continue;
+                    if(!r[14] || !r[14].includes("Approvato")) continue;
                     let dIn = parseData(r[1]); let dOut = parseData(r[2]);
                     
                     if(dIn && dOut && dataCorrente >= dIn && dataCorrente < dOut) {
@@ -654,7 +622,7 @@
                 if (dReqIn && dReqOut) {
                     let overlap = false;
                     for (let c of dbCheckin) {
-                        if (c[14] === "Bloccato") continue;
+                        if (c[14] === "Bloccato" || !c[14].includes("Approvato")) continue;
                         let dIn = parseData(c[1]); let dOut = parseData(c[2]);
                         if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
                     }
@@ -669,7 +637,7 @@
                 }
             }
 
-            const btn = event.target; btn.innerText = "..."; btn.disabled = true;
+            const btn = event.target; btn.innerText = "Attendere"; btn.disabled = true;
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: dbRichieste.length - 1 - index, status: nuovoStato }) })
             .then(() => caricaDati());
         }
@@ -703,6 +671,29 @@
         }
 
         function approvaEScarica(index, event) {
+            let chk = dbCheckin[index];
+            let dReqIn = parseData(chk[1]); let dReqOut = parseData(chk[2]);
+            if (dReqIn && dReqOut) {
+                let overlap = false; let overlapNome = "";
+                for (let i = 0; i < dbCheckin.length; i++) {
+                    if (i === index) continue;
+                    let c = dbCheckin[i];
+                    if (!c[14] || !c[14].includes("Approvato")) continue;
+                    let dIn = parseData(c[1]); let dOut = parseData(c[2]);
+                    if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (c[4]||"")+" "+(c[5]||""); break; }
+                }
+                if (!overlap) {
+                    for (let r of dbRichieste) {
+                        if (r[9] !== "Accettata") continue;
+                        let dIn = parseData(r[5]); let dOut = parseData(r[6]);
+                        if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (r[1]||"")+" "+(r[2]||""); break; }
+                    }
+                }
+                if (overlap) {
+                    if(!confirm(`⚠️ ATTENZIONE: SOVRAPPOSIZIONE DATE!\n\nQuesto check-in coincide con le date di: ${overlapNome}.\n\nSe è la stessa persona (la richiesta si trasforma in check-in), premi OK per approvare.\nSe è un errore, premi ANNULLA e bloccalo.`)) return;
+                }
+            }
+
             const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true;
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Approvato" }) })
             .then(() => { generaCSVCompleto(dbCheckin[index]); caricaDati(); });
@@ -716,8 +707,31 @@
         }
 
         function salvaModifiche(event) {
-            const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true;
             const index = document.getElementById('edit-index').value;
+            let chk = dbCheckin[index];
+            let dReqIn = parseData(chk[1]); let dReqOut = parseData(chk[2]);
+            if (dReqIn && dReqOut) {
+                let overlap = false; let overlapNome = "";
+                for (let i = 0; i < dbCheckin.length; i++) {
+                    if (i == index) continue;
+                    let c = dbCheckin[i];
+                    if (!c[14] || !c[14].includes("Approvato")) continue;
+                    let dIn = parseData(c[1]); let dOut = parseData(c[2]);
+                    if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (c[4]||"")+" "+(c[5]||""); break; }
+                }
+                if (!overlap) {
+                    for (let r of dbRichieste) {
+                        if (r[9] !== "Accettata") continue;
+                        let dIn = parseData(r[5]); let dOut = parseData(r[6]);
+                        if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (r[1]||"")+" "+(r[2]||""); break; }
+                    }
+                }
+                if (overlap) {
+                    if(!confirm(`⚠️ ATTENZIONE: SOVRAPPOSIZIONE DATE!\n\nQuesto check-in coincide con le date di: ${overlapNome}.\n\nPremi OK per confermare, o ANNULLA per fermarti.`)) return;
+                }
+            }
+
+            const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true;
             const payload = {
                 action: "editDati", row: dbCheckin.length - 1 - index, nome: document.getElementById('edit-nome').value, cognome: document.getElementById('edit-cognome').value,
                 documento: document.getElementById('edit-doc').value, nascita: document.getElementById('edit-nascita').value,
@@ -732,7 +746,7 @@
 
         function generaCSVCompleto(riga) {
             const LICENZA = "SLBA000982-0018"; let csv = [];
-            const fmtS = (s) => s.toUpperCase().startsWith('M') ? "1" : "2";
+            const fmtS = (s) => String(s).toUpperCase().startsWith('M') ? "1" : "2";
             csv.push([1, String(riga[4]||"").toUpperCase(), String(riga[5]||"").toUpperCase(), parseDataString(riga[1]), parseDataString(riga[2]), "", LICENZA, fmtS(riga[7]||""), parseDataString(riga[8])].join(","));
             let extraStr = riga[15] || "";
             if (extraStr.includes("--- OSPITE")) {
