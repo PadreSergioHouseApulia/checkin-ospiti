@@ -570,6 +570,32 @@
             });
         });
     }
+	// --- BLOCCO DELLE DATE PASSATE PER IL CHECK-IN ---
+    document.addEventListener("DOMContentLoaded", function() {
+        // I campi si chiamano checkin e checkout nel tuo form originale
+        const dataCheckin = document.querySelector('input[name="checkin"]');
+        const dataCheckout = document.querySelector('input[name="checkout"]');
+        
+        if(dataCheckin && dataCheckout) {
+            let dataDiOggi = new Date().toISOString().split("T")[0];
+            dataCheckin.setAttribute('min', dataDiOggi);
+            dataCheckout.setAttribute('min', dataDiOggi);
+
+            dataCheckin.addEventListener('change', function() {
+                let dataMinCheckout = new Date(this.value);
+                dataMinCheckout.setDate(dataMinCheckout.getDate() + 1); // Sposta in avanti di 1 giorno
+                let limiteCheckoutStr = dataMinCheckout.toISOString().split("T")[0];
+                
+                dataCheckout.setAttribute('min', limiteCheckoutStr);
+                
+                // Azzera il checkout se quello selezionato prima è ora "invalido"
+                if(dataCheckout.value && dataCheckout.value < limiteCheckoutStr) {
+                    dataCheckout.value = "";
+                }
+            });
+        }
+    });
+
 </script>
 
 </body>
