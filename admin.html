@@ -6,6 +6,8 @@
     <title>Admin | PadreSergio House</title>
     <link rel="icon" type="image/x-icon" href="icona_admin.ico">
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --colore-principale: #5e7153; 
@@ -44,6 +46,7 @@
         .header-sezione { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-sezione h2 { margin: 0; color: var(--colore-principale); }
 
+        /* SCHEDE */
         .grid-prenotazioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--colore-card); border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--giallo-attesa); transition: transform 0.2s; }
         .card.approvato { border-top-color: var(--verde-ok); }
@@ -73,6 +76,15 @@
         .btn-whatsapp { background-color: #25d366; color: white; }
         .btn-email { background-color: var(--blu-info); color: white; }
 
+        /* DASHBOARD & GRAFICO */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; grid-column: 1 / -1; margin-bottom: 30px; }
+        .dash-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid var(--colore-principale); }
+        .dash-icon { font-size: 40px; margin-bottom: 10px; }
+        .dash-value { font-size: 32px; font-weight: bold; color: var(--colore-principale); margin-bottom: 5px; }
+        .dash-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
+        
+        .grafico-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; }
+
         /* CALENDARIO VISIVO */
         .calendario-wrapper { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .calendario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -96,7 +108,7 @@
         .campo-edit { margin-bottom: 10px; }
         .campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 3px; }
         .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
-        #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; }
+        #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; grid-column: 1 / -1;}
         
         /* TASTO NAV */
         .btn-nav-azione { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
@@ -128,14 +140,15 @@
 
         <div class="container">
             <div class="tab-container">
-                <button class="tab-button active" id="tab-checkin" onclick="cambiaVista('checkin')">📝 Check-in Attivi</button>
+                <button class="tab-button active" id="tab-dashboard" onclick="cambiaVista('dashboard')">📊 Dashboard</button>
+                <button class="tab-button" id="tab-checkin" onclick="cambiaVista('checkin')">📝 Check-in Attivi</button>
                 <button class="tab-button" id="tab-richieste" onclick="cambiaVista('richieste')">📩 Richieste Sito</button>
                 <button class="tab-button" id="tab-calendario" onclick="cambiaVista('calendario')">📅 Calendario</button>
                 <button class="tab-button" id="tab-archivio" onclick="cambiaVista('archivio')">🗄️ Archivio Passati</button>
             </div>
 
             <div class="header-sezione">
-                <h2 id="titolo-sezione">Check-in Ricevuti</h2>
+                <h2 id="titolo-sezione">Statistiche in Tempo Reale</h2>
                 <button style="padding: 10px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; background: var(--colore-secondario); color: white;" onclick="caricaDati()">🔄 Aggiorna Dati</button>
             </div>
             
@@ -210,14 +223,17 @@
 
     <script>
         const LINK_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec";
+        const MESI = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
         
         let dbCheckin = []; 
         let dbRichieste = []; 
-        let vistaAttuale = "checkin";
+        let vistaAttuale = "dashboard"; 
         let meseCorrente = new Date().getMonth();
         let annoCorrente = new Date().getFullYear();
 
-        // --- PASSWORD GESTION ---
+        let graficoOccupazione = null; // Variabile per tenere in memoria il grafico
+
+        // --- PASSWORD E LOGIN ---
         function mostraNascondiPassword() { document.getElementById('passwordInput').type = (document.getElementById('passwordInput').type === 'password') ? 'text' : 'password'; }
         
         function verificaPassword() {
@@ -254,7 +270,7 @@
             if (nuova !== conf) { msg.style.display = 'block'; msg.style.color = 'red'; msg.innerText = "Le nuove password non coincidono!"; return; }
             if (nuova.length < 6) { msg.style.display = 'block'; msg.style.color = 'red'; msg.innerText = "La password deve avere almeno 6 caratteri!"; return; }
 
-            btn.innerText = "Salvataggio...💾"; btn.disabled = true;
+            btn.innerText = "Salvataggio..."; btn.disabled = true;
 
             fetch(LINK_GOOGLE_SCRIPT, {
                 method: "POST",
@@ -280,74 +296,20 @@
             document.getElementById('contenitore-schede').style.display = (tipo === 'calendario') ? 'none' : 'grid';
             document.getElementById('contenitore-calendario').style.display = (tipo === 'calendario') ? 'block' : 'none';
 
-            if(tipo === 'checkin') document.getElementById('titolo-sezione').innerText = "Check-in Attivi";
-            else if(tipo === 'richieste') document.getElementById('titolo-sezione').innerText = "Richieste di Prenotazione";
-            else if(tipo === 'archivio') document.getElementById('titolo-sezione').innerText = "Archivio Check-in Passati";
-            else if(tipo === 'calendario') document.getElementById('titolo-sezione').innerText = "Calendario Completo";
+            const titoli = { 
+                dashboard: "Statistiche in Tempo Reale",
+                checkin: "Check-in Attivi",
+                richieste: "Richieste di Prenotazione",
+                calendario: "Calendario Completo",
+                archivio: "Archivio Check-in Passati"
+            };
+            document.getElementById('titolo-sezione').innerText = titoli[tipo];
 
             if (tipo === 'calendario') generaCalendario();
-            else caricaDati();
+            else renderizzaSchedeODashboard();
         }
 
-        // --- MESSAGGI WHATSAPP / EMAIL ---
-        function copiaMessaggio(nome, dataArrivo) {
-            const msg = `Ciao ${nome}, ti aspettiamo a PadreSergio House il ${dataArrivo}!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!`;
-            navigator.clipboard.writeText(msg).then(() => alert("Messaggio copiato!"));
-        }
-
-        function generaLinkMessaggio(nome, arrivo, partenza, telefono, email, tipo, esito) {
-            let testo = ""; let url = "";
-            if (esito === 'accettata') {
-                testo = `Ciao ${nome},\nsiamo felici di confermarti la disponibilità per le date dal ${arrivo} al ${partenza}!\n\nPer confermare la prenotazione e ricevere i dettagli sul pagamento, rispondi a questo messaggio.\n\nTi aspettiamo a PadreSergio House!`;
-            } else {
-                testo = `Gentile ${nome},\nti ringraziamo per aver scelto PadreSergio House. Purtroppo per le date dal ${arrivo} al ${partenza} non abbiamo disponibilità in quanto la struttura è già occupata.\n\nSperiamo di poterti accogliere in futuro!\n\nCordiali saluti,\nPadreSergio House`;
-            }
-
-            if (tipo === 'whatsapp') url = `https://wa.me/${String(telefono || '').replace(/\D/g, '')}?text=${encodeURIComponent(testo)}`;
-            else if (tipo === 'email') url = `mailto:${email || ''}?subject=${encodeURIComponent(esito === 'accettata' ? "Disponibilità Confermata" : "Aggiornamento Disponibilità")}&body=${encodeURIComponent(testo)}`;
-            return url;
-        }
-
-        // --- OVERBOOKING E SALVATAGGIO ---
-        function cambiaStatoRichiesta(index, nuovoStato, event) {
-            if (nuovoStato === 'Accettata') {
-                let req = dbRichieste[index];
-                let dReqIn = parseData(req[5]); let dReqOut = parseData(req[6]);
-                
-                if (dReqIn && dReqOut) {
-                    let overlap = false;
-                    for (let c of dbCheckin) {
-                        if (c[14] === "Bloccato") continue;
-                        let dIn = parseData(c[1]); let dOut = parseData(c[2]);
-                        if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
-                    }
-                    if (!overlap) {
-                        for (let i = 0; i < dbRichieste.length; i++) {
-                            if (i === index || dbRichieste[i][9] !== "Accettata") continue;
-                            let c = dbRichieste[i]; let dIn = parseData(c[5]); let dOut = parseData(c[6]);
-                            if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
-                        }
-                    }
-                    if (overlap) {
-                        alert("⚠️ IMPOSSIBILE ACCETTARE:\n\nLe date richieste si sovrappongono con un'altra prenotazione o richiesta confermata! Scegli 'Rifiuta' per questa richiesta.");
-                        return; 
-                    }
-                }
-            }
-
-            const btn = event.target; btn.innerText = "..."; btn.disabled = true;
-            const rigaReale = dbRichieste.length - 1 - index;
-            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: rigaReale, status: nuovoStato }) })
-            .then(() => caricaDati());
-        }
-
-        function apriInfoRichiesta(index) {
-            const r = dbRichieste[index];
-            document.getElementById('modal-titolo').innerText = `Richiesta: ${r[1]} ${r[2]}`;
-            document.getElementById('contenuto-modale').innerHTML = `<div class="sezione-dati"><p><strong>Periodo:</strong> dal ${r[5]} al ${r[6]}</p><p><strong>Ospiti:</strong> ${r[7]}</p><p><strong>Contatti:</strong> ${r[3]} | Tel. ${r[4]}</p><p><strong>Messaggio dell'ospite:</strong><br><i>"${r[8] || 'Nessun messaggio'}"</i></p></div>`;
-            document.getElementById('dettagliModal').style.display = 'flex';
-        }
-
+        // --- CARICAMENTO DATI ---
         function caricaDati() {
             if(vistaAttuale !== 'calendario') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message">Sincronizzazione dati in corso... ⏳</div>';
             
@@ -356,14 +318,16 @@
                 fetch(LINK_GOOGLE_SCRIPT + "?tipo=richieste").then(r => r.json())
             ]).then(([checkins, richieste]) => {
                 dbCheckin = checkins.reverse(); dbRichieste = richieste.reverse();
-                renderSchedeO_Calendario();
+                renderizzaSchedeODashboard();
             }).catch(() => {
                 if(vistaAttuale !== 'calendario') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione al database.</div>';
             });
         }
 
-        function renderSchedeO_Calendario() {
+        // --- RENDERIZZA VISTE ---
+        function renderizzaSchedeODashboard() {
             if (vistaAttuale === 'calendario') { generaCalendario(); return; }
+            if (vistaAttuale === 'dashboard') { generaDashboard(); return; }
 
             const cont = document.getElementById('contenitore-schede');
             cont.innerHTML = ''; 
@@ -436,9 +400,159 @@
             if(elementiMostrati === 0) cont.innerHTML = '<div id="loading-message">Nessun dato presente in questa sezione.</div>';
         }
 
-        // --- CALENDARIO ---
-        const MESI = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-        function cambiaMese(dir) { meseCorrente += dir; if(meseCorrente > 11) { meseCorrente = 0; annoCorrente++; } if(meseCorrente < 0) { meseCorrente = 11; annoCorrente--; } generaCalendario(); }
+        // --- DASHBOARD E GRAFICO ---
+        function generaDashboard() {
+            const cont = document.getElementById('contenitore-schede');
+            let oggi = new Date(); oggi.setHours(0,0,0,0);
+            
+            // Usiamo il meseCorrente che può essere cambiato dalle freccette
+            let giorniNelMeseScelto = new Date(annoCorrente, meseCorrente + 1, 0).getDate();
+            
+            let ospitiTotaliStorico = 0; // Totale di sempre
+            let nottiOccupateMeseScelto = 0;
+            let prossimiArrivi = 0;
+
+            // Arrays per il grafico
+            let labelsGiorni = [];
+            let dataOccupazione = [];
+            
+            // Inizializza i giorni del mese
+            for(let i=1; i<=giorniNelMeseScelto; i++) {
+                labelsGiorni.push(i);
+                dataOccupazione.push(0); // 0 = libero, 1 = occupato
+            }
+
+            function calcolaNottiEPopolaGrafico(dIn, dOut) {
+                let count = 0;
+                for(let d=1; d<=giorniNelMeseScelto; d++) {
+                    let date = new Date(annoCorrente, meseCorrente, d);
+                    if(date >= dIn && date < dOut) {
+                        count++;
+                        dataOccupazione[d-1] = 1; // Segna come occupato nel grafico
+                    }
+                }
+                return count;
+            }
+
+            // Analizza Checkin 
+            dbCheckin.forEach(c => {
+                if(c[14] === "Bloccato") return;
+                let dIn = parseData(c[1]); let dOut = parseData(c[2]);
+                if(!dIn || !dOut) return;
+
+                ospitiTotaliStorico += parseInt(c[3]) || 0;
+                nottiOccupateMeseScelto += calcolaNottiEPopolaGrafico(dIn, dOut);
+
+                let diffGiorni = (dIn - oggi) / (1000 * 60 * 60 * 24);
+                if(diffGiorni >= 0 && diffGiorni <= 7) prossimiArrivi++;
+            });
+
+            // Analizza Richieste (solo accettate)
+            dbRichieste.forEach(r => {
+                if(r[9] !== "Accettata") return;
+                let dIn = parseData(r[5]); let dOut = parseData(r[6]);
+                if(!dIn || !dOut) return;
+
+                ospitiTotaliStorico += parseInt(r[7]) || 0;
+                nottiOccupateMeseScelto += calcolaNottiEPopolaGrafico(dIn, dOut);
+
+                let diffGiorni = (dIn - oggi) / (1000 * 60 * 60 * 24);
+                if(diffGiorni >= 0 && diffGiorni <= 7) prossimiArrivi++;
+            });
+
+            let tassoOccupazione = Math.round((nottiOccupateMeseScelto / giorniNelMeseScelto) * 100);
+            if (tassoOccupazione > 100) tassoOccupazione = 100;
+
+            cont.innerHTML = `
+                <div class="calendario-header" style="grid-column: 1 / -1; background:white; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05); margin-bottom: -10px;">
+                    <button onclick="cambiaMese(-1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">❮ Mese Prec.</button>
+                    <h2 style="color: var(--colore-principale); margin: 0; min-width: 150px; text-align: center;">${MESI[meseCorrente]} ${annoCorrente}</h2>
+                    <button onclick="cambiaMese(1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">Mese Succ. ❯</button>
+                </div>
+
+                <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                    <div class="dash-card">
+                        <div class="dash-icon">📈</div>
+                        <div class="dash-value">${tassoOccupazione}%</div>
+                        <div class="dash-label">Occupazione Mensile</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-icon">👥</div>
+                        <div class="dash-value">${ospitiTotaliStorico}</div>
+                        <div class="dash-label">Ospiti Totali (Storico)</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-icon">🛎️</div>
+                        <div class="dash-value">${prossimiArrivi}</div>
+                        <div class="dash-label">Arrivi in 7 gg (Da Oggi)</div>
+                    </div>
+                </div>
+
+                <div class="grafico-container">
+                    <h3 style="text-align:center; color:var(--colore-principale); margin-top:0;">Andamento Occupazione (${MESI[meseCorrente]})</h3>
+                    <canvas id="occupazioneChart" height="80"></canvas>
+                </div>
+            `;
+
+            // DISEGNA IL GRAFICO CON CHART.JS
+            setTimeout(() => {
+                const ctx = document.getElementById('occupazioneChart').getContext('2d');
+                
+                // Distruggi il grafico vecchio se esiste, per non sovrapporli
+                if (graficoOccupazione != null) {
+                    graficoOccupazione.destroy();
+                }
+
+                graficoOccupazione = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labelsGiorni,
+                        datasets: [{
+                            label: 'Notte Occupata',
+                            data: dataOccupazione,
+                            backgroundColor: dataOccupazione.map(v => v === 1 ? 'rgba(94, 113, 83, 0.8)' : 'rgba(232, 248, 245, 0.5)'),
+                            borderColor: dataOccupazione.map(v => v === 1 ? '#5e7153' : '#bdc3c7'),
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.raw === 1 ? "Occupato" : "Libero";
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1,
+                                ticks: { stepSize: 1, callback: function(value) { return value === 1 ? 'Sì' : 'No'; } }
+                            }
+                        }
+                    }
+                });
+            }, 100);
+        }
+
+        // --- CALENDARIO CONDIVISO (SIA PER DASHBOARD CHE PER TAB CALENDARIO) ---
+        function cambiaMese(dir) { 
+            meseCorrente += dir; 
+            if(meseCorrente > 11) { meseCorrente = 0; annoCorrente++; } 
+            if(meseCorrente < 0) { meseCorrente = 11; annoCorrente--; } 
+            
+            // Se siamo nella dashboard, ricarica la dashboard per aggiornare il grafico
+            if (vistaAttuale === 'dashboard') {
+                generaDashboard();
+            } else if (vistaAttuale === 'calendario') {
+                generaCalendario();
+            }
+        }
 
         function generaCalendario() {
             document.getElementById('mese-anno-titolo').innerText = MESI[meseCorrente] + " " + annoCorrente;
@@ -456,20 +570,26 @@
                 let statoGiorno = "libero";
                 let nomeOspite = ""; let infoOspiti = ""; let infoArrivo = ""; let infoPartenza = ""; let infoTipologia = "";
 
-                for(let c of dbCheckin) {
-                    if(c[14] === "Bloccato") continue;
-                    let dIn = parseData(c[1]); let dOut = parseData(c[2]);
+                // Cerca nei Check-in
+                for(let i=0; i<dbCheckin.length; i++) {
+                    let r = dbCheckin[i];
+                    if(r[14] === "Bloccato") continue;
+                    let dIn = parseData(r[1]); let dOut = parseData(r[2]);
+                    
                     if(dIn && dOut && dataCorrente >= dIn && dataCorrente < dOut) {
-                        statoGiorno = "occupato"; nomeOspite = String(c[4]||"") + " " + String(c[5]||""); 
-                        infoOspiti = String(c[3]||""); infoArrivo = String(c[1]||""); infoPartenza = String(c[2]||""); 
+                        statoGiorno = "occupato"; nomeOspite = String(r[4]||"") + " " + String(r[5]||""); 
+                        infoOspiti = String(r[3]||""); infoArrivo = String(r[1]||""); infoPartenza = String(r[2]||""); 
                         infoTipologia = "Check-in Registrato"; break;
                     }
                 }
 
+                // Se libero, cerca nelle Richieste
                 if(statoGiorno === "libero") {
-                    for(let r of dbRichieste) {
+                    for(let i=0; i<dbRichieste.length; i++) {
+                        let r = dbRichieste[i];
                         if(r[9] !== "Accettata") continue;
                         let dIn = parseData(r[5]); let dOut = parseData(r[6]);
+                        
                         if(dIn && dOut && dataCorrente >= dIn && dataCorrente < dOut) {
                             statoGiorno = "richiesta"; nomeOspite = String(r[1]||"") + " " + String(r[2]||""); 
                             infoOspiti = String(r[7]||""); infoArrivo = String(r[5]||""); infoPartenza = String(r[6]||""); 
@@ -508,7 +628,59 @@
             document.getElementById('anteprimaCalendarioModal').style.display = 'flex';
         }
 
-        // --- UTILITY E MODALI ---
+        // --- MESSAGGI WHATSAPP / EMAIL ---
+        function copiaMessaggio(nome, dataArrivo) {
+            const msg = `Ciao ${nome}, ti aspettiamo a PadreSergio House il ${dataArrivo}!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!`;
+            navigator.clipboard.writeText(msg).then(() => alert("Messaggio copiato!"));
+        }
+
+        function generaLinkMessaggio(nome, arrivo, partenza, telefono, email, tipo, esito) {
+            let testo = ""; let url = "";
+            if (esito === 'accettata') {
+                testo = `Ciao ${nome},\nsiamo felici di confermarti la disponibilità per le date dal ${arrivo} al ${partenza}!\n\nPer confermare la prenotazione e ricevere i dettagli sul pagamento, rispondi a questo messaggio.\n\nTi aspettiamo a PadreSergio House!`;
+            } else {
+                testo = `Gentile ${nome},\nti ringraziamo per aver scelto PadreSergio House. Purtroppo per le date dal ${arrivo} al ${partenza} non abbiamo disponibilità in quanto la struttura è già occupata.\n\nSperiamo di poterti accogliere in futuro!\n\nCordiali saluti,\nPadreSergio House`;
+            }
+
+            if (tipo === 'whatsapp') url = `https://wa.me/${String(telefono || '').replace(/\D/g, '')}?text=${encodeURIComponent(testo)}`;
+            else if (tipo === 'email') url = `mailto:${email || ''}?subject=${encodeURIComponent(esito === 'accettata' ? "Disponibilità Confermata" : "Aggiornamento Disponibilità")}&body=${encodeURIComponent(testo)}`;
+            return url;
+        }
+
+        // --- OVERBOOKING E AZIONI CHECK-IN/RICHIESTE ---
+        function cambiaStatoRichiesta(index, nuovoStato, event) {
+            if (nuovoStato === 'Accettata') {
+                let req = dbRichieste[index]; let dReqIn = parseData(req[5]); let dReqOut = parseData(req[6]);
+                if (dReqIn && dReqOut) {
+                    let overlap = false;
+                    for (let c of dbCheckin) {
+                        if (c[14] === "Bloccato") continue;
+                        let dIn = parseData(c[1]); let dOut = parseData(c[2]);
+                        if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
+                    }
+                    if (!overlap) {
+                        for (let i = 0; i < dbRichieste.length; i++) {
+                            if (i === index || dbRichieste[i][9] !== "Accettata") continue;
+                            let c = dbRichieste[i]; let dIn = parseData(c[5]); let dOut = parseData(c[6]);
+                            if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; break; }
+                        }
+                    }
+                    if (overlap) { alert("⚠️ IMPOSSIBILE ACCETTARE:\n\nLe date richieste si sovrappongono con un'altra prenotazione o richiesta confermata! Scegli 'Rifiuta' per questa richiesta."); return; }
+                }
+            }
+
+            const btn = event.target; btn.innerText = "..."; btn.disabled = true;
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: dbRichieste.length - 1 - index, status: nuovoStato }) })
+            .then(() => caricaDati());
+        }
+
+        function apriInfoRichiesta(index) {
+            const r = dbRichieste[index];
+            document.getElementById('modal-titolo').innerText = `Richiesta: ${r[1]} ${r[2]}`;
+            document.getElementById('contenuto-modale').innerHTML = `<div class="sezione-dati"><p><strong>Periodo:</strong> dal ${r[5]} al ${r[6]}</p><p><strong>Ospiti:</strong> ${r[7]}</p><p><strong>Contatti:</strong> ${r[3]} | Tel. ${r[4]}</p><p><strong>Messaggio:</strong><br><i>"${r[8] || 'Nessun messaggio'}"</i></p></div>`;
+            document.getElementById('dettagliModal').style.display = 'flex';
+        }
+
         function chiudiModal(id) { document.getElementById(id).style.display = 'none'; }
         
         function apriDettagli(index) {
@@ -521,12 +693,12 @@
         }
 
         function apriModifica(index) {
-            const riga = dbCheckin[index];
-            document.getElementById('edit-index').value = index; document.getElementById('edit-nome').value = riga[4];
-            document.getElementById('edit-cognome').value = riga[5]; document.getElementById('edit-doc').value = riga[6];
-            document.getElementById('edit-nascita').value = riga[8]; document.getElementById('edit-luogo').value = riga[9];
-            document.getElementById('edit-nazionalita').value = riga[10]; document.getElementById('edit-residenza').value = riga[11];
-            document.getElementById('edit-ospitiExtra').value = riga[15] || "";
+            const r = dbCheckin[index];
+            document.getElementById('edit-index').value = index; document.getElementById('edit-nome').value = r[4];
+            document.getElementById('edit-cognome').value = r[5]; document.getElementById('edit-doc').value = r[6];
+            document.getElementById('edit-nascita').value = r[8]; document.getElementById('edit-luogo').value = r[9];
+            document.getElementById('edit-nazionalita').value = r[10]; document.getElementById('edit-residenza').value = r[11];
+            document.getElementById('edit-ospitiExtra').value = r[15] || "";
             document.getElementById('modificaModal').style.display = 'flex';
         }
 
