@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Admin | PadreSergio House</title>
     <meta name="description" content="Pannello di amministrazione riservato - PadreSergio House Apulia.">
+
     <meta property="og:title" content="Admin | PadreSergio House">
     <meta property="og:description" content="Pannello di amministrazione riservato per la gestione della struttura.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://padresergiohouseapulia.github.io/Padresergio_Web/admin.html">
-    <meta property="og:image" content="https://padresergiohouseapulia.github.io/Padresergio_Web/anteprima.jpg">
-    <meta property="og:image:secure_url" content="https://padresergiohouseapulia.github.io/Padresergio_Web/anteprima.jpg">
+    <meta property="og:image" content="https://padresergiohouseapulia.github.io/Padresergio_Web/anteprima_admin.jpg">
+    <meta property="og:image:secure_url" content="https://padresergiohouseapulia.github.io/Padresergio_Web/anteprima_admin.jpg">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -721,9 +723,19 @@
         function apriDettagli(index) {
             const riga = dbCheckin[index];
             document.getElementById('modal-titolo').innerText = 'Dettagli: ' + riga[4] + ' ' + riga[5];
-            let f1 = riga[12] ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte</a>` : '';
-            let f2 = riga[13] ? `<a href="${riga[13]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro</a>` : '';
-            document.getElementById('contenuto-modale').innerHTML = `<div class="sezione-dati"><p style="font-size:14px;"><strong>Doc:</strong> ${riga[6]}<br><strong>Nato:</strong> ${riga[8]} a ${riga[9]}<br><strong>Naz:</strong> ${riga[10]} | <strong>Res:</strong> ${riga[11]}</p><hr><strong>Extra:</strong><pre style="white-space:pre-wrap; font-size:13px;">${riga[15] || 'Nessuno'}</pre>${f1} ${f2}</div>`;
+            
+            let f1 = (riga[12] && riga[12] !== "N/A") ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte (Capogruppo)</a>` : '';
+            let f2 = (riga[13] && riga[13] !== "N/A") ? `<a href="${riga[13]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro (Capogruppo)</a>` : '';
+            
+            let extraStr = riga[15] || 'Nessuno';
+            if (extraStr !== 'Nessuno') {
+                extraStr = extraStr.replace(/Foto Fronte: (https?:\/\/[^\s]+)/g, '<br><a href="$1" target="_blank" class="foto-doc-link" style="margin-top: 5px;">📸 Apri Foto Fronte</a>');
+                extraStr = extraStr.replace(/Foto Retro: (https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="foto-doc-link" style="margin-top: 5px;">📸 Apri Foto Retro</a><br>');
+                extraStr = extraStr.replace(/Foto Fronte: N\/A/g, '');
+                extraStr = extraStr.replace(/Foto Retro: N\/A/g, '');
+            }
+
+            document.getElementById('contenuto-modale').innerHTML = `<div class="sezione-dati"><p style="font-size:14px;"><strong>Doc:</strong> ${riga[6]}<br><strong>Nato:</strong> ${riga[8]} a ${riga[9]}<br><strong>Naz:</strong> ${riga[10]} | <strong>Res:</strong> ${riga[11]}</p><div>${f1} ${f2}</div><hr><strong>Extra:</strong><pre style="white-space:pre-wrap; font-size:13px; font-family:inherit;">${extraStr}</pre></div>`;
             document.getElementById('dettagliModal').style.display = 'flex';
         }
 
