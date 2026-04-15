@@ -167,6 +167,7 @@
             <h1>PadreSergio Admin</h1>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <button class="btn-nav-azione" onclick="document.getElementById('cambioPasswordModal').style.display = 'flex'">🔑 Cambia Password</button>
+                <button class="btn-nav-azione" onclick="esci()">🚪 Esci</button>
             </div>
         </div>
 
@@ -278,8 +279,10 @@
                 body: JSON.stringify({ action: "verificaPassword", password: pwd })
             }).then(r => r.text()).then(risposta => {
                 if (risposta === "OK") {
+                    localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000); // Salva sessione per 5 min
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
+                    btn.innerText = "Accedi"; btn.disabled = false;
                     caricaDati();
                 } else {
                     document.getElementById('messaggioErrore').style.display = 'block';
@@ -667,7 +670,7 @@
             document.getElementById('anteprimaCalendarioModal').style.display = 'flex';
         }
 
-        // --- MESSAGGI WHATSAPP / EMAIL ---
+        // --- MESSAGGI E AZIONI ---
         function copiaMessaggio(nome, dataArrivo) {
             const msg = `Ciao ${nome}, ti aspettiamo a PadreSergio House il ${dataArrivo}!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!`;
             navigator.clipboard.writeText(msg).then(() => alert("Messaggio copiato!"));
@@ -686,7 +689,6 @@
             return url;
         }
 
-        // --- OVERBOOKING E AZIONI CHECK-IN/RICHIESTE ---
         function cambiaStatoRichiesta(index, nuovoStato, event) {
             if (nuovoStato === 'Accettata') {
                 let req = dbRichieste[index]; let dReqIn = parseData(req[5]); let dReqOut = parseData(req[6]);
@@ -854,13 +856,33 @@
             if(!s) return ""; let p = String(s).includes('-') ? String(s).split('-') : (String(s).includes('/') ? String(s).split('/') : []);
             if(p.length !== 3) return s; return p[0].length === 4 ? `${p[2]}/${p[1]}/${p[0]}` : s;
         }
-    </script>
 
-	<script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-      }
-    </script>
+        // --- GESTIONE SESSIONE (5 MINUTI) ---
+        function esci() {
+            localStorage.removeItem('adminSessionExp');
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('messaggioErrore').style.display = 'none';
+        }
 
+        function controllaSessione() {
+            let exp = localStorage.getItem('adminSessionExp');
+            if (exp && Date.now() < parseInt(exp)) {
+                // Sessione valida: rinnova per altri 5 minuti ed entra
+                localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000);
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                caricaDati();
+            } else {
+                // Sessione scaduta o inesistente
+                localStorage.removeItem('adminSessionExp');
+            }
+        }
+        
+        // Esegui il controllo appena si apre la pagina
+        controllaSessione();
+
+    </script>
 </body>
 </html>
