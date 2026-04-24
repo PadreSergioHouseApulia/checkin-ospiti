@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pagina non trovata | PadreSergio House</title>
+    <link rel="icon" type="image/x-icon" href="not_found.ico">
+    
+    <style>
+        :root {
+            --verde-primario: #5e7153;
+            --crema-sfondo: #faf9f6;
+            --testo-scuro: #333333;
+            --testo-chiaro: #666666;
+        }
+
+        body { 
+            margin: 0; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            background-color: var(--crema-sfondo); 
+            color: var(--testo-scuro); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            text-align: center; 
+            padding: 20px; 
+            box-sizing: border-box; 
+            position: relative;
+        }
+
+        /* LOGICA CAMBIO LINGUA */
+        body.it [lang="en"] { display: none !important; }
+        body.en [lang="it"] { display: none !important; }
+
+        /* TASTI LINGUA */
+        .lang-switch { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: rgba(0,0,0,0.05); 
+            border-radius: 20px; 
+            padding: 4px 8px; 
+            display: flex; 
+            gap: 5px; 
+        }
+        .lang-btn { 
+            cursor: pointer; 
+            font-size: 24px; 
+            opacity: 0.4; 
+            transition: 0.3s; 
+            border: none; 
+            background: none; 
+            padding: 0; 
+            filter: grayscale(100%); 
+        }
+        .lang-btn.active { 
+            opacity: 1; 
+            filter: grayscale(0%); 
+            transform: scale(1.1); 
+        }
+
+        h1 { 
+            color: var(--verde-primario); 
+            font-family: 'Georgia', serif; 
+            font-size: 60px; 
+            margin: 0 0 10px 0; 
+        }
+        h2 {
+            color: var(--verde-primario);
+            font-family: 'Georgia', serif; 
+            font-size: 24px;
+            margin-top: 0;
+        }
+        p { 
+            color: var(--testo-chiaro); 
+            margin-bottom: 30px; 
+            font-size: 16px; 
+            line-height: 1.6; 
+            max-width: 450px; 
+        }
+        .btn-home { 
+            background-color: var(--verde-primario); 
+            color: white; 
+            padding: 14px 30px; 
+            border-radius: 25px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            display: inline-block; 
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(94, 113, 83, 0.3);
+            transition: 0.3s;
+        }
+        .btn-home:hover { transform: scale(1.05); }
+        
+        .whatsapp-box {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            width: 100%;
+            max-width: 300px;
+        }
+        .btn-whatsapp { 
+            background-color: #25D366; 
+            color: white; 
+            padding: 12px 25px; 
+            border-radius: 25px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            display: inline-block; 
+            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.3);
+        }
+    </style>
+</head>
+<body class="it">
+
+    <div class="lang-switch">
+        <button class="lang-btn active" id="btn-it" onclick="setLang('it')">🇮🇹</button>
+        <button class="lang-btn" id="btn-en" onclick="setLang('en')">🇬🇧</button>
+    </div>
+
+    <h1>Ops! 🙈</h1>
+    
+    <h2 lang="it">Ti sei perso tra i vicoli?</h2>
+    <h2 lang="en">Did you get lost in the alleys?</h2>
+    
+    <p lang="it">Sembra che la pagina che stai cercando si sia persa tra le bellissime stradine di Monopoli, oppure il link è stato digitato male.</p>
+    <p lang="en">It seems the page you are looking for got lost in the beautiful streets of Monopoli, or the link was typed incorrectly.</p>
+    
+    <a href="https://padresergiohouseapulia.github.io/padresergio_web/" class="btn-home">
+        <span lang="it">🏡 Torna alla Home Page</span>
+        <span lang="en">🏡 Back to Home Page</span>
+    </a>
+
+    <div class="whatsapp-box">
+        <p lang="it" style="margin-bottom: 10px; font-size: 14px;">Volevi prenotare o hai bisogno di noi?</p>
+        <p lang="en" style="margin-bottom: 10px; font-size: 14px;">Did you want to book or need our help?</p>
+        
+        <a href="https://wa.me/393384699286" class="btn-whatsapp">
+            <span lang="it">💬 Scrivici su WhatsApp</span>
+            <span lang="en">💬 Message us on WhatsApp</span>
+        </a>
+    </div>
+
+    <script>
+        // SCRIPT PER IL CAMBIO LINGUA ISTANTANEO
+        function setLang(lang) {
+            document.body.className = lang;
+            document.getElementById('btn-it').classList.remove('active');
+            document.getElementById('btn-en').classList.remove('active');
+            document.getElementById('btn-' + lang).classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
