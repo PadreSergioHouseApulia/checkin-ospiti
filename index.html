@@ -244,8 +244,8 @@
         <div class="section">
             <h2><span class="it">2. Dati Capogruppo</span><span class="en">2. Main Guest</span></h2>
             <div class="grid">
-                <div><label><span class="it">Nome *</span><span class="en">First Name *</span></label><input type="text" name="nomeCapo" required></div>
-                <div><label><span class="it">Cognome *</span><span class="en">Last Name *</span></label><input type="text" name="cognomeCapo" required></div>
+                <div><label><span class="it">Nome (Completo) *</span><span class="en">First Name (Full name) *</span></label><input type="text" name="nomeCapo" required></div>
+                <div><label><span class="it">Cognome (Completo) *</span><span class="en">Last Name (Full surname) *</span></label><input type="text" name="cognomeCapo" required></div>
             </div>
             <div class="grid">
                 <div>
@@ -440,22 +440,22 @@
                         <span class="it">Ospite ${i}</span><span class="en">Guest ${i}</span>
                     </strong>
                     <div class="grid">
-                        <div><label><span class="it">Nome</span><span class="en">First Name</span></label><input type="text" name="nome_${i}" required></div>
-                        <div><label><span class="it">Cognome</span><span class="en">Last Name</span></label><input type="text" name="cognome_${i}" required></div>
+                        <div><label><span class="it">Nome (Completo) *</span><span class="en">First Name (Full name) *</span></label><input type="text" name="nome_${i}" required></div>
+                        <div><label><span class="it">Cognome (Completo) *</span><span class="en">Last Name (Full surname) *</span></label><input type="text" name="cognome_${i}" required></div>
                     </div>
                     <div class="grid">
                         <div>
-                            <label><span class="it">Sesso</span><span class="en">Gender</span></label>
+                            <label><span class="it">Sesso *</span><span class="en">Gender *</span></label>
                             <select name="sesso_${i}">
                                 <option value="Femmina">Femmina / Female</option>
                                 <option value="Maschio">Maschio / Male</option>
                             </select>
                         </div>
-                        <div><label><span class="it">Data di nascita</span><span class="en">Date of Birth</span></label><input type="date" name="nascita_${i}" required></div>
+                        <div><label><span class="it">Data di nascita *</span><span class="en">Date of Birth *</span></label><input type="date" name="nascita_${i}" required></div>
                     </div>
                     <div class="grid">
                         <div>
-                            <label><span class="it">Luogo di nascita</span><span class="en">Place of Birth (Country)</span></label>
+                            <label><span class="it">Luogo di nascita *</span><span class="en">Place of Birth (Country) *</span></label>
                             <select name="luogoNascita_${i}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
                                 <option value="" disabled selected>-- Select --</option>
                                 <option value="ITALIA">ITALIA / ITALY</option>
@@ -488,7 +488,7 @@
                             </select>
                         </div>
                         <div>
-                            <label><span class="it">Nazionalità</span><span class="en">Nationality</span></label>
+                            <label><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
                             <select name="nazionalita_${i}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
                                 <option value="" disabled selected>-- Select --</option>
                                 <option value="ITALIA">ITALIA / ITALY</option>
