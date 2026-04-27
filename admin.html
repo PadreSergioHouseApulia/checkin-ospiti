@@ -266,6 +266,59 @@
         let annoCorrente = new Date().getFullYear();
         let graficoOccupazione = null; 
 
+        // --- MOTORE TRADUZIONE CODICI POLIZIA ---
+        let dictComuni = {};
+        let dictStati = {};
+
+        async function caricaDizionari() {
+            try {
+                let resCom = await fetch('comuni.csv');
+                if (resCom.ok) {
+                    let txtCom = await resCom.text();
+                    let righeCom = txtCom.split(/\r?\n/);
+                    for (let i = 1; i < righeCom.length; i++) {
+                        let p = righeCom[i].split(',');
+                        if (p.length >= 2) {
+                            let cod = p[0].trim(); let nom = p[1].trim().toUpperCase(); let fine = p[3] ? p[3].trim() : "";
+                            // Prende il codice valido attuale (non scaduto)
+                            if (!dictComuni[nom] || fine === "") dictComuni[nom] = cod;
+                        }
+                    }
+                }
+                
+                let resStat = await fetch('stati.csv');
+                if (resStat.ok) {
+                    let txtStat = await resStat.text();
+                    let righeStat = txtStat.split(/\r?\n/);
+                    for (let i = 1; i < righeStat.length; i++) {
+                        let p = righeStat[i].split(',');
+                        if (p.length >= 2) {
+                            let cod = p[0].trim(); let nom = p[1].trim().toUpperCase(); let fine = p[3] ? p[3].trim() : "";
+                            if (!dictStati[nom] || fine === "") dictStati[nom] = cod;
+                            if (nom === "ITALIA") { dictStati["ITALIANA"] = cod; dictStati["ITALIANO"] = cod; }
+                        }
+                    }
+                }
+            } catch(e) { console.warn("Dizionari CSV non trovati."); }
+        }
+        caricaDizionari(); // Esegue il caricamento in background
+
+        function getCodiciLuogo(luogo) {
+            if(!luogo) return { nazione: "", comune: "" };
+            luogo = luogo.trim().toUpperCase();
+            if(dictComuni[luogo]) return { nazione: "100000100", comune: dictComuni[luogo] }; 
+            if(dictStati[luogo]) return { nazione: dictStati[luogo], comune: "" }; 
+            return { nazione: luogo, comune: "" }; // Se non trova corrispondenza lascia il testo per mostrare l'errore
+        }
+
+        function getCodiceNazione(nazionalita) {
+            if(!nazionalita) return "";
+            nazionalita = nazionalita.trim().toUpperCase();
+            if(dictStati[nazionalita]) return dictStati[nazionalita];
+            if(nazionalita === "ITALIANA" || nazionalita === "ITALIANO") return "100000100";
+            return nazionalita; 
+        }
+
         // --- PASSWORD E LOGIN ---
         function mostraNascondiPassword() { document.getElementById('passwordInput').type = (document.getElementById('passwordInput').type === 'password') ? 'text' : 'password'; }
         
@@ -279,7 +332,7 @@
                 body: JSON.stringify({ action: "verificaPassword", password: pwd })
             }).then(r => r.text()).then(risposta => {
                 if (risposta === "OK") {
-                    localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000); // Salva sessione per 5 min
+                    localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000); 
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
                     btn.innerText = "Accedi"; btn.disabled = false;
@@ -827,21 +880,75 @@
                 residenza: document.getElementById('edit-residenza').value, ospitiExtra: document.getElementById('edit-ospitiExtra').value
             };
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) }).then(() => { 
-                let rAgg = [...dbCheckin[index]]; rAgg[4]=payload.nome; rAgg[5]=payload.cognome; rAgg[8]=payload.nascita; rAgg[15]=payload.ospitiExtra;
+                let rAgg = [...dbCheckin[index]]; 
+                rAgg[4]=payload.nome; rAgg[5]=payload.cognome; rAgg[8]=payload.nascita; 
+                rAgg[9]=payload.luogoNascita; rAgg[10]=payload.nazionalita; rAgg[11]=payload.residenza; rAgg[15]=payload.ospitiExtra;
                 generaCSVCompleto(rAgg); chiudiModal('modificaModal'); caricaDati(); 
             });
         }
 
+        // ==========================================
+        // MOTORE DI GENERAZIONE CSV PAYTOURIST
+        // ==========================================
         function generaCSVCompleto(riga) {
             const LICENZA = "SLBA000982-0018"; let csv = [];
             const fmtS = (s) => String(s).toUpperCase().startsWith('M') ? "1" : "2";
-            csv.push([1, String(riga[4]||"").toUpperCase(), String(riga[5]||"").toUpperCase(), parseDataString(riga[1]), parseDataString(riga[2]), "", LICENZA, fmtS(riga[7]||""), parseDataString(riga[8])].join(","));
+            
+            // TRADUZIONE CODICI CAPOGRUPPO
+            let nascitaCapo = getCodiciLuogo(riga[9]);
+            let resCapo = getCodiciLuogo(riga[11]);
+            let nazCapo = getCodiceNazione(riga[10]);
+
+            csv.push([
+                1, 
+                String(riga[4]||"").toUpperCase(), 
+                String(riga[5]||"").toUpperCase(), 
+                parseDataString(riga[1]), 
+                parseDataString(riga[2]), 
+                "", 
+                LICENZA, 
+                fmtS(riga[7]||""), 
+                parseDataString(riga[8]),
+                "", "", 
+                nascitaCapo.nazione, 
+                nascitaCapo.comune, 
+                resCapo.nazione, 
+                resCapo.comune, 
+                nazCapo
+            ].join(","));
+
             let extraStr = riga[15] || "";
             if (extraStr.includes("--- OSPITE")) {
                 extraStr.split("--- OSPITE").slice(1).forEach(blocco => {
                     let c = blocco.match(/Cognome: (.*)/)?.[1] || ""; let n = blocco.match(/Nome: (.*)/)?.[1] || "";
                     let s = blocco.match(/Sesso: (.*)/)?.[1] || ""; let d = (blocco.match(/Nascita: (.*?) a /) || [])[1] || "";
-                    csv.push([1, n.trim().toUpperCase(), c.trim().toUpperCase(), parseDataString(riga[1]), parseDataString(riga[2]), "", LICENZA, fmtS(s), parseDataString(d.trim())].join(","));
+                    
+                    let luogoNascitaOspite = (blocco.match(/Nascita: .*? a (.*)/) || [])[1] || "";
+                    let nazionalitaOspite = blocco.match(/Nazionalità: (.*)/)?.[1] || "";
+                    let residenzaOspite = blocco.match(/Residenza: (.*)/)?.[1] || "";
+
+                    // TRADUZIONE CODICI OSPITI
+                    let nascitaOsp = getCodiciLuogo(luogoNascitaOspite);
+                    let resOsp = getCodiciLuogo(residenzaOspite);
+                    let nazOsp = getCodiceNazione(nazionalitaOspite);
+
+                    csv.push([
+                        1, 
+                        n.trim().toUpperCase(), 
+                        c.trim().toUpperCase(), 
+                        parseDataString(riga[1]), 
+                        parseDataString(riga[2]), 
+                        "", 
+                        LICENZA, 
+                        fmtS(s), 
+                        parseDataString(d.trim()),
+                        "", "", 
+                        nascitaOsp.nazione, 
+                        nascitaOsp.comune, 
+                        resOsp.nazione, 
+                        resOsp.comune, 
+                        nazOsp
+                    ].join(","));
                 });
             }
             const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv.join("\n")], { type: 'text/csv;charset=utf-8;' }));
@@ -857,7 +964,7 @@
             if(p.length !== 3) return s; return p[0].length === 4 ? `${p[2]}/${p[1]}/${p[0]}` : s;
         }
 
-        // --- GESTIONE SESSIONE (5 MINUTI) ---
+        // --- GESTIONE SESSIONE ---
         function esci() {
             localStorage.removeItem('adminSessionExp');
             document.getElementById('main-content').style.display = 'none';
@@ -869,18 +976,15 @@
         function controllaSessione() {
             let exp = localStorage.getItem('adminSessionExp');
             if (exp && Date.now() < parseInt(exp)) {
-                // Sessione valida: rinnova per altri 5 minuti ed entra
                 localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000);
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
                 caricaDati();
             } else {
-                // Sessione scaduta o inesistente
                 localStorage.removeItem('adminSessionExp');
             }
         }
         
-        // Esegui il controllo appena si apre la pagina
         controllaSessione();
 
     </script>
