@@ -158,6 +158,7 @@
             font-size: 16px; 
             background-color: #fff;
             -webkit-appearance: none; 
+            appearance: none; 
         }
         
         input[type="file"] {
@@ -229,8 +230,6 @@
         <span class="en">Welcome! Please enter your details and upload the photos of your ID document to complete the online check-in.</span>
     </div>
 
-    <datalist id="lista-stati"></datalist>
-
     <form id="checkinForm">
         
         <div class="section">
@@ -261,7 +260,9 @@
             </div>
             
             <label><span class="it">Luogo rilascio documento (Stato) *</span><span class="en">Place of Issue (Country) *</span></label>
-            <input type="text" name="rilascioDoc" list="lista-stati" autocomplete="off" required>
+            <select name="rilascioDoc" class="selettore-stati" required>
+                <option value="" disabled selected>-- Caricamento Stati... --</option>
+            </select>
             
             <div style="background: rgba(94, 113, 83, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; border: 1px dashed var(--colore-principale);">
                 <label style="color: var(--colore-principale); font-size: 15px; margin-top: 0;">
@@ -291,14 +292,23 @@
                 <div><label><span class="it">Data di nascita *</span><span class="en">Date of Birth *</span></label><input type="date" name="nascitaCapo" required></div>
             </div>
             <div class="grid">
-                <div><label><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label><input type="text" id="luogoNascita_capogruppo" name="luogoNascita_capogruppo" list="lista-stati" autocomplete="off" required></div>
+                <div>
+                    <label><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label>
+                    <select name="luogoNascita_capogruppo" class="selettore-stati" required>
+                        <option value="" disabled selected>-- Caricamento Stati... --</option>
+                    </select>
+                </div>
                 <div>
                     <label><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
-                    <input type="text" id="cittadinanza_capogruppo" name="cittadinanza" list="lista-stati" autocomplete="off" required>
+                    <select name="cittadinanza" class="selettore-stati" required>
+                        <option value="" disabled selected>-- Caricamento Stati... --</option>
+                    </select>
                 </div>
             </div>
             <label><span class="it">Stato di residenza *</span><span class="en">Country of Residence *</span></label>
-            <input type="text" id="residenzaCapo" name="residenzaCapo" list="lista-stati" autocomplete="off" required>
+            <select name="residenzaCapo" class="selettore-stati" required>
+                <option value="" disabled selected>-- Caricamento Stati... --</option>
+            </select>
         </div>
 
         <div class="section" id="sezioneOspitiExtra" style="display:none;">
@@ -325,37 +335,67 @@
 </div>
 
 <script>
-    // --- MOTORE AUTOCOMPLETAMENTO CSV (Solo Stati) ---
-    async function caricaListePerCheckin() {
-        try {
-            let htmlStati = "";
-            const baseUrl = "https://padresergiohouseapulia.github.io/checkin-ospiti/";
+    // --- VARIABILE GLOBALE PER SALVARE GLI STATI ---
+    window.opzioniStatiHTML = '<option value="" disabled selected>-- Seleziona / Select --</option><option value="ITALIA">ITALIA / ITALY</option>';
 
+    // --- DIZIONARIO TRADUZIONI ---
+    const dizionarioInglese = {
+        "ALBANIA": "ALBANIA", "ARGENTINA": "ARGENTINA", "AUSTRALIA": "AUSTRALIA",
+        "AUSTRIA": "AUSTRIA", "BELGIO": "BELGIUM", "BRASILE": "BRAZIL", 
+        "BULGARIA": "BULGARIA", "CANADA": "CANADA", "CILE": "CHILE",
+        "CINA": "CHINA", "CROAZIA": "CROATIA", "DANIMARCA": "DENMARK", 
+        "EGITTO": "EGYPT", "EMIRATI ARABI UNITI": "UAE", "FINLANDIA": "FINLAND",
+        "FRANCIA": "FRANCE", "GERMANIA": "GERMANY", "GIAPPONE": "JAPAN", 
+        "GRECIA": "GREECE", "INDIA": "INDIA", "IRLANDA": "IRELAND", 
+        "ISRAELE": "ISRAEL", "LUSSEMBURGO": "LUXEMBOURG", "MAROCCO": "MOROCCO", 
+        "MESSICO": "MEXICO", "NORVEGIA": "NORWAY", "PAESI BASSI": "NETHERLANDS", 
+        "POLONIA": "POLAND", "PORTOGALLO": "PORTUGAL", "REGNO UNITO": "UNITED KINGDOM", 
+        "REPUBBLICA CECA": "CZECH REPUBLIC", "ROMANIA": "ROMANIA", "RUSSIA": "RUSSIA", 
+        "SLOVACCHIA": "SLOVAKIA", "SLOVENIA": "SLOVENIA", "SPAGNA": "SPAIN", 
+        "STATI UNITI D'AMERICA": "USA", "SUD AFRICA": "SOUTH AFRICA", "SVEZIA": "SWEDEN", 
+        "SVIZZERA": "SWITZERLAND", "TURCHIA": "TURKEY", "UNGHERIA": "HUNGARY"
+    };
+
+    // --- CARICAMENTO MENU A TENDINA DA CSV ---
+    async function caricaMenuStati() {
+        try {
+            const baseUrl = "https://padresergiohouseapulia.github.io/checkin-ospiti/";
             const resStati = await fetch(baseUrl + 'stati.csv');
+            
             if (resStati.ok) {
                 const txtStati = await resStati.text();
                 const righe = txtStati.split(/\r?\n/);
+                
                 for(let i=1; i<righe.length; i++) {
                     let p = righe[i].split(',');
                     if(p.length >= 2) {
                         let stato = p[1].trim().replace(/"/g, '');
-                        htmlStati += `<option value="${stato}">`;
+                        
+                        if (stato !== "ITALIA" && stato.length > 1) {
+                            // Cerca la traduzione, se esiste la aggiunge
+                            let suffissoEN = dizionarioInglese[stato] ? ` / ${dizionarioInglese[stato]}` : "";
+                            
+                            // Il 'value' resta rigorosamente in italiano per PayTourist, il testo visibile è tradotto
+                            window.opzioniStatiHTML += `<option value="${stato}">${stato}${suffissoEN}</option>`;
+                        }
                     }
                 }
             }
 
-            // Aggiungiamo ITALIA manualmente per sicurezza (spesso cercata)
-            htmlStati += `<option value="ITALIA">`;
-
-            // Inietta nel datalist
-            document.getElementById('lista-stati').innerHTML = htmlStati;
+            document.querySelectorAll('.selettore-stati').forEach(select => {
+                select.innerHTML = window.opzioniStatiHTML;
+            });
 
         } catch (error) {
             console.warn("Dizionario CSV Stati non caricato.", error);
+            document.querySelectorAll('.selettore-stati').forEach(select => {
+                select.innerHTML = window.opzioniStatiHTML;
+            });
         }
     }
-    window.addEventListener('DOMContentLoaded', caricaListePerCheckin);
-    // -------------------------------------
+    
+    window.addEventListener('DOMContentLoaded', caricaMenuStati);
+    // -----------------------------------------
 
 
     function cambiaLingua(lang) {
@@ -404,16 +444,22 @@
                     <div class="grid">
                         <div>
                             <label><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label>
-                            <input type="text" name="luogoNascita_${i}" list="lista-stati" autocomplete="off" required>
+                            <select name="luogoNascita_${i}" required>
+                                ${window.opzioniStatiHTML}
+                            </select>
                         </div>
                         <div>
                             <label><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
-                            <input type="text" name="nazionalita_${i}" list="lista-stati" autocomplete="off" required>
+                            <select name="nazionalita_${i}" required>
+                                ${window.opzioniStatiHTML}
+                            </select>
                         </div>
                     </div>
                     
                     <label><span class="it">Stato di residenza *</span><span class="en">Country of Residence *</span></label>
-                    <input type="text" name="residenza_${i}" list="lista-stati" autocomplete="off" required>
+                    <select name="residenza_${i}" required>
+                        ${window.opzioniStatiHTML}
+                    </select>
                     
                     <div style="background: rgba(94, 113, 83, 0.1); padding: 15px; border-radius: 6px; margin-top: 15px; border: 1px dashed var(--colore-principale);">
                         <label style="color: var(--colore-principale); font-size: 14px; margin-top: 0;">
