@@ -229,6 +229,8 @@
         <span class="en">Welcome! Please enter your details and upload the photos of your ID document to complete the online check-in.</span>
     </div>
 
+    <datalist id="lista-stati"></datalist>
+
     <form id="checkinForm">
         
         <div class="section">
@@ -258,37 +260,8 @@
                 <div><label><span class="it">Numero documento *</span><span class="en">Document Number *</span></label><input type="text" name="numDocCapo" required></div>
             </div>
             
-            <label><span class="it">Luogo rilascio documento *</span><span class="en">Place of Issue (City or Country) *</span></label>
-            <select name="rilascioDoc" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
-                <option value="" disabled selected>-- Select --</option>
-                <option value="ITALIA">ITALIA / ITALY</option>
-                <option value="ALBANIA">ALBANIA</option>
-                <option value="ARGENTINA">ARGENTINA</option>
-                <option value="AUSTRIA">AUSTRIA</option>
-                <option value="BELGIO">BELGIO / BELGIUM</option>
-                <option value="BRASILE">BRASILE / BRAZIL</option>
-                <option value="CANADA">CANADA</option>
-                <option value="CINA">CINA / CHINA</option>
-                <option value="CROAZIA">CROAZIA / CROATIA</option>
-                <option value="DANIMARCA">DANIMARCA / DENMARK</option>
-                <option value="FRANCIA">FRANCIA / FRANCE</option>
-                <option value="GERMANIA">GERMANIA / GERMANY</option>
-                <option value="GRECIA">GRECIA / GREECE</option>
-                <option value="IRLANDA">IRLANDA / IRELAND</option>
-                <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
-                <option value="NORVEGIA">NORVEGIA / NORWAY</option>
-                <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
-                <option value="POLONIA">POLONIA / POLAND</option>
-                <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
-                <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
-                <option value="ROMANIA">ROMANIA</option>
-                <option value="SPAGNA">SPAGNA / SPAIN</option>
-                <option value="STATI UNITI">STATI UNITI / USA</option>
-                <option value="SVEZIA">SVEZIA / SWEDEN</option>
-                <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
-                <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
-                <option value="ALTRO">ALTRO / OTHER</option>
-            </select>
+            <label><span class="it">Luogo rilascio documento (Stato) *</span><span class="en">Place of Issue (Country) *</span></label>
+            <input type="text" name="rilascioDoc" list="lista-stati" autocomplete="off" required>
             
             <div style="background: rgba(94, 113, 83, 0.1); padding: 15px; border-radius: 6px; margin-top: 20px; border: 1px dashed var(--colore-principale);">
                 <label style="color: var(--colore-principale); font-size: 15px; margin-top: 0;">
@@ -318,72 +291,14 @@
                 <div><label><span class="it">Data di nascita *</span><span class="en">Date of Birth *</span></label><input type="date" name="nascitaCapo" required></div>
             </div>
             <div class="grid">
-                <div><label><span class="it">Luogo di nascita *</span><span class="en">Place of Birth *</span></label><input type="text" name="luogoNascita" required></div>
+                <div><label><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label><input type="text" id="luogoNascita_capogruppo" name="luogoNascita_capogruppo" list="lista-stati" autocomplete="off" required></div>
                 <div>
                     <label><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
-                    <select name="cittadinanza" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
-                        <option value="" disabled selected>-- Select --</option>
-                        <option value="ITALIA">ITALIA / ITALY</option>
-                        <option value="ALBANIA">ALBANIA</option>
-                        <option value="ARGENTINA">ARGENTINA</option>
-                        <option value="AUSTRIA">AUSTRIA</option>
-                        <option value="BELGIO">BELGIO / BELGIUM</option>
-                        <option value="BRASILE">BRASILE / BRAZIL</option>
-                        <option value="CANADA">CANADA</option>
-                        <option value="CINA">CINA / CHINA</option>
-                        <option value="CROAZIA">CROAZIA / CROATIA</option>
-                        <option value="DANIMARCA">DANIMARCA / DENMARK</option>
-                        <option value="FRANCIA">FRANCIA / FRANCE</option>
-                        <option value="GERMANIA">GERMANIA / GERMANY</option>
-                        <option value="GRECIA">GRECIA / GREECE</option>
-                        <option value="IRLANDA">IRLANDA / IRELAND</option>
-                        <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
-                        <option value="NORVEGIA">NORVEGIA / NORWAY</option>
-                        <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
-                        <option value="POLONIA">POLONIA / POLAND</option>
-                        <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
-                        <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
-                        <option value="ROMANIA">ROMANIA</option>
-                        <option value="SPAGNA">SPAGNA / SPAIN</option>
-                        <option value="STATI UNITI">STATI UNITI / USA</option>
-                        <option value="SVEZIA">SVEZIA / SWEDEN</option>
-                        <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
-                        <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
-                        <option value="ALTRO">ALTRO / OTHER</option>
-                    </select>
+                    <input type="text" id="cittadinanza_capogruppo" name="cittadinanza" list="lista-stati" autocomplete="off" required>
                 </div>
             </div>
-            <label><span class="it">Luogo di residenza *</span><span class="en">Home Address *</span></label>
-            <select name="residenzaCapo" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
-                <option value="" disabled selected>-- Select --</option>
-                <option value="ITALIA">ITALIA / ITALY</option>
-                <option value="ALBANIA">ALBANIA</option>
-                <option value="ARGENTINA">ARGENTINA</option>
-                <option value="AUSTRIA">AUSTRIA</option>
-                <option value="BELGIO">BELGIO / BELGIUM</option>
-                <option value="BRASILE">BRASILE / BRAZIL</option>
-                <option value="CANADA">CANADA</option>
-                <option value="CINA">CINA / CHINA</option>
-                <option value="CROAZIA">CROAZIA / CROATIA</option>
-                <option value="DANIMARCA">DANIMARCA / DENMARK</option>
-                <option value="FRANCIA">FRANCIA / FRANCE</option>
-                <option value="GERMANIA">GERMANIA / GERMANY</option>
-                <option value="GRECIA">GRECIA / GREECE</option>
-                <option value="IRLANDA">IRLANDA / IRELAND</option>
-                <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
-                <option value="NORVEGIA">NORVEGIA / NORWAY</option>
-                <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
-                <option value="POLONIA">POLONIA / POLAND</option>
-                <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
-                <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
-                <option value="ROMANIA">ROMANIA</option>
-                <option value="SPAGNA">SPAGNA / SPAIN</option>
-                <option value="STATI UNITI">STATI UNITI / USA</option>
-                <option value="SVEZIA">SVEZIA / SWEDEN</option>
-                <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
-                <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
-                <option value="ALTRO">ALTRO / OTHER</option>
-            </select>
+            <label><span class="it">Stato di residenza *</span><span class="en">Country of Residence *</span></label>
+            <input type="text" id="residenzaCapo" name="residenzaCapo" list="lista-stati" autocomplete="off" required>
         </div>
 
         <div class="section" id="sezioneOspitiExtra" style="display:none;">
@@ -410,6 +325,39 @@
 </div>
 
 <script>
+    // --- MOTORE AUTOCOMPLETAMENTO CSV (Solo Stati) ---
+    async function caricaListePerCheckin() {
+        try {
+            let htmlStati = "";
+            const baseUrl = "https://padresergiohouseapulia.github.io/checkin-ospiti/";
+
+            const resStati = await fetch(baseUrl + 'stati.csv');
+            if (resStati.ok) {
+                const txtStati = await resStati.text();
+                const righe = txtStati.split(/\r?\n/);
+                for(let i=1; i<righe.length; i++) {
+                    let p = righe[i].split(',');
+                    if(p.length >= 2) {
+                        let stato = p[1].trim().replace(/"/g, '');
+                        htmlStati += `<option value="${stato}">`;
+                    }
+                }
+            }
+
+            // Aggiungiamo ITALIA manualmente per sicurezza (spesso cercata)
+            htmlStati += `<option value="ITALIA">`;
+
+            // Inietta nel datalist
+            document.getElementById('lista-stati').innerHTML = htmlStati;
+
+        } catch (error) {
+            console.warn("Dizionario CSV Stati non caricato.", error);
+        }
+    }
+    window.addEventListener('DOMContentLoaded', caricaListePerCheckin);
+    // -------------------------------------
+
+
     function cambiaLingua(lang) {
         if(lang === 'en') {
             document.body.classList.add('lang-en');
@@ -455,72 +403,17 @@
                     </div>
                     <div class="grid">
                         <div>
-                            <label><span class="it">Luogo di nascita *</span><span class="en">Place of Birth (Country) *</span></label>
-                            <select name="luogoNascita_${i}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
-                                <option value="" disabled selected>-- Select --</option>
-                                <option value="ITALIA">ITALIA / ITALY</option>
-                                <option value="ALBANIA">ALBANIA</option>
-                                <option value="ARGENTINA">ARGENTINA</option>
-                                <option value="AUSTRIA">AUSTRIA</option>
-                                <option value="BELGIO">BELGIO / BELGIUM</option>
-                                <option value="BRASILE">BRASILE / BRAZIL</option>
-                                <option value="CANADA">CANADA</option>
-                                <option value="CINA">CINA / CHINA</option>
-                                <option value="CROAZIA">CROAZIA / CROATIA</option>
-                                <option value="DANIMARCA">DANIMARCA / DENMARK</option>
-                                <option value="FRANCIA">FRANCIA / FRANCE</option>
-                                <option value="GERMANIA">GERMANIA / GERMANY</option>
-                                <option value="GRECIA">GRECIA / GREECE</option>
-                                <option value="IRLANDA">IRLANDA / IRELAND</option>
-                                <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
-                                <option value="NORVEGIA">NORVEGIA / NORWAY</option>
-                                <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
-                                <option value="POLONIA">POLONIA / POLAND</option>
-                                <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
-                                <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
-                                <option value="ROMANIA">ROMANIA</option>
-                                <option value="SPAGNA">SPAGNA / SPAIN</option>
-                                <option value="STATI UNITI">STATI UNITI / USA</option>
-                                <option value="SVEZIA">SVEZIA / SWEDEN</option>
-                                <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
-                                <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
-                                <option value="ALTRO">ALTRO / OTHER</option>
-                            </select>
+                            <label><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label>
+                            <input type="text" name="luogoNascita_${i}" list="lista-stati" autocomplete="off" required>
                         </div>
                         <div>
                             <label><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
-                            <select name="nazionalita_${i}" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;" required>
-                                <option value="" disabled selected>-- Select --</option>
-                                <option value="ITALIA">ITALIA / ITALY</option>
-                                <option value="ALBANIA">ALBANIA</option>
-                                <option value="ARGENTINA">ARGENTINA</option>
-                                <option value="AUSTRIA">AUSTRIA</option>
-                                <option value="BELGIO">BELGIO / BELGIUM</option>
-                                <option value="BRASILE">BRASILE / BRAZIL</option>
-                                <option value="CANADA">CANADA</option>
-                                <option value="CINA">CINA / CHINA</option>
-                                <option value="CROAZIA">CROAZIA / CROATIA</option>
-                                <option value="DANIMARCA">DANIMARCA / DENMARK</option>
-                                <option value="FRANCIA">FRANCIA / FRANCE</option>
-                                <option value="GERMANIA">GERMANIA / GERMANY</option>
-                                <option value="GRECIA">GRECIA / GREECE</option>
-                                <option value="IRLANDA">IRLANDA / IRELAND</option>
-                                <option value="LUSSEMBURGO">LUSSEMBURGO / LUXEMBOURG</option>
-                                <option value="NORVEGIA">NORVEGIA / NORWAY</option>
-                                <option value="PAESI BASSI">PAESI BASSI / NETHERLANDS</option>
-                                <option value="POLONIA">POLONIA / POLAND</option>
-                                <option value="PORTOGALLO">PORTOGALLO / PORTUGAL</option>
-                                <option value="REGNO UNITO">REGNO UNITO / UNITED KINGDOM</option>
-                                <option value="ROMANIA">ROMANIA</option>
-                                <option value="SPAGNA">SPAGNA / SPAIN</option>
-                                <option value="STATI UNITI">STATI UNITI / USA</option>
-                                <option value="SVEZIA">SVEZIA / SWEDEN</option>
-                                <option value="SVIZZERA">SVIZZERA / SWITZERLAND</option>
-                                <option value="UNGHERIA">UNGHERIA / HUNGARY</option>
-                                <option value="ALTRO">ALTRO / OTHER</option>
-                            </select>
+                            <input type="text" name="nazionalita_${i}" list="lista-stati" autocomplete="off" required>
                         </div>
                     </div>
+                    
+                    <label><span class="it">Stato di residenza *</span><span class="en">Country of Residence *</span></label>
+                    <input type="text" name="residenza_${i}" list="lista-stati" autocomplete="off" required>
                     
                     <div style="background: rgba(94, 113, 83, 0.1); padding: 15px; border-radius: 6px; margin-top: 15px; border: 1px dashed var(--colore-principale);">
                         <label style="color: var(--colore-principale); font-size: 14px; margin-top: 0;">
@@ -538,7 +431,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>`;
             }
             container.innerHTML = htmlGenerato;
@@ -568,14 +460,12 @@
 
         const formDataObj = {};
         
-        // 1. Raccogliamo tutti i dati testuali dal form
         new FormData(form).forEach((value, key) => { 
             if (typeof value === 'string') {
                 formDataObj[key] = value.toUpperCase().trim(); 
             }
         });
 
-        // 2. Raccogliamo DINAMICAMENTE tutte le foto inserite (sia Capogruppo che Extra)
         const fileInputs = Array.from(form.querySelectorAll('input[type="file"]'));
         const promises = [];
         const fileKeys = [];
@@ -589,7 +479,6 @@
         });
 
         Promise.all(promises).then(risultati => {
-            // Assegniamo i risultati base64
             risultati.forEach((b64, index) => {
                 formDataObj[fileKeys[index] + "_base64"] = b64;
             });
