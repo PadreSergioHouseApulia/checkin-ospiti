@@ -103,6 +103,23 @@
             document.getElementById('btn-' + lang).classList.add('active');
         }
 
+	window.onload = () => {
+            const saved = localStorage.getItem('pref-lang');
+            if (saved) {
+                // Se l'ospite aveva già scelto una lingua, usiamo quella
+                changeLang(saved);
+            } else {
+                // MAGIA: Rileva la lingua del telefono dell'ospite!
+                const userLang = navigator.language || navigator.userLanguage;
+                // Se il telefono è impostato su Italiano, mostra ITA. Altrimenti, forza l'Inglese.
+                if (userLang.toLowerCase().startsWith('it')) {
+                    changeLang('it');
+                } else {
+                    changeLang('en');
+                }
+            }
+        };
+
         // MOTORE CAMALEONTE: Capisce chi si è perso leggendo l'URL
         window.addEventListener('DOMContentLoaded', () => {
             const linkSbagliato = window.location.href.toLowerCase();
