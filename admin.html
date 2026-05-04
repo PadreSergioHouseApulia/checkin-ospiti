@@ -149,6 +149,11 @@
 </head>
 <body>
 
+	<!-- BANNER AVVISO SCADENZA PASSWORD -->
+    <div id="banner-scadenza-pwd" style="display: none; background-color: #ffcc00; color: #333; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; position: relative;">
+        ⚠️ Attenzione: La tua password scadrà tra <span id="giorni-rimanenti"></span> giorni (il 1° del mese). Preparati a cambiarla.
+    </div>
+
     <div id="login-screen">
         <div class="login-box">
             <h1>PadreSergio</h1>
@@ -251,7 +256,10 @@
             <div class="campo-edit"><label>Nazionalità</label><input type="text" id="edit-nazionalita"></div>
             <div class="campo-edit"><label>Residenza</label><input type="text" id="edit-residenza"></div>
             <div class="campo-edit"><label>Ospiti Extra</label><textarea id="edit-ospitiExtra" rows="8"></textarea></div>
-            <button onclick="salvaModifiche(event)" style="background:var(--rosso-allerta); color:white; width:100%; padding:15px; border:none; border-radius:5px; margin-top:15px; font-weight:bold; cursor:pointer;">💾 Salva e Approva</button>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="salvaModifiche(event, false)" style="background: var(--colore-secondario); color: white; width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">💾 Solo Salva</button>
+                <button onclick="salvaModifiche(event, true)" style="background: var(--verde-ok); color: white; width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">✅ Salva e Approva</button>
+            </div>
         </div>
     </div>
 
@@ -349,29 +357,76 @@
         function gestisciInvio(event) { if (event.key === "Enter") verificaPassword(); }
 
         function salvaNuovaPassword(event) {
-            const vecchia = document.getElementById('pwd-vecchia').value;
-            const nuova = document.getElementById('pwd-nuova').value;
-            const conf = document.getElementById('pwd-conferma').value;
-            const msg = document.getElementById('msg-pwd');
-            const btn = event.target;
+            // Controlla quale finestra è aperta per prendere gli ID giusti
+            let isObbligatorio = document.getElementById('modal-cambio-pwd').style.display === 'flex';
+            
+            let oldPwdId = isObbligatorio ? 'old-pwd' : 'pwd-vecchia';
+            let newPwdId = isObbligatorio ? 'new-pwd' : 'pwd-nuova';
+            let confirmPwdId = isObbligatorio ? 'confirm-pwd' : 'pwd-conferma';
+            let errorId = isObbligatorio ? 'errore-pwd' : 'msg-pwd';
 
-            if (nuova !== conf) { msg.style.display = 'block'; msg.style.color = 'red'; msg.innerText = "Le nuove password non coincidono!"; return; }
-            if (nuova.length < 6) { msg.style.display = 'block'; msg.style.color = 'red'; msg.innerText = "La password deve avere almeno 6 caratteri!"; return; }
+            const oldPwd = document.getElementById(oldPwdId).value;
+            const newPwd = document.getElementById(newPwdId).value;
+            const confirmPwd = document.getElementById(confirmPwdId).value;
+            const erroreMsg = document.getElementById(errorId);
 
-            btn.innerText = "Salvataggio..."; btn.disabled = true;
+            if (event) { event.target.innerText = "Attendere..."; event.target.disabled = true; }
 
-            fetch(LINK_GOOGLE_SCRIPT, {
-                method: "POST",
-                body: JSON.stringify({ action: "cambiaPasswordManuale", vecchia: vecchia, nuova: nuova })
-            }).then(r => r.text()).then(risp => {
-                btn.innerText = "💾 Salva Password"; btn.disabled = false;
-                msg.style.display = 'block';
-                if (risp === "CAMBIO_OK") {
-                    msg.style.color = 'green'; msg.innerText = "Password aggiornata con successo!";
-                    setTimeout(() => chiudiModal('cambioPasswordModal'), 2000);
+            // Controlli base
+            if (newPwd.length < 6) {
+                erroreMsg.innerText = "La nuova password deve avere almeno 6 caratteri.";
+                erroreMsg.style.display = 'block';
+                if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
+                return;
+            }
+            if (newPwd !== confirmPwd) {
+                erroreMsg.innerText = "Le due nuove password non coincidono!";
+                erroreMsg.style.display = 'block';
+                if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
+                return;
+            }
+
+            erroreMsg.style.color = "#5e7153";
+            erroreMsg.innerText = "Aggiornamento sul server in corso...";
+            erroreMsg.style.display = 'block';
+
+            const URL_SCRIPT_GOOGLE = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec"; 
+
+            fetch(URL_SCRIPT_GOOGLE, {
+                method: 'POST',
+                body: JSON.stringify({ action: "cambiaPasswordManuale", vecchia: oldPwd, nuova: newPwd })
+            })
+            .then(r => r.text())
+            .then(res => {
+                if (res === "CAMBIO_OK") {
+                    localStorage.setItem('mese_ultimo_cambio_pwd', new Date().getMonth());
+                    alert("✅ Password aggiornata con successo!");
+                    
+                    // Chiude la finestra corretta e pulisce i campi
+                    if (isObbligatorio) {
+                        document.getElementById('modal-cambio-pwd').style.display = 'none';
+                        document.getElementById('banner-scadenza-pwd').style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    } else {
+                        chiudiModal('cambioPasswordModal');
+                    }
+                    
+                    document.getElementById(oldPwdId).value = "";
+                    document.getElementById(newPwdId).value = "";
+                    document.getElementById(confirmPwdId).value = "";
+                    erroreMsg.style.display = 'none';
+                } else if (res === "VECCHIA_ERRATA") {
+                    erroreMsg.style.color = "red";
+                    erroreMsg.innerText = "La password attuale inserita è errata!";
                 } else {
-                    msg.style.color = 'red'; msg.innerText = "La vecchia password è errata!";
+                    erroreMsg.style.color = "red";
+                    erroreMsg.innerText = "Errore di connessione.";
                 }
+                if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
+            }).catch(() => {
+                erroreMsg.style.color = "red";
+                erroreMsg.innerText = "Errore di comunicazione col server.";
+                if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
             });
         }
 
@@ -846,11 +901,13 @@
             .then(() => caricaDati());
         }
 
-        function salvaModifiche(event) {
+        function salvaModifiche(event, approva) {
             const index = document.getElementById('edit-index').value;
             let chk = dbCheckin[index];
             let dReqIn = parseData(chk[1]); let dReqOut = parseData(chk[2]);
-            if (dReqIn && dReqOut) {
+            
+            // Controlla la sovrapposizione date SOLO se stai cercando di APPROVARE
+            if (approva && dReqIn && dReqOut) {
                 let overlap = false; let overlapNome = "";
                 for (let i = 0; i < dbCheckin.length; i++) {
                     if (i == index) continue;
@@ -867,23 +924,38 @@
                     }
                 }
                 if (overlap) {
-                    alert(`⛔ IMPOSSIBILE PROCEDERE: SOVRAPPOSIZIONE DATE!\n\nI nuovi dati coincidono con le date di: ${overlapNome}.\n\nModifica le date o libera il calendario prima di salvare.`); 
+                    alert(`⛔ IMPOSSIBILE APPROVARE: SOVRAPPOSIZIONE DATE!\n\nI dati coincidono con le date di: ${overlapNome}.\n\nModifica le date o libera il calendario prima di approvare.`); 
                     return;
                 }
             }
 
-            const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true;
+            const btn = event.target; 
+            const testoOriginale = btn.innerText;
+            btn.innerText = "Salvataggio... ⏳"; btn.disabled = true;
+
             const payload = {
-                action: "editDati", row: dbCheckin.length - 1 - index, nome: document.getElementById('edit-nome').value, cognome: document.getElementById('edit-cognome').value,
+                action: "editDati", row: dbCheckin.length - 1 - index, 
+                nome: document.getElementById('edit-nome').value, cognome: document.getElementById('edit-cognome').value,
                 documento: document.getElementById('edit-doc').value, nascita: document.getElementById('edit-nascita').value,
                 luogoNascita: document.getElementById('edit-luogo').value, nazionalita: document.getElementById('edit-nazionalita').value,
-                residenza: document.getElementById('edit-residenza').value, ospitiExtra: document.getElementById('edit-ospitiExtra').value
+                residenza: document.getElementById('edit-residenza').value, ospitiExtra: document.getElementById('edit-ospitiExtra').value,
+                approva: approva // Manda al server l'istruzione se approvare o no
             };
+
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) }).then(() => { 
                 let rAgg = [...dbCheckin[index]]; 
                 rAgg[4]=payload.nome; rAgg[5]=payload.cognome; rAgg[8]=payload.nascita; 
                 rAgg[9]=payload.luogoNascita; rAgg[10]=payload.nazionalita; rAgg[11]=payload.residenza; rAgg[15]=payload.ospitiExtra;
-                generaCSVCompleto(rAgg); chiudiModal('modificaModal'); caricaDati(); 
+                
+                // Se hai scelto "Salva e Approva", scarica anche il CSV della Questura
+                if (approva) { 
+                    rAgg[14] = "Corretto e Approvato"; 
+                    generaCSVCompleto(rAgg); 
+                }
+                
+                chiudiModal('modificaModal'); 
+                caricaDati(); 
+                btn.innerText = testoOriginale; btn.disabled = false;
             });
         }
 
@@ -987,6 +1059,57 @@
         
         controllaSessione();
 
+	// --- SISTEMA DI SCADENZA PASSWORD MENSILE ---
+        function controllaScadenzaPassword() {
+            const oggi = new Date();
+            const giornoAttuale = oggi.getDate();
+            const meseAttuale = oggi.getMonth();
+            const annoAttuale = oggi.getFullYear();
+            
+            // Calcola quanti giorni ha il mese corrente
+            const ultimoGiornoMese = new Date(annoAttuale, meseAttuale + 1, 0).getDate();
+            const giorniMancanti = ultimoGiornoMese - giornoAttuale;
+
+            // Recupera dal database locale l'ultimo mese in cui hai cambiato la password
+            const ultimoMeseCambio = localStorage.getItem('mese_ultimo_cambio_pwd');
+
+            const modalCambio = document.getElementById('modal-cambio-pwd');
+            const bannerAvviso = document.getElementById('banner-scadenza-pwd');
+            const spanGiorni = document.getElementById('giorni-rimanenti');
+
+            // REGOLA 1: Se è il 1° del mese e NON l'hai ancora cambiata questo mese -> BLOCCA TUTTO
+            if (giornoAttuale === 1 && ultimoMeseCambio != meseAttuale) {
+                modalCambio.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Blocca lo scorrimento
+            } 
+            // REGOLA 2: Se mancano 5 giorni o meno alla fine del mese -> MOSTRA AVVISO
+            else if (giorniMancanti <= 4 && giorniMancanti >= 0 && ultimoMeseCambio != meseAttuale + 1) {
+                // (Se giorniMancanti è 4, mancano in realtà 5 giorni al 1° del mese successivo)
+                spanGiorni.innerText = giorniMancanti + 1;
+                bannerAvviso.style.display = 'block';
+            }
+        }
+
+        // Avvia il controllo appena si carica il pannello Admin
+        window.addEventListener('load', controllaScadenzaPassword);
+
     </script>
+
+	<!-- MODAL CAMBIO PASSWORD OBBLIGATORIO -->
+    <div id="modal-cambio-pwd" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;">
+            <h2 style="color: #5e7153; margin-top: 0;">Aggiornamento Sicurezza</h2>
+            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">È il 1° del mese. Per motivi di sicurezza devi impostare una nuova password per accedere al pannello.</p>
+            
+            <input type="password" id="old-pwd" placeholder="Password Attuale" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+            <input type="password" id="new-pwd" placeholder="Nuova Password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+            <input type="password" id="confirm-pwd" placeholder="Conferma Nuova Password" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+            
+            <p id="errore-pwd" style="color: red; font-size: 13px; display: none; margin-top: -10px; margin-bottom: 15px; font-weight: bold;"></p>
+            <button onclick="salvaNuovaPassword(event)" style="background: #5e7153; color: white; border: none; padding: 12px 20px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px;">Aggiorna Password</button>
+
+        </div>
+    </div>
+
 </body>
 </html>
