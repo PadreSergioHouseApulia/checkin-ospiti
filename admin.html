@@ -1117,7 +1117,7 @@
             // Controlla se gli auguri sono già stati fatti quest'anno
             const auguriFatti = localStorage.getItem('auguri_compleanno_' + anno);
 
-            if (true) {
+            if (mese === 4 && giorno === 23 && !auguriFatti) {
                 document.getElementById('schermata-compleanno').style.display = 'flex';
                 lanciaCoriandoli();
             }
