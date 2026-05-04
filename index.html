@@ -294,7 +294,7 @@
             <div class="grid">
                 <div>
                     <label><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label>
-                    <select name="luogoNascita_capogruppo" class="selettore-stati" required>
+                    <select name="luogoNascita" class="selettore-stati" required>
                         <option value="" disabled selected>-- Caricamento Stati... --</option>
                     </select>
                 </div>
@@ -305,6 +305,7 @@
                     </select>
                 </div>
             </div>
+            
             <label><span class="it">Stato di residenza *</span><span class="en">Country of Residence *</span></label>
             <select name="residenzaCapo" class="selettore-stati" required>
                 <option value="" disabled selected>-- Caricamento Stati... --</option>
@@ -397,7 +398,7 @@
     window.addEventListener('DOMContentLoaded', caricaMenuStati);
     // -----------------------------------------
 
-	window.onload = () => {
+    window.onload = () => {
             const saved = localStorage.getItem('pref-lang');
             if (saved) {
                 // Se l'ospite aveva già scelto una lingua, usiamo quella
