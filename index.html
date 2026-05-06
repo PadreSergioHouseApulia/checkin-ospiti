@@ -32,7 +32,7 @@
 
         body { 
             font-family: 'Arial', sans-serif;
-            background-image: url('Foto sfondo.jpg');
+            background-image: url('Foto sfondo.jpg'); /* Sfondo predefinito */
             background-size: cover;
             background-position: center top;
             background-repeat: no-repeat;
@@ -42,6 +42,7 @@
             line-height: 1.6; 
             margin: 0;
             min-height: 100vh;
+            transition: background-image 1s ease-in-out; /* Transizione morbida aggiunta */
         }
         
         .container { 
@@ -398,22 +399,39 @@
     window.addEventListener('DOMContentLoaded', caricaMenuStati);
     // -----------------------------------------
 
+    // --- FUNZIONE SFONDO DINAMICO AGGIUNTA ---
+    function impostaSfondoDinamico() {
+        const ora = new Date().getHours();
+        let immagineUrl = 'Foto sfondo.jpg'; // Mattina e Giorno (06:00 - 16:59)
+
+        if (ora >= 17 && ora < 20) {
+            immagineUrl = 'Foto sfondo tramonto.jpg'; // Tramonto (17:00 - 19:59)
+        } else if (ora >= 20 || ora < 6) {
+            immagineUrl = 'Foto sfondo notte.jpg'; // Notte (20:00 - 05:59)
+        }
+
+        document.body.style.backgroundImage = `url('${immagineUrl}')`;
+    }
+
     window.onload = () => {
-            const saved = localStorage.getItem('pref-lang');
-            if (saved) {
-                // Se l'ospite aveva già scelto una lingua, usiamo quella
-                changeLang(saved);
+        // Applica lo sfondo in base all'orario aggiunto qui
+        impostaSfondoDinamico();
+
+        const saved = localStorage.getItem('pref-lang');
+        if (saved) {
+            // Se l'ospite aveva già scelto una lingua, usiamo quella
+            changeLang(saved);
+        } else {
+            // MAGIA: Rileva la lingua del telefono dell'ospite!
+            const userLang = navigator.language || navigator.userLanguage;
+            // Se il telefono è impostato su Italiano, mostra ITA. Altrimenti, forza l'Inglese.
+            if (userLang.toLowerCase().startsWith('it')) {
+                changeLang('it');
             } else {
-                // MAGIA: Rileva la lingua del telefono dell'ospite!
-                const userLang = navigator.language || navigator.userLanguage;
-                // Se il telefono è impostato su Italiano, mostra ITA. Altrimenti, forza l'Inglese.
-                if (userLang.toLowerCase().startsWith('it')) {
-                    changeLang('it');
-                } else {
-                    changeLang('en');
-                }
+                changeLang('en');
             }
-        };
+        }
+    };
 
     function cambiaLingua(lang) {
         if(lang === 'en') {
