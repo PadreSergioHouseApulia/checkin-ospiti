@@ -290,7 +290,8 @@
 
         async function caricaDizionari() {
             try {
-                let resCom = await fetch('comuni.csv');
+                // Modifica il percorso per puntare alla cartella assets
+                let resCom = await fetch('assets/comuni.csv'); 
                 if (resCom.ok) {
                     let txtCom = await resCom.text();
                     let righeCom = txtCom.split(/\r?\n/);
@@ -304,7 +305,8 @@
                     }
                 }
                 
-                let resStat = await fetch('stati.csv');
+                // Modifica il percorso per puntare alla cartella assets
+                let resStat = await fetch('assets/stati.csv'); 
                 if (resStat.ok) {
                     let txtStat = await resStat.text();
                     let righeStat = txtStat.split(/\r?\n/);
@@ -317,7 +319,7 @@
                         }
                     }
                 }
-            } catch(e) { console.warn("Dizionari CSV non trovati."); }
+            } catch(e) { console.warn("Dizionari CSV non trovati in cartella assets."); }
         }
         caricaDizionari(); // Esegue il caricamento in background
 
