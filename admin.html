@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-
     <link rel="manifest" href="manifest-admin.json">
     <meta name="theme-color" content="#5e7153">
     <link rel="apple-touch-icon" href="icona.png">
@@ -11,16 +10,6 @@
     
     <title>Admin | PadreSergio House</title>
     <meta name="description" content="Pannello di amministrazione riservato - PadreSergio House Apulia.">
-
-    <meta property="og:title" content="Admin | PadreSergio House">
-    <meta property="og:description" content="Pannello di amministrazione riservato per la gestione della struttura.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://padresergiohouseapulia.github.io/checkin-ospiti/admin.html">
-    <meta property="og:image" content="https://padresergiohouseapulia.github.io/checkin-ospiti/anteprima_admin.jpg">
-    <meta property="og:image:secure_url" content="https://padresergiohouseapulia.github.io/checkin-ospiti/anteprima_admin.jpg">
-    <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
     <link rel="icon" type="image/x-icon" href="icona_admin.ico">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -38,7 +27,6 @@
             --nero-blocco: #2c3e50; 
             --blu-info: #3498db;
         }
-        /* SISTEMA RUOLI: Nasconde gli elementi sensibili se l'utente è Base */
         body.role-base .admin-only { display: none !important; }
         body { font-family: 'Arial', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo); margin: 0; padding: 0; }
 
@@ -64,7 +52,6 @@
         .header-sezione { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .header-sezione h2 { margin: 0; color: var(--colore-principale); }
 
-        /* SCHEDE */
         .grid-prenotazioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
         .card { background: var(--colore-card); border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--giallo-attesa); transition: transform 0.2s; }
         .card.approvato { border-top-color: var(--verde-ok); }
@@ -94,45 +81,29 @@
         .btn-whatsapp { background-color: #25d366; color: white; }
         .btn-email { background-color: var(--blu-info); color: white; }
 
-        /* DASHBOARD & GRAFICO */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; grid-column: 1 / -1; margin-bottom: 30px; }
         .dash-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid var(--colore-principale); }
         .dash-icon { font-size: 40px; margin-bottom: 10px; }
         .dash-value { font-size: 32px; font-weight: bold; color: var(--colore-principale); margin-bottom: 5px; }
         .dash-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
-        
         .grafico-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; }
 
-        /* CALENDARIO VISIVO */
         .calendario-wrapper { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .calendario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
         .giorno-nome { font-weight: bold; color: #666; padding: 10px 0; border-bottom: 2px solid #eee; }
         .giorno-box { padding: 10px 5px; border-radius: 5px; background: #f9f9f9; font-size: 14px; position: relative; overflow: hidden; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; }
         .giorno-box.vuoto { background: transparent; border: none; }
-        
-        /* Stili avanzati per checkin/checkout a metà giornata */
         .giorno-box.libero { background: #e8f8f5; color: #27ae60; font-weight: bold; border: 1px solid #27ae60; }
         .giorno-box.occupato-full { background: #fadbd8; color: #c0392b; font-weight: bold; border: 1px solid #e74c3c; cursor: pointer; transition: 0.2s; }
         .giorno-box.occupato-full:hover { background: #f5b7b1; }
-        
-        /* Metà verde e metà rossa */
-        .giorno-box.occupato-pm { 
-            color: #c0392b; font-weight: bold; cursor: pointer;
-            border: 1px solid transparent;
-            background: linear-gradient(to right, #e8f8f5 50%, #fadbd8 50%) padding-box,
-                        linear-gradient(to right, #27ae60 50%, #e74c3c 50%) border-box;
-        }
-        .giorno-box.occupato-am { 
-            color: #c0392b; font-weight: bold; cursor: pointer;
-            border: 1px solid transparent;
-            background: linear-gradient(to right, #fadbd8 50%, #e8f8f5 50%) padding-box,
-                        linear-gradient(to right, #e74c3c 50%, #27ae60 50%) border-box;
-        }
-        
+        .giorno-box.occupato-pm { color: #c0392b; font-weight: bold; cursor: pointer; border: 1px solid transparent; background: linear-gradient(to right, #e8f8f5 50%, #fadbd8 50%) padding-box, linear-gradient(to right, #27ae60 50%, #e74c3c 50%) border-box; }
+        .giorno-box.occupato-am { color: #c0392b; font-weight: bold; cursor: pointer; border: 1px solid transparent; background: linear-gradient(to right, #fadbd8 50%, #e8f8f5 50%) padding-box, linear-gradient(to right, #e74c3c 50%, #27ae60 50%) border-box; }
         .nome-calendario { font-size: 10px; display: block; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: normal; color: inherit; width: 100%; box-sizing: border-box;}
 
-        /* MODALI */
+        .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .user-list-item:last-child { border-bottom: none; }
+
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
         .modal { background: white; width: 90%; max-width: 600px; border-radius: 10px; padding: 30px; max-height: 85vh; overflow-y: auto; position: relative; }
         .chiudi-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; }
@@ -140,17 +111,14 @@
         .foto-doc-link { display: inline-block; background: var(--colore-principale); color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; margin-right: 10px; margin-top: 10px; }
         .campo-edit { margin-bottom: 10px; }
         .campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 3px; }
-        .campo-edit input, .campo-edit textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
+        .campo-edit input, .campo-edit textarea, .campo-edit select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
         #loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; grid-column: 1 / -1;}
-        
-        /* TASTO NAV */
         .btn-nav-azione { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
         .btn-nav-azione:hover { background: white; color: var(--colore-principale); }
     </style>
 </head>
 <body>
 
-	<!-- SCHERMATA COMPLEANNO (EASTER EGG 23 MAGGIO) -->
     <div id="schermata-compleanno" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #f4f7f6 0%, #e0e6ed 100%); z-index: 100000; justify-content: center; align-items: center; flex-direction: column; text-align: center; box-sizing: border-box; padding: 20px;">
         <div style="font-size: 80px; margin-bottom: -10px; animation: bounce 2s infinite;">🎂</div>
         <h1 style="font-size: 45px; color: var(--colore-principale); font-family: 'Georgia', serif; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">Buon Compleanno!</h1>
@@ -160,9 +128,14 @@
         <style>@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }</style>
     </div>
 
-	<!-- BANNER AVVISO SCADENZA PASSWORD -->
-    <div id="banner-scadenza-pwd" style="display: none; background-color: #ffcc00; color: #333; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; position: relative;">
+    <!-- AVVISO PRE-SCADENZA (Giallo) -->
+    <div id="banner-scadenza-pwd-pre" style="display: none; background-color: var(--giallo-attesa); color: #333; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 999; position: relative;">
         ⚠️ Attenzione: La tua password scadrà tra <span id="giorni-rimanenti"></span> giorni (il 1° del mese). Preparati a cambiarla.
+    </div>
+
+    <!-- BLOCCO OBBLIGATORIO 1° MESE (Rosso) -->
+    <div id="banner-scadenza-pwd" style="display: none; background-color: #e74c3c; color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 10000; position: relative;">
+        ⚠️ ACCESSO BLOCCATO: È il 1° del mese. Devi obbligatoriamente cambiare la password per accedere.
     </div>
 
     <div id="login-screen">
@@ -170,12 +143,9 @@
             <h1>PadreSergio</h1>
             <p>Pannello di Amministrazione</p>
             
-            <!-- CAMPO NOME UTENTE -->
             <div class="password-container" style="margin-bottom: 10px;">
                 <input type="text" id="usernameInput" placeholder="Nome Utente" onkeypress="gestisciInvio(event)" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-align: center;">
             </div>
-
-            <!-- CAMPO PASSWORD -->
             <div class="password-container">
                 <input type="password" id="passwordInput" placeholder="Inserisci Password" onkeypress="gestisciInvio(event)">
                 <span class="toggle-password" onclick="mostraNascondiPassword()">👁️</span>
@@ -190,7 +160,7 @@
         <div class="navbar">
             <h1>PadreSergio Admin</h1>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="btn-nav-azione" onclick="document.getElementById('cambioPasswordModal').style.display = 'flex'">🔑 Cambia Password</button>
+                <button class="btn-nav-azione" onclick="apriCambioPasswordVolontario()">🔑 Cambia Password</button>
                 <button class="btn-nav-azione" onclick="esci()">🚪 Esci</button>
             </div>
         </div>
@@ -202,6 +172,9 @@
                 <button class="tab-button" id="tab-richieste" onclick="cambiaVista('richieste')">📩 Richieste Sito</button>
                 <button class="tab-button" id="tab-calendario" onclick="cambiaVista('calendario')">📅 Calendario</button>
                 <button class="tab-button" id="tab-archivio" onclick="cambiaVista('archivio')">🗄️ Archivio Passati</button>
+                <!-- TAB ADMIN ONLY -->
+                <button class="tab-button admin-only" id="tab-utenti" onclick="cambiaVista('utenti')">👥 Utenti</button>
+                <button class="tab-button admin-only" id="tab-impostazioni" onclick="cambiaVista('impostazioni')">⚙️ Impostazioni</button>
             </div>
 
             <div class="header-sezione">
@@ -220,14 +193,58 @@
                 <div class="calendario-grid" id="griglia-giorni"></div>
             </div>
 
+            <!-- CONTENITORE UTENTI (Admin) -->
+            <div id="contenitore-utenti" style="display:none;" class="admin-only">
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 style="margin-top:0; color: var(--colore-principale);">Aggiungi Nuovo Utente</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div class="campo-edit" style="flex: 1; min-width: 150px;"><input type="text" id="new-user" placeholder="Username (es. reception2)"></div>
+                        <div class="campo-edit" style="flex: 1; min-width: 150px;"><input type="password" id="new-pwd" placeholder="Password Temporanea"></div>
+                        <div class="campo-edit" style="flex: 1; min-width: 150px;">
+                            <select id="new-role">
+                                <option value="BASE">Base (Reception)</option>
+                                <option value="ADMIN">Super Admin</option>
+                            </select>
+                        </div>
+                        <button onclick="aggiungiUtente(event)" style="padding: 10px 15px; background: var(--verde-ok); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">➕ Crea</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top:0; color: var(--colore-principale);">Utenti Registrati</h3>
+                    <div id="lista-utenti-box">Caricamento utenti in corso...</div>
+                </div>
+            </div>
+
+            <!-- CONTENITORE IMPOSTAZIONI (Admin) -->
+            <div id="contenitore-impostazioni" style="display:none;" class="admin-only">
+                <div class="card">
+                    <h3 style="margin-top:0; color: var(--colore-principale);">Impostazioni Globali</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Questi valori vengono utilizzati in tutta la web app per generare i messaggi e configurare il sistema.</p>
+                    
+                    <div class="campo-edit">
+                        <label>Password Rete Wi-Fi della struttura</label>
+                        <input type="text" id="conf-wifi-pwd">
+                    </div>
+                    
+                    <div class="campo-edit">
+                        <label>Messaggio di Benvenuto standard (Variabili supportate: [NOME], [DATA])</label>
+                        <textarea id="conf-msg-benvenuto" rows="5"></textarea>
+                    </div>
+                    
+                    <button onclick="salvaImpostazioni(event)" style="padding: 15px; background: var(--colore-principale); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px;">💾 Salva Impostazioni</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
+    <!-- MODAL CAMBIO PASSWORD E MODIFICA UTENTE -->
     <div class="modal-overlay" id="cambioPasswordModal">
         <div class="modal" style="max-width: 400px; text-align: center;">
-            <span class="chiudi-modal" onclick="chiudiModal('cambioPasswordModal')">×</span>
-            <h2 style="color: var(--colore-principale); margin-top: 0;">🔑 Cambia Password</h2>
-            <p style="font-size: 13px; color: #666;">Inserisci i dati per aggiornare la password di accesso.</p>
+            <span class="chiudi-modal" id="btn-chiudi-modal-pwd" onclick="chiudiModal('cambioPasswordModal')">×</span>
+            <h2 style="color: var(--colore-principale); margin-top: 0;">🔑 Cambio Password</h2>
+            <p style="font-size: 13px; color: #666;" id="testo-modal-pwd">Inserisci i dati per aggiornare la password di accesso.</p>
             
             <div class="campo-edit" style="text-align: left;"><label>Password Attuale</label><input type="password" id="pwd-vecchia"></div>
             <div class="campo-edit" style="text-align: left;"><label>Nuova Password</label><input type="password" id="pwd-nuova"></div>
@@ -239,6 +256,31 @@
         </div>
     </div>
 
+    <!-- MODAL MODIFICA UTENTE (Admin) -->
+    <div class="modal-overlay" id="modificaUtenteModal">
+        <div class="modal" style="max-width: 400px; text-align: center;">
+            <span class="chiudi-modal" onclick="chiudiModal('modificaUtenteModal')">×</span>
+            <h2 style="color: var(--colore-principale); margin-top: 0;">✏️ Modifica Utente</h2>
+            <input type="hidden" id="edit-user-oldname">
+            
+            <div class="campo-edit" style="text-align: left;"><label>Nome Utente</label><input type="text" id="edit-user-newname"></div>
+            <div class="campo-edit" style="text-align: left;">
+                <label>Nuova Password</label>
+                <input type="password" id="edit-user-pwd" placeholder="Lascia vuoto per non cambiare">
+            </div>
+            <div class="campo-edit" style="text-align: left;">
+                <label>Ruolo</label>
+                <select id="edit-user-role">
+                    <option value="BASE">Base (Reception)</option>
+                    <option value="ADMIN">Super Admin</option>
+                </select>
+            </div>
+            
+            <button onclick="salvaModificaUtente(event)" style="background:var(--verde-ok); color:white; width:100%; padding:15px; border:none; border-radius:5px; margin-top:10px; font-weight:bold; cursor:pointer;">💾 Salva Utente</button>
+        </div>
+    </div>
+
+    <!-- ALTRE MODALI CHECKIN -->
     <div class="modal-overlay" id="dettagliModal">
         <div class="modal">
             <span class="chiudi-modal" onclick="chiudiModal('dettagliModal')">×</span>
@@ -268,7 +310,6 @@
             <h2 style="color: var(--rosso-allerta); margin-top: 0;">✏️ Correggi Dati</h2>
             <input type="hidden" id="edit-index">
             
-            <!-- CAMPI DATA (Visibili solo ad Admin) -->
             <div class="campo-edit admin-only"><label>Data Arrivo (Solo Admin)</label><input type="date" id="edit-arrivo"></div>
             <div class="campo-edit admin-only"><label>Data Partenza (Solo Admin)</label><input type="date" id="edit-partenza"></div>
             <div class="campo-edit"><label>Nome</label><input type="text" id="edit-nome"></div>
@@ -292,15 +333,14 @@
         
         let dbCheckin = []; 
         let dbRichieste = []; 
+        let impostazioniGlobali = {};
         let vistaAttuale = "dashboard"; 
         let meseCorrente = new Date().getMonth();
         let annoCorrente = new Date().getFullYear();
         let graficoOccupazione = null; 
 
         // --- MOTORE TRADUZIONE CODICI POLIZIA ---
-        let dictComuni = {};
-        let dictStati = {};
-
+        let dictComuni = {}; let dictStati = {};
         async function caricaDizionari() {
             try {
                 let resCom = await fetch('assets/comuni.csv'); 
@@ -315,7 +355,6 @@
                         }
                     }
                 }
-                
                 let resStat = await fetch('assets/stati.csv'); 
                 if (resStat.ok) {
                     let txtStat = await resStat.text();
@@ -329,7 +368,7 @@
                         }
                     }
                 }
-            } catch(e) { console.warn("Dizionari CSV non trovati in cartella assets."); }
+            } catch(e) { console.warn("Dizionari CSV non trovati."); }
         }
         caricaDizionari(); 
 
@@ -340,7 +379,6 @@
             if(dictStati[luogo]) return { nazione: dictStati[luogo], comune: "" }; 
             return { nazione: luogo, comune: "" }; 
         }
-
         function getCodiceNazione(nazionalita) {
             if(!nazionalita) return "";
             nazionalita = nazionalita.trim().toUpperCase();
@@ -362,9 +400,22 @@
                 method: "POST",
                 body: JSON.stringify({ action: "verificaPassword", username: user, password: pwd })
             }).then(r => r.text()).then(risposta => {
-                if (risposta === "ADMIN" || risposta === "BASE") {
+                
+                if (risposta.startsWith("FORCE_PWD_CHANGE")) {
+                    let parti = risposta.split("|");
+                    localStorage.setItem('tempUser', parti[2]); 
+                    
+                    document.getElementById('modal-cambio-pwd').style.display = 'flex';
+                    document.getElementById('btn-chiudi-modal-pwd').style.display = 'none'; 
+                    document.getElementById('banner-scadenza-pwd').style.display = 'block';
+                    document.getElementById('testo-modal-pwd').innerText = "Devi scegliere una nuova password prima di continuare.";
+                    
+                    btn.innerText = "Accedi"; btn.disabled = false;
+                
+                } else if (risposta === "ADMIN" || risposta === "BASE") {
                     localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000); 
                     localStorage.setItem('userRole', risposta); 
+                    localStorage.setItem('currentUser', user); 
                     document.body.className = "role-" + risposta.toLowerCase(); 
                     
                     document.getElementById('login-screen').style.display = 'none';
@@ -372,6 +423,7 @@
                     btn.innerText = "Accedi"; btn.disabled = false;
                     caricaDati();
                     controllaCompleanno();
+                    controllaScadenzaPassword(); // Avvia controllo per banner pre-scadenza
                 } else {
                     document.getElementById('messaggioErrore').style.display = 'block';
                     btn.innerText = "Accedi"; btn.disabled = false;
@@ -384,18 +436,21 @@
 
         function gestisciInvio(event) { if (event.key === "Enter") verificaPassword(); }
 
-        function salvaNuovaPassword(event) {
-            let isObbligatorio = document.getElementById('modal-cambio-pwd').style.display === 'flex';
-            
-            let oldPwdId = isObbligatorio ? 'old-pwd' : 'pwd-vecchia';
-            let newPwdId = isObbligatorio ? 'new-pwd' : 'pwd-nuova';
-            let confirmPwdId = isObbligatorio ? 'confirm-pwd' : 'pwd-conferma';
-            let errorId = isObbligatorio ? 'errore-pwd' : 'msg-pwd';
+        function apriCambioPasswordVolontario() {
+            document.getElementById('cambioPasswordModal').style.display = 'flex';
+            document.getElementById('btn-chiudi-modal-pwd').style.display = 'block';
+            document.getElementById('banner-scadenza-pwd').style.display = 'none';
+            document.getElementById('testo-modal-pwd').innerText = "Inserisci i dati per aggiornare la password di accesso.";
+        }
 
-            const oldPwd = document.getElementById(oldPwdId).value;
-            const newPwd = document.getElementById(newPwdId).value;
-            const confirmPwd = document.getElementById(confirmPwdId).value;
-            const erroreMsg = document.getElementById(errorId);
+        function salvaNuovaPassword(event) {
+            let isObbligatorio = document.getElementById('btn-chiudi-modal-pwd').style.display === 'none';
+            let targetUser = isObbligatorio ? localStorage.getItem('tempUser') : localStorage.getItem('currentUser');
+
+            const oldPwd = document.getElementById('pwd-vecchia').value;
+            const newPwd = document.getElementById('pwd-nuova').value;
+            const confirmPwd = document.getElementById('pwd-conferma').value;
+            const erroreMsg = document.getElementById('msg-pwd');
 
             if (event) { event.target.innerText = "Attendere..."; event.target.disabled = true; }
 
@@ -418,31 +473,27 @@
 
             fetch(LINK_GOOGLE_SCRIPT, {
                 method: 'POST',
-                body: JSON.stringify({ 
-                    action: "cambiaPasswordManuale", 
-                    vecchia: oldPwd, 
-                    nuova: newPwd,
-                    ruolo: localStorage.getItem('userRole') 
-                })
+                body: JSON.stringify({ action: "cambiaPasswordManuale", username: targetUser, vecchia: oldPwd, nuova: newPwd })
             })
             .then(r => r.text())
             .then(res => {
                 if (res === "CAMBIO_OK") {
+                    document.getElementById('pwd-vecchia').value = "";
+                    document.getElementById('pwd-nuova').value = "";
+                    document.getElementById('pwd-conferma').value = "";
+                    erroreMsg.style.display = 'none';
                     localStorage.setItem('mese_ultimo_cambio_pwd', new Date().getMonth());
-                    alert("✅ Password aggiornata con successo!");
                     
                     if (isObbligatorio) {
-                        document.getElementById('modal-cambio-pwd').style.display = 'none';
+                        alert("✅ Password aggiornata! Ora puoi effettuare il login con la nuova password.");
+                        document.getElementById('cambioPasswordModal').style.display = 'none';
                         document.getElementById('banner-scadenza-pwd').style.display = 'none';
-                        document.body.style.overflow = 'auto';
+                        document.getElementById('passwordInput').value = ""; 
                     } else {
+                        alert("✅ Password aggiornata con successo!");
                         chiudiModal('cambioPasswordModal');
+                        document.getElementById('banner-scadenza-pwd-pre').style.display = 'none';
                     }
-                    
-                    document.getElementById(oldPwdId).value = "";
-                    document.getElementById(newPwdId).value = "";
-                    document.getElementById(confirmPwdId).value = "";
-                    erroreMsg.style.display = 'none';
                 } else if (res === "VECCHIA_ERRATA") {
                     erroreMsg.style.color = "red";
                     erroreMsg.innerText = "La password attuale inserita è errata!";
@@ -458,46 +509,188 @@
             });
         }
 
+        // --- SISTEMA DI PRE-SCADENZA PASSWORD (GIALLO) ---
+        function controllaScadenzaPassword() {
+            const oggi = new Date();
+            const giornoAttuale = oggi.getDate();
+            const meseAttuale = oggi.getMonth();
+            const annoAttuale = oggi.getFullYear();
+            
+            const ultimoGiornoMese = new Date(annoAttuale, meseAttuale + 1, 0).getDate();
+            const giorniMancanti = ultimoGiornoMese - giornoAttuale;
+            const ultimoMeseCambio = localStorage.getItem('mese_ultimo_cambio_pwd');
+
+            const bannerPreAvviso = document.getElementById('banner-scadenza-pwd-pre');
+            const spanGiorni = document.getElementById('giorni-rimanenti');
+
+            // Se mancano 5 giorni o meno alla fine del mese e la password non è stata aggiornata per il prossimo mese
+            if (giorniMancanti <= 4 && giorniMancanti >= 0 && ultimoMeseCambio != meseAttuale + 1 && giornoAttuale !== 1) {
+                spanGiorni.innerText = giorniMancanti + 1;
+                bannerPreAvviso.style.display = 'block';
+            } else {
+                bannerPreAvviso.style.display = 'none';
+            }
+        }
+
         // --- NAVIGAZIONE ---
         function cambiaVista(tipo) {
             vistaAttuale = tipo;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-' + tipo).classList.add('active');
             
-            document.getElementById('contenitore-schede').style.display = (tipo === 'calendario') ? 'none' : 'grid';
+            document.getElementById('contenitore-schede').style.display = (tipo === 'calendario' || tipo === 'utenti' || tipo === 'impostazioni') ? 'none' : 'grid';
             document.getElementById('contenitore-calendario').style.display = (tipo === 'calendario') ? 'block' : 'none';
+            document.getElementById('contenitore-utenti').style.display = (tipo === 'utenti') ? 'block' : 'none';
+            document.getElementById('contenitore-impostazioni').style.display = (tipo === 'impostazioni') ? 'block' : 'none';
 
             const titoli = { 
-                dashboard: "Statistiche in Tempo Reale",
-                checkin: "Check-in Attivi",
-                richieste: "Richieste di Prenotazione",
-                calendario: "Calendario Completo",
-                archivio: "Archivio Check-in Passati"
+                dashboard: "Statistiche in Tempo Reale", checkin: "Check-in Attivi", richieste: "Richieste di Prenotazione",
+                calendario: "Calendario Completo", archivio: "Archivio Check-in Passati", 
+                utenti: "Gestione Utenti del Sistema", impostazioni: "Impostazioni Globali"
             };
             document.getElementById('titolo-sezione').innerText = titoli[tipo];
 
             if (tipo === 'calendario') generaCalendario();
+            else if (tipo === 'utenti') caricaUtenti();
+            else if (tipo === 'impostazioni') caricaImpostazioni();
             else renderizzaSchedeODashboard();
+        }
+
+        // --- GESTIONE UTENTI (SOLO ADMIN) ---
+        function caricaUtenti() {
+            document.getElementById('lista-utenti-box').innerHTML = "Caricamento utenti... ⏳";
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "getUtenti" }) })
+            .then(r => r.json())
+            .then(utenti => {
+                let html = "";
+                utenti.forEach(u => {
+                    let badgeColor = u[2] === "ADMIN" ? "var(--blu-info)" : "var(--verde-ok)";
+                    let btnEdit = `<button onclick="apriModificaUtente('${u[0]}', '${u[2]}')" style="background:#e0e6ed; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-right:5px;">✏️ Modifica</button>`;
+                    let btnDelete = u[0] === "admin" ? `<span style="font-size:12px; color:#999; margin-left:10px;">Ineliminabile</span>` : `<button onclick="eliminaUtente('${u[0]}', event)" style="background:var(--rosso-allerta); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">🗑️ Elimina</button>`;
+                    html += `
+                        <div class="user-list-item">
+                            <div><strong>${u[0]}</strong> <span style="background:${badgeColor}; color:white; font-size:10px; padding:3px 8px; border-radius:10px; margin-left:10px;">${u[2]}</span></div>
+                            <div>${btnEdit}${btnDelete}</div>
+                        </div>`;
+                });
+                document.getElementById('lista-utenti-box').innerHTML = html;
+            }).catch(() => document.getElementById('lista-utenti-box').innerHTML = "Errore di caricamento.");
+        }
+
+        function aggiungiUtente(event) {
+            const newUser = document.getElementById('new-user').value.trim();
+            const newPwd = document.getElementById('new-pwd').value;
+            const newRole = document.getElementById('new-role').value;
+            if(!newUser || newPwd.length < 6) return alert("Inserisci username valido e una password di almeno 6 caratteri.");
+            
+            const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "addUtente", newUser: newUser, newPwd: newPwd, newRole: newRole }) })
+            .then(r => r.text()).then(res => {
+                btn.innerText = "➕ Crea"; btn.disabled = false;
+                if(res === "ESISTE") alert("Username già in uso!");
+                else { document.getElementById('new-user').value = ""; document.getElementById('new-pwd').value = ""; caricaUtenti(); }
+            });
+        }
+
+        function apriModificaUtente(oldName, oldRole) {
+            document.getElementById('edit-user-oldname').value = oldName;
+            document.getElementById('edit-user-newname').value = oldName;
+            document.getElementById('edit-user-pwd').value = "";
+            document.getElementById('edit-user-role').value = oldRole;
+            
+            if (oldName === "admin") {
+                document.getElementById('edit-user-role').disabled = true; // Non può togliersi i permessi
+            } else {
+                document.getElementById('edit-user-role').disabled = false;
+            }
+            
+            document.getElementById('modificaUtenteModal').style.display = 'flex';
+        }
+
+        function salvaModificaUtente(event) {
+            const oldName = document.getElementById('edit-user-oldname').value;
+            const newName = document.getElementById('edit-user-newname').value.trim();
+            const newPwd = document.getElementById('edit-user-pwd').value;
+            const newRole = document.getElementById('edit-user-role').value;
+
+            if(!newName) return alert("Il nome utente non può essere vuoto.");
+            if(newPwd && newPwd.length < 6) return alert("La nuova password deve avere almeno 6 caratteri.");
+
+            const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
+
+            fetch(LINK_GOOGLE_SCRIPT, { 
+                method: "POST", 
+                body: JSON.stringify({ action: "editUtente", oldUser: oldName, newUser: newName, newPwd: newPwd, newRole: newRole }) 
+            })
+            .then(r => r.text()).then(res => {
+                btn.innerText = "💾 Salva Utente"; btn.disabled = false;
+                if (res === "ESISTE") alert("Il nuovo nome utente scelto è già in uso da un'altra persona!");
+                else if (res === "KO") alert("Errore di sicurezza o utente non trovato.");
+                else {
+                    chiudiModal('modificaUtenteModal');
+                    caricaUtenti();
+                }
+            });
+        }
+
+        function eliminaUtente(user, event) {
+            if(!confirm("Sicuro di voler eliminare l'utente: " + user + "?")) return;
+            const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "deleteUtente", targetUser: user }) })
+            .then(() => caricaUtenti());
+        }
+
+        // --- GESTIONE IMPOSTAZIONI GLOBALI (ADMIN) ---
+        function caricaImpostazioni() {
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "getImpostazioni" }) })
+            .then(r => r.json())
+            .then(imp => {
+                impostazioniGlobali = imp;
+                document.getElementById('conf-wifi-pwd').value = imp["wifi_password"] || "";
+                document.getElementById('conf-msg-benvenuto').value = imp["msg_benvenuto"] || "";
+            }).catch(e => console.error("Errore caricamento impostazioni", e));
+        }
+
+        function salvaImpostazioni(event) {
+            const btn = event.target; btn.innerText = "Salvataggio... ⏳"; btn.disabled = true;
+            
+            let nuoveImp = {
+                "wifi_password": document.getElementById('conf-wifi-pwd').value,
+                "msg_benvenuto": document.getElementById('conf-msg-benvenuto').value
+            };
+
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "saveImpostazioni", impostazioni: nuoveImp }) })
+            .then(r => r.text())
+            .then(res => {
+                btn.innerText = "💾 Salva Impostazioni"; btn.disabled = false;
+                if(res === "OK") {
+                    impostazioniGlobali = nuoveImp;
+                    alert("Impostazioni salvate con successo!");
+                }
+            });
         }
 
         // --- CARICAMENTO DATI ---
         function caricaDati() {
-            if(vistaAttuale !== 'calendario') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message">Sincronizzazione dati in corso... ⏳</div>';
+            if(vistaAttuale !== 'calendario' && vistaAttuale !== 'utenti' && vistaAttuale !== 'impostazioni') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message">Sincronizzazione dati in corso... ⏳</div>';
             
             Promise.all([
                 fetch(LINK_GOOGLE_SCRIPT).then(r => r.json()),
-                fetch(LINK_GOOGLE_SCRIPT + "?tipo=richieste").then(r => r.json())
-            ]).then(([checkins, richieste]) => {
-                dbCheckin = checkins.reverse(); dbRichieste = richieste.reverse();
+                fetch(LINK_GOOGLE_SCRIPT + "?tipo=richieste").then(r => r.json()),
+                (localStorage.getItem('userRole') === 'ADMIN') ? fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "getImpostazioni" }) }).then(r=>r.json()) : Promise.resolve({})
+            ]).then(([checkins, richieste, imp]) => {
+                dbCheckin = checkins.reverse(); 
+                dbRichieste = richieste.reverse();
+                if(imp.msg_benvenuto) impostazioniGlobali = imp;
                 renderizzaSchedeODashboard();
             }).catch(() => {
-                if(vistaAttuale !== 'calendario') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione al database.</div>';
+                if(vistaAttuale !== 'calendario' && vistaAttuale !== 'utenti' && vistaAttuale !== 'impostazioni') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione al database.</div>';
             });
         }
 
         // --- RENDERIZZA VISTE ---
         function renderizzaSchedeODashboard() {
-            if (vistaAttuale === 'calendario') { generaCalendario(); return; }
+            if (vistaAttuale === 'calendario' || vistaAttuale === 'utenti' || vistaAttuale === 'impostazioni') return;
             if (vistaAttuale === 'dashboard') { generaDashboard(); return; }
 
             const cont = document.getElementById('contenitore-schede');
@@ -526,7 +719,7 @@
                         if (stato.includes("Approvato")) {
                             let nomePulito = String(riga[4] || "").replace(/'/g, "\\'");
                             bottoni = `
-                                <button class="btn-email" onclick="copiaMessaggio('${nomePulito}', '${riga[1]}')">💬 Copia Benvenuto</button>
+                                <button class="btn-email" onclick="copiaMessaggioDinamic('${nomePulito}', '${riga[1]}')">💬 Copia Benvenuto</button>
                                 <button class="btn-dettagli admin-only" style="background:var(--blu-info); color:white;" onclick="generaCSVCompleto(dbCheckin[${index}])">📥 Ri-scarica CSV</button>
                             `;
                         } else if (stato === "Bloccato") {
@@ -580,27 +773,16 @@
             let oggi = new Date(); oggi.setHours(0,0,0,0);
             
             let giorniNelMeseScelto = new Date(annoCorrente, meseCorrente + 1, 0).getDate();
+            let ospitiTotaliStorico = 0; let nottiOccupateMeseScelto = 0; let prossimiArrivi = 0;
+            let labelsGiorni = []; let dataOccupazione = [];
             
-            let ospitiTotaliStorico = 0; 
-            let nottiOccupateMeseScelto = 0;
-            let prossimiArrivi = 0;
-
-            let labelsGiorni = [];
-            let dataOccupazione = [];
-            
-            for(let i=1; i<=giorniNelMeseScelto; i++) {
-                labelsGiorni.push(i);
-                dataOccupazione.push(0); 
-            }
+            for(let i=1; i<=giorniNelMeseScelto; i++) { labelsGiorni.push(i); dataOccupazione.push(0); }
 
             function calcolaNottiEPopolaGrafico(dIn, dOut) {
                 let count = 0;
                 for(let d=1; d<=giorniNelMeseScelto; d++) {
                     let date = new Date(annoCorrente, meseCorrente, d);
-                    if(date >= dIn && date < dOut) {
-                        count++;
-                        dataOccupazione[d-1] = 1; 
-                    }
+                    if(date >= dIn && date < dOut) { count++; dataOccupazione[d-1] = 1; }
                 }
                 return count;
             }
@@ -609,10 +791,8 @@
                 if(c[14] === "Bloccato" || !c[14].includes("Approvato")) return;
                 let dIn = parseData(c[1]); let dOut = parseData(c[2]);
                 if(!dIn || !dOut) return;
-
                 ospitiTotaliStorico += parseInt(c[3]) || 0;
                 nottiOccupateMeseScelto += calcolaNottiEPopolaGrafico(dIn, dOut);
-
                 let diffGiorni = (dIn - oggi) / (1000 * 60 * 60 * 24);
                 if(diffGiorni >= 0 && diffGiorni <= 7) prossimiArrivi++;
             });
@@ -621,10 +801,8 @@
                 if(r[9] !== "Accettata") return;
                 let dIn = parseData(r[5]); let dOut = parseData(r[6]);
                 if(!dIn || !dOut) return;
-
                 ospitiTotaliStorico += parseInt(r[7]) || 0;
                 nottiOccupateMeseScelto += calcolaNottiEPopolaGrafico(dIn, dOut);
-
                 let diffGiorni = (dIn - oggi) / (1000 * 60 * 60 * 24);
                 if(diffGiorni >= 0 && diffGiorni <= 7) prossimiArrivi++;
             });
@@ -638,25 +816,11 @@
                     <h2 style="color: var(--colore-principale); margin: 0; min-width: 150px; text-align: center;">${MESI[meseCorrente]} ${annoCorrente}</h2>
                     <button onclick="cambiaMese(1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">Mese Succ. ❯</button>
                 </div>
-
                 <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                    <div class="dash-card">
-                        <div class="dash-icon">📈</div>
-                        <div class="dash-value">${tassoOccupazione}%</div>
-                        <div class="dash-label">Occupazione Mensile</div>
-                    </div>
-                    <div class="dash-card">
-                        <div class="dash-icon">👥</div>
-                        <div class="dash-value">${ospitiTotaliStorico}</div>
-                        <div class="dash-label">Ospiti Totali (Storico)</div>
-                    </div>
-                    <div class="dash-card">
-                        <div class="dash-icon">🛎️</div>
-                        <div class="dash-value">${prossimiArrivi}</div>
-                        <div class="dash-label">Arrivi in 7 gg (Da Oggi)</div>
-                    </div>
+                    <div class="dash-card"><div class="dash-icon">📈</div><div class="dash-value">${tassoOccupazione}%</div><div class="dash-label">Occupazione Mensile</div></div>
+                    <div class="dash-card"><div class="dash-icon">👥</div><div class="dash-value">${ospitiTotaliStorico}</div><div class="dash-label">Ospiti Totali (Storico)</div></div>
+                    <div class="dash-card"><div class="dash-icon">🛎️</div><div class="dash-value">${prossimiArrivi}</div><div class="dash-label">Arrivi in 7 gg (Da Oggi)</div></div>
                 </div>
-
                 <div class="grafico-container" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; margin-top: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <button onclick="cambiaMese(-1)" style="padding: 8px 12px; cursor: pointer; border: none; background: #f4f7f6; border-radius: 5px; font-weight: bold; color: var(--colore-principale);">❮ Prec</button>
@@ -670,25 +834,17 @@
             setTimeout(() => {
                 const ctx = document.getElementById('occupazioneChart').getContext('2d');
                 if (graficoOccupazione != null) { graficoOccupazione.destroy(); }
-
                 graficoOccupazione = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labelsGiorni,
                         datasets: [{
-                            label: 'Notte Occupata',
-                            data: dataOccupazione,
+                            label: 'Notte Occupata', data: dataOccupazione,
                             backgroundColor: dataOccupazione.map(v => v === 1 ? 'rgba(94, 113, 83, 0.8)' : 'rgba(232, 248, 245, 0.5)'),
-                            borderColor: dataOccupazione.map(v => v === 1 ? '#5e7153' : '#bdc3c7'),
-                            borderWidth: 1,
-                            borderRadius: 4
+                            borderColor: dataOccupazione.map(v => v === 1 ? '#5e7153' : '#bdc3c7'), borderWidth: 1, borderRadius: 4
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return c.raw === 1 ? "Occupato" : "Libero"; } } } },
-                        scales: { y: { beginAtZero: true, max: 1, ticks: { stepSize: 1, callback: function(v) { return v === 1 ? 'Sì' : 'No'; } } } }
-                    }
+                    options: { responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return c.raw === 1 ? "Occupato" : "Libero"; } } } }, scales: { y: { beginAtZero: true, max: 1, ticks: { stepSize: 1, callback: function(v) { return v === 1 ? 'Sì' : 'No'; } } } } }
                 });
             }, 100);
         }
@@ -698,9 +854,7 @@
             meseCorrente += dir; 
             if(meseCorrente > 11) { meseCorrente = 0; annoCorrente++; } 
             if(meseCorrente < 0) { meseCorrente = 11; annoCorrente--; } 
-            
-            if (vistaAttuale === 'dashboard') generaDashboard();
-            else if (vistaAttuale === 'calendario') generaCalendario();
+            if (vistaAttuale === 'dashboard') generaDashboard(); else if (vistaAttuale === 'calendario') generaCalendario();
         }
 
         function generaCalendario() {
@@ -718,9 +872,7 @@
 
             for(let g=1; g<=giorniNelMese; g++) {
                 let dataCorrente = new Date(annoCorrente, meseCorrente, g);
-                
-                let occupantiAM = []; 
-                let occupantiPM = []; 
+                let occupantiAM = []; let occupantiPM = []; 
 
                 for(let i=0; i<dbCheckin.length; i++) {
                     let r = dbCheckin[i];
@@ -728,9 +880,7 @@
                     let dIn = parseData(r[1]); let dOut = parseData(r[2]);
                     if(!dIn || !dOut) continue;
                     dIn.setHours(0,0,0,0); dOut.setHours(0,0,0,0);
-                    
                     let ospiteObj = {n: String(r[4]||"")+" "+String(r[5]||""), o: String(r[3]||""), i: String(r[1]||""), f: String(r[2]||""), t: "Check-in Registrato"};
-                    
                     if(dataCorrente > dIn && dataCorrente < dOut) { occupantiAM.push(ospiteObj); occupantiPM.push(ospiteObj); }
                     else if (dataCorrente.getTime() === dIn.getTime()) { occupantiPM.push(ospiteObj); }
                     else if (dataCorrente.getTime() === dOut.getTime()) { occupantiAM.push(ospiteObj); }
@@ -742,61 +892,31 @@
                     let dIn = parseData(r[5]); let dOut = parseData(r[6]);
                     if(!dIn || !dOut) continue;
                     dIn.setHours(0,0,0,0); dOut.setHours(0,0,0,0);
-                    
                     let ospiteObj = {n: String(r[1]||"")+" "+String(r[2]||""), o: String(r[7]||""), i: String(r[5]||""), f: String(r[6]||""), t: "Prenotazione dal Sito"};
-                    
                     if(dataCorrente > dIn && dataCorrente < dOut) { occupantiAM.push(ospiteObj); occupantiPM.push(ospiteObj); }
                     else if (dataCorrente.getTime() === dIn.getTime()) { occupantiPM.push(ospiteObj); }
                     else if (dataCorrente.getTime() === dOut.getTime()) { occupantiAM.push(ospiteObj); }
                 }
 
-                let isAM = occupantiAM.length > 0;
-                let isPM = occupantiPM.length > 0;
-                let boxHtml = "";
+                let isAM = occupantiAM.length > 0; let isPM = occupantiPM.length > 0; let boxHtml = "";
 
                 if (isAM && isPM) {
                     if (occupantiAM[0].n === occupantiPM[0].n) {
                         let o = occupantiAM[0];
-                        boxHtml = `
-                            <div class="giorno-box occupato-full" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">
-                                ${g}<br>
-                                <span style="font-size:9px; text-transform:uppercase;">Occupato</span><br>
-                                <span class="nome-calendario">${o.n}</span>
-                            </div>`;
+                        boxHtml = `<div class="giorno-box occupato-full" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">${g}<br><span style="font-size:9px; text-transform:uppercase;">Occupato</span><br><span class="nome-calendario">${o.n}</span></div>`;
                     } else {
                         let oIn = occupantiPM[0];
-                        boxHtml = `
-                            <div class="giorno-box occupato-full" onclick="mostraAnteprimaCalendario('${escapeStr(oIn.n)}', '${escapeStr(oIn.o)}', '${escapeStr(oIn.i)}', '${escapeStr(oIn.f)}', '${escapeStr(oIn.t)}')">
-                                ${g}<br>
-                                <span style="font-size:9px; text-transform:uppercase;">Cambio</span><br>
-                                <span class="nome-calendario">↑ ${occupantiAM[0].n}</span>
-                                <span class="nome-calendario">↓ ${occupantiPM[0].n}</span>
-                            </div>`;
+                        boxHtml = `<div class="giorno-box occupato-full" onclick="mostraAnteprimaCalendario('${escapeStr(oIn.n)}', '${escapeStr(oIn.o)}', '${escapeStr(oIn.i)}', '${escapeStr(oIn.f)}', '${escapeStr(oIn.t)}')">${g}<br><span style="font-size:9px; text-transform:uppercase;">Cambio</span><br><span class="nome-calendario">↑ ${occupantiAM[0].n}</span><span class="nome-calendario">↓ ${occupantiPM[0].n}</span></div>`;
                     }
                 } else if (isPM) {
                     let o = occupantiPM[0];
-                    boxHtml = `
-                        <div class="giorno-box occupato-pm" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">
-                            ${g}<br>
-                            <span style="font-size:9px; text-transform:uppercase;">Check-in</span><br>
-                            <span class="nome-calendario" style="text-align:right; padding-right:4px;">${o.n}</span>
-                        </div>`;
+                    boxHtml = `<div class="giorno-box occupato-pm" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">${g}<br><span style="font-size:9px; text-transform:uppercase;">Check-in</span><br><span class="nome-calendario" style="text-align:right; padding-right:4px;">${o.n}</span></div>`;
                 } else if (isAM) {
                     let o = occupantiAM[0];
-                    boxHtml = `
-                        <div class="giorno-box occupato-am" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">
-                            ${g}<br>
-                            <span style="font-size:9px; text-transform:uppercase;">Check-out</span><br>
-                            <span class="nome-calendario" style="text-align:left; padding-left:4px;">${o.n}</span>
-                        </div>`;
+                    boxHtml = `<div class="giorno-box occupato-am" onclick="mostraAnteprimaCalendario('${escapeStr(o.n)}', '${escapeStr(o.o)}', '${escapeStr(o.i)}', '${escapeStr(o.f)}', '${escapeStr(o.t)}')">${g}<br><span style="font-size:9px; text-transform:uppercase;">Check-out</span><br><span class="nome-calendario" style="text-align:left; padding-left:4px;">${o.n}</span></div>`;
                 } else {
-                    boxHtml = `
-                        <div class="giorno-box libero">
-                            ${g}<br>
-                            <span style="font-size:9px; text-transform:uppercase;">Libero</span>
-                        </div>`;
+                    boxHtml = `<div class="giorno-box libero">${g}<br><span style="font-size:9px; text-transform:uppercase;">Libero</span></div>`;
                 }
-                
                 griglia.innerHTML += boxHtml;
             }
         }
@@ -810,9 +930,10 @@
         }
 
         // --- MESSAGGI E AZIONI ---
-        function copiaMessaggio(nome, dataArrivo) {
-            const msg = `Ciao ${nome}, ti aspettiamo a PadreSergio House il ${dataArrivo}!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!`;
-            navigator.clipboard.writeText(msg).then(() => alert("Messaggio copiato!"));
+        function copiaMessaggioDinamic(nome, dataArrivo) {
+            let msgOriginale = impostazioniGlobali["msg_benvenuto"] || "Ciao [NOME], ti aspettiamo a PadreSergio House il [DATA]!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!";
+            let msgPersonalizzato = msgOriginale.replace("[NOME]", nome).replace("[DATA]", dataArrivo);
+            navigator.clipboard.writeText(msgPersonalizzato).then(() => alert("Messaggio copiato!"));
         }
 
         function generaLinkMessaggio(nome, arrivo, partenza, telefono, email, tipo, esito) {
@@ -822,7 +943,6 @@
             } else {
                 testo = `Gentile ${nome},\nti ringraziamo per aver scelto PadreSergio House. Purtroppo per le date dal ${arrivo} al ${partenza} non abbiamo disponibilità in quanto la struttura è già occupata.\n\nSperiamo di poterti accogliere in futuro!\n\nCordiali saluti,\nPadreSergio House`;
             }
-
             if (tipo === 'whatsapp') url = `https://wa.me/${String(telefono || '').replace(/\D/g, '')}?text=${encodeURIComponent(testo)}`;
             else if (tipo === 'email') url = `mailto:${email || ''}?subject=${encodeURIComponent(esito === 'accettata' ? "Disponibilità Confermata" : "Aggiornamento Disponibilità")}&body=${encodeURIComponent(testo)}`;
             return url;
@@ -851,10 +971,8 @@
                     }
                 }
             }
-
             const btn = event.target; btn.innerText = "Attendere..."; btn.disabled = true;
-            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: dbRichieste.length - 1 - index, status: nuovoStato }) })
-            .then(() => caricaDati());
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: dbRichieste.length - 1 - index, status: nuovoStato }) }).then(() => caricaDati());
         }
 
         function apriInfoRichiesta(index) {
@@ -880,7 +998,6 @@
                 extraStr = extraStr.replace(/Foto Fronte: N\/A/g, '');
                 extraStr = extraStr.replace(/Foto Retro: N\/A/g, '');
             }
-
             document.getElementById('contenuto-modale').innerHTML = `<div class="sezione-dati"><p style="font-size:14px;"><strong>Doc:</strong> ${riga[6]}<br><strong>Nato:</strong> ${riga[8]} a ${riga[9]}<br><strong>Naz:</strong> ${riga[10]} | <strong>Res:</strong> ${riga[11]}</p><div>${f1} ${f2}</div><hr><strong>Extra:</strong><pre style="white-space:pre-wrap; font-size:13px; font-family:inherit;">${extraStr}</pre></div>`;
             document.getElementById('dettagliModal').style.display = 'flex';
         }
@@ -932,17 +1049,14 @@
                     return;
                 }
             }
-
             const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true;
-            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Approvato" }) })
-            .then(() => { generaCSVCompleto(dbCheckin[index]); caricaDati(); });
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Approvato" }) }).then(() => { generaCSVCompleto(dbCheckin[index]); caricaDati(); });
         }
 
         function bloccaCheckin(index, event) {
             if(!confirm("Sei sicuro di voler bloccare?")) return;
             const btn = event.target; btn.innerText = "Attendere..."; btn.disabled = true;
-            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Bloccato" }) })
-            .then(() => caricaDati());
+            fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Bloccato" }) }).then(() => caricaDati());
         }
 
         function salvaModifiche(event, approva) {
@@ -972,9 +1086,7 @@
                 }
             }
 
-            const btn = event.target; 
-            const testoOriginale = btn.innerText;
-            btn.innerText = "Salvataggio... ⏳"; btn.disabled = true;
+            const btn = event.target; const testoOriginale = btn.innerText; btn.innerText = "Salvataggio... ⏳"; btn.disabled = true;
 
             const payload = {
                 action: "editDati", row: dbCheckin.length - 1 - index, 
@@ -993,24 +1105,11 @@
 
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) }).then(() => { 
                 let rAgg = [...dbCheckin[index]]; 
-                rAgg[1]=payload.checkin; 
-                rAgg[2]=payload.checkout; 
-                rAgg[4]=payload.nome; 
-                rAgg[5]=payload.cognome; 
-                rAgg[8]=payload.nascita; 
-                rAgg[9]=payload.luogoNascita; 
-                rAgg[10]=payload.nazionalita; 
-                rAgg[11]=payload.residenza; 
-                rAgg[15]=payload.ospitiExtra;
+                rAgg[1]=payload.checkin; rAgg[2]=payload.checkout; rAgg[4]=payload.nome; rAgg[5]=payload.cognome; 
+                rAgg[8]=payload.nascita; rAgg[9]=payload.luogoNascita; rAgg[10]=payload.nazionalita; rAgg[11]=payload.residenza; rAgg[15]=payload.ospitiExtra;
                 
-                if (approva) { 
-                    rAgg[14] = "Corretto e Approvato"; 
-                    generaCSVCompleto(rAgg); 
-                }
-                
-                chiudiModal('modificaModal'); 
-                caricaDati(); 
-                btn.innerText = testoOriginale; btn.disabled = false;
+                if (approva) { rAgg[14] = "Corretto e Approvato"; generaCSVCompleto(rAgg); }
+                chiudiModal('modificaModal'); caricaDati(); btn.innerText = testoOriginale; btn.disabled = false;
             });
         }
 
@@ -1021,26 +1120,11 @@
             const LICENZA = "SLBA000982-0018"; let csv = [];
             const fmtS = (s) => String(s).toUpperCase().startsWith('M') ? "1" : "2";
             
-            let nascitaCapo = getCodiciLuogo(riga[9]);
-            let resCapo = getCodiciLuogo(riga[11]);
-            let nazCapo = getCodiceNazione(riga[10]);
+            let nascitaCapo = getCodiciLuogo(riga[9]); let resCapo = getCodiciLuogo(riga[11]); let nazCapo = getCodiceNazione(riga[10]);
 
             csv.push([
-                1, 
-                String(riga[4]||"").toUpperCase(), 
-                String(riga[5]||"").toUpperCase(), 
-                parseDataString(riga[1]), 
-                parseDataString(riga[2]), 
-                "", 
-                LICENZA, 
-                fmtS(riga[7]||""), 
-                parseDataString(riga[8]),
-                "", "", 
-                nascitaCapo.nazione, 
-                nascitaCapo.comune, 
-                resCapo.nazione, 
-                resCapo.comune, 
-                nazCapo
+                1, String(riga[4]||"").toUpperCase(), String(riga[5]||"").toUpperCase(), parseDataString(riga[1]), parseDataString(riga[2]), 
+                "", LICENZA, fmtS(riga[7]||""), parseDataString(riga[8]), "", "", nascitaCapo.nazione, nascitaCapo.comune, resCapo.nazione, resCapo.comune, nazCapo
             ].join(","));
 
             let extraStr = riga[15] || "";
@@ -1048,31 +1132,15 @@
                 extraStr.split("--- OSPITE").slice(1).forEach(blocco => {
                     let c = blocco.match(/Cognome: (.*)/)?.[1] || ""; let n = blocco.match(/Nome: (.*)/)?.[1] || "";
                     let s = blocco.match(/Sesso: (.*)/)?.[1] || ""; let d = (blocco.match(/Nascita: (.*?) a /) || [])[1] || "";
-                    
                     let luogoNascitaOspite = (blocco.match(/Nascita: .*? a (.*)/) || [])[1] || "";
                     let nazionalitaOspite = blocco.match(/Nazionalità: (.*)/)?.[1] || "";
                     let residenzaOspite = blocco.match(/Residenza: (.*)/)?.[1] || "";
-
-                    let nascitaOsp = getCodiciLuogo(luogoNascitaOspite);
-                    let resOsp = getCodiciLuogo(residenzaOspite);
-                    let nazOsp = getCodiceNazione(nazionalitaOspite);
+                    
+                    let nascitaOsp = getCodiciLuogo(luogoNascitaOspite); let resOsp = getCodiciLuogo(residenzaOspite); let nazOsp = getCodiceNazione(nazionalitaOspite);
 
                     csv.push([
-                        1, 
-                        n.trim().toUpperCase(), 
-                        c.trim().toUpperCase(), 
-                        parseDataString(riga[1]), 
-                        parseDataString(riga[2]), 
-                        "", 
-                        LICENZA, 
-                        fmtS(s), 
-                        parseDataString(d.trim()),
-                        "", "", 
-                        nascitaOsp.nazione, 
-                        nascitaOsp.comune, 
-                        resOsp.nazione, 
-                        resOsp.comune, 
-                        nazOsp
+                        1, n.trim().toUpperCase(), c.trim().toUpperCase(), parseDataString(riga[1]), parseDataString(riga[2]), 
+                        "", LICENZA, fmtS(s), parseDataString(d.trim()), "", "", nascitaOsp.nazione, nascitaOsp.comune, resOsp.nazione, resOsp.comune, nazOsp
                     ].join(","));
                 });
             }
@@ -1089,10 +1157,11 @@
             if(p.length !== 3) return s; return p[0].length === 4 ? `${p[2]}/${p[1]}/${p[0]}` : s;
         }
 
-        // --- GESTIONE SESSIONE E LOGOUT (CORRETTO) ---
+        // --- GESTIONE SESSIONE E LOGOUT ---
         function esci() {
             localStorage.removeItem('adminSessionExp');
             localStorage.removeItem('userRole');
+            localStorage.removeItem('currentUser');
             document.body.className = "";
             document.getElementById('main-content').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
@@ -1105,52 +1174,21 @@
             let exp = localStorage.getItem('adminSessionExp');
             if (exp && Date.now() < parseInt(exp)) {
                 localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000);
-                
                 let ruolo = localStorage.getItem('userRole') || 'base';
                 document.body.className = "role-" + ruolo.toLowerCase();
-                
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
                 caricaDati();
                 controllaCompleanno();
+                controllaScadenzaPassword(); // Avvia controllo banner pre-scadenza
             } else {
-                localStorage.removeItem('adminSessionExp');
-                localStorage.removeItem('userRole');
-                document.body.className = "";
+                esci();
             }
         }
         
         controllaSessione();
 
-	// --- SISTEMA DI SCADENZA PASSWORD MENSILE ---
-        function controllaScadenzaPassword() {
-            const oggi = new Date();
-            const giornoAttuale = oggi.getDate();
-            const meseAttuale = oggi.getMonth();
-            const annoAttuale = oggi.getFullYear();
-            
-            const ultimoGiornoMese = new Date(annoAttuale, meseAttuale + 1, 0).getDate();
-            const giorniMancanti = ultimoGiornoMese - giornoAttuale;
-
-            const ultimoMeseCambio = localStorage.getItem('mese_ultimo_cambio_pwd');
-
-            const modalCambio = document.getElementById('modal-cambio-pwd');
-            const bannerAvviso = document.getElementById('banner-scadenza-pwd');
-            const spanGiorni = document.getElementById('giorni-rimanenti');
-
-            if (giornoAttuale === 1 && ultimoMeseCambio != meseAttuale) {
-                modalCambio.style.display = 'flex';
-                document.body.style.overflow = 'hidden'; 
-            } 
-            else if (giorniMancanti <= 4 && giorniMancanti >= 0 && ultimoMeseCambio != meseAttuale + 1) {
-                spanGiorni.innerText = giorniMancanti + 1;
-                bannerAvviso.style.display = 'block';
-            }
-        }
-
-        window.addEventListener('load', controllaScadenzaPassword);
-
-	// ==========================================
+        // ==========================================
         // EASTER EGG: BUON COMPLEANNO (23 MAGGIO)
         // ==========================================
         function controllaCompleanno() {
@@ -1158,7 +1196,6 @@
             const mese = oggi.getMonth(); 
             const giorno = oggi.getDate();
             const anno = oggi.getFullYear();
-            
             const auguriFatti = localStorage.getItem('auguri_compleanno_' + anno);
 
             if (mese === 4 && giorno === 23 && !auguriFatti) {
@@ -1174,10 +1211,8 @@
         }
 
         function lanciaCoriandoli() {
-            const durata = 5 * 1000; 
-            const fineAnimazione = Date.now() + durata;
+            const durata = 5 * 1000; const fineAnimazione = Date.now() + durata;
             const coloriStruttura = ['#5e7153', '#f39c12', '#27ae60', '#ffffff']; 
-
             (function frame() {
                 confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: coloriStruttura, zIndex: 100001 });
                 confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: coloriStruttura, zIndex: 100001 });
@@ -1186,22 +1221,5 @@
         }
 
     </script>
-
-	<!-- MODAL CAMBIO PASSWORD OBBLIGATORIO -->
-    <div id="modal-cambio-pwd" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-        <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); text-align: center;">
-            <h2 style="color: #5e7153; margin-top: 0;">Aggiornamento Sicurezza</h2>
-            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">È il 1° del mese. Per motivi di sicurezza devi impostare una nuova password per accedere al pannello.</p>
-            
-            <input type="password" id="old-pwd" placeholder="Password Attuale" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
-            <input type="password" id="new-pwd" placeholder="Nuova Password" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
-            <input type="password" id="confirm-pwd" placeholder="Conferma Nuova Password" style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
-            
-            <p id="errore-pwd" style="color: red; font-size: 13px; display: none; margin-top: -10px; margin-bottom: 15px; font-weight: bold;"></p>
-            <button onclick="salvaNuovaPassword(event)" style="background: #5e7153; color: white; border: none; padding: 12px 20px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px;">Aggiorna Password</button>
-
-        </div>
-    </div>
-
 </body>
 </html>
