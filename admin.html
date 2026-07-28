@@ -38,7 +38,8 @@
             --nero-blocco: #2c3e50; 
             --blu-info: #3498db;
         }
-
+        /* SISTEMA RUOLI: Nasconde gli elementi sensibili se l'utente è Base */
+        body.role-base .admin-only { display: none !important; }
         body { font-family: 'Arial', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo); margin: 0; padding: 0; }
 
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: var(--colore-principale); display: flex; justify-content: center; align-items: center; z-index: 1000; }
@@ -168,12 +169,20 @@
         <div class="login-box">
             <h1>PadreSergio</h1>
             <p>Pannello di Amministrazione</p>
+            
+            <!-- CAMPO NOME UTENTE -->
+            <div class="password-container" style="margin-bottom: 10px;">
+                <input type="text" id="usernameInput" placeholder="Nome Utente" onkeypress="gestisciInvio(event)" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-align: center;">
+            </div>
+
+            <!-- CAMPO PASSWORD -->
             <div class="password-container">
                 <input type="password" id="passwordInput" placeholder="Inserisci Password" onkeypress="gestisciInvio(event)">
                 <span class="toggle-password" onclick="mostraNascondiPassword()">👁️</span>
             </div>
+            
             <button id="btn-accedi" onclick="verificaPassword()">Accedi</button>
-            <div id="messaggioErrore" style="color:red; font-size:13px; display:none; margin-top:10px;">Password errata o server non raggiungibile.</div>
+            <div id="messaggioErrore" style="color:red; font-size:13px; display:none; margin-top:10px;">Credenziali errate o server non raggiungibile.</div>
         </div>
     </div>
 
@@ -258,6 +267,10 @@
             <span class="chiudi-modal" onclick="chiudiModal('modificaModal')">×</span>
             <h2 style="color: var(--rosso-allerta); margin-top: 0;">✏️ Correggi Dati</h2>
             <input type="hidden" id="edit-index">
+            
+            <!-- CAMPI DATA (Visibili solo ad Admin) -->
+            <div class="campo-edit admin-only"><label>Data Arrivo (Solo Admin)</label><input type="date" id="edit-arrivo"></div>
+            <div class="campo-edit admin-only"><label>Data Partenza (Solo Admin)</label><input type="date" id="edit-partenza"></div>
             <div class="campo-edit"><label>Nome</label><input type="text" id="edit-nome"></div>
             <div class="campo-edit"><label>Cognome</label><input type="text" id="edit-cognome"></div>
             <div class="campo-edit"><label>Documento (Tipo e Numero)</label><input type="text" id="edit-doc"></div>
@@ -290,7 +303,6 @@
 
         async function caricaDizionari() {
             try {
-                // Modifica il percorso per puntare alla cartella assets
                 let resCom = await fetch('assets/comuni.csv'); 
                 if (resCom.ok) {
                     let txtCom = await resCom.text();
@@ -299,13 +311,11 @@
                         let p = righeCom[i].split(',');
                         if (p.length >= 2) {
                             let cod = p[0].trim(); let nom = p[1].trim().toUpperCase(); let fine = p[3] ? p[3].trim() : "";
-                            // Prende il codice valido attuale (non scaduto)
                             if (!dictComuni[nom] || fine === "") dictComuni[nom] = cod;
                         }
                     }
                 }
                 
-                // Modifica il percorso per puntare alla cartella assets
                 let resStat = await fetch('assets/stati.csv'); 
                 if (resStat.ok) {
                     let txtStat = await resStat.text();
@@ -321,14 +331,14 @@
                 }
             } catch(e) { console.warn("Dizionari CSV non trovati in cartella assets."); }
         }
-        caricaDizionari(); // Esegue il caricamento in background
+        caricaDizionari(); 
 
         function getCodiciLuogo(luogo) {
             if(!luogo) return { nazione: "", comune: "" };
             luogo = luogo.trim().toUpperCase();
             if(dictComuni[luogo]) return { nazione: "100000100", comune: dictComuni[luogo] }; 
             if(dictStati[luogo]) return { nazione: dictStati[luogo], comune: "" }; 
-            return { nazione: luogo, comune: "" }; // Se non trova corrispondenza lascia il testo per mostrare l'errore
+            return { nazione: luogo, comune: "" }; 
         }
 
         function getCodiceNazione(nazionalita) {
@@ -343,16 +353,20 @@
         function mostraNascondiPassword() { document.getElementById('passwordInput').type = (document.getElementById('passwordInput').type === 'password') ? 'text' : 'password'; }
         
         function verificaPassword() {
+            const user = document.getElementById('usernameInput').value.trim(); 
             const pwd = document.getElementById('passwordInput').value;
             const btn = document.getElementById('btn-accedi');
             btn.innerText = "Verifica in corso..."; btn.disabled = true;
 
             fetch(LINK_GOOGLE_SCRIPT, {
                 method: "POST",
-                body: JSON.stringify({ action: "verificaPassword", password: pwd })
+                body: JSON.stringify({ action: "verificaPassword", username: user, password: pwd })
             }).then(r => r.text()).then(risposta => {
-                if (risposta === "OK") {
+                if (risposta === "ADMIN" || risposta === "BASE") {
                     localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000); 
+                    localStorage.setItem('userRole', risposta); 
+                    document.body.className = "role-" + risposta.toLowerCase(); 
+                    
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('main-content').style.display = 'block';
                     btn.innerText = "Accedi"; btn.disabled = false;
@@ -367,10 +381,10 @@
                 btn.innerText = "Accedi"; btn.disabled = false;
             });
         }
+
         function gestisciInvio(event) { if (event.key === "Enter") verificaPassword(); }
 
         function salvaNuovaPassword(event) {
-            // Controlla quale finestra è aperta per prendere gli ID giusti
             let isObbligatorio = document.getElementById('modal-cambio-pwd').style.display === 'flex';
             
             let oldPwdId = isObbligatorio ? 'old-pwd' : 'pwd-vecchia';
@@ -385,7 +399,6 @@
 
             if (event) { event.target.innerText = "Attendere..."; event.target.disabled = true; }
 
-            // Controlli base
             if (newPwd.length < 6) {
                 erroreMsg.innerText = "La nuova password deve avere almeno 6 caratteri.";
                 erroreMsg.style.display = 'block';
@@ -403,11 +416,14 @@
             erroreMsg.innerText = "Aggiornamento sul server in corso...";
             erroreMsg.style.display = 'block';
 
-            const URL_SCRIPT_GOOGLE = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec"; 
-
-            fetch(URL_SCRIPT_GOOGLE, {
+            fetch(LINK_GOOGLE_SCRIPT, {
                 method: 'POST',
-                body: JSON.stringify({ action: "cambiaPasswordManuale", vecchia: oldPwd, nuova: newPwd })
+                body: JSON.stringify({ 
+                    action: "cambiaPasswordManuale", 
+                    vecchia: oldPwd, 
+                    nuova: newPwd,
+                    ruolo: localStorage.getItem('userRole') 
+                })
             })
             .then(r => r.text())
             .then(res => {
@@ -415,7 +431,6 @@
                     localStorage.setItem('mese_ultimo_cambio_pwd', new Date().getMonth());
                     alert("✅ Password aggiornata con successo!");
                     
-                    // Chiude la finestra corretta e pulisce i campi
                     if (isObbligatorio) {
                         document.getElementById('modal-cambio-pwd').style.display = 'none';
                         document.getElementById('banner-scadenza-pwd').style.display = 'none';
@@ -510,7 +525,10 @@
                     if(vistaAttuale !== 'archivio') {
                         if (stato.includes("Approvato")) {
                             let nomePulito = String(riga[4] || "").replace(/'/g, "\\'");
-                            bottoni = `<button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button><button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">✅ ${stato}</button><button class="btn-email" onclick="copiaMessaggio('${nomePulito}', '${riga[1]}')">💬 Copia Benvenuto</button>`;
+                            bottoni = `
+                                <button class="btn-email" onclick="copiaMessaggio('${nomePulito}', '${riga[1]}')">💬 Copia Benvenuto</button>
+                                <button class="btn-dettagli admin-only" style="background:var(--blu-info); color:white;" onclick="generaCSVCompleto(dbCheckin[${index}])">📥 Ri-scarica CSV</button>
+                            `;
                         } else if (stato === "Bloccato") {
                             bottoni = `<button class="btn-rifiuta" disabled style="background:#ccc; cursor:not-allowed;">✏️ Bloccato</button><button class="btn-approva" disabled style="background:#ccc; cursor:not-allowed;">🚫 Bloccato</button>`;
                         } else {
@@ -867,12 +885,25 @@
             document.getElementById('dettagliModal').style.display = 'flex';
         }
 
+        function formattaDataPerInput(d) {
+            if(!d) return "";
+            let p = String(d).split('/');
+            if(p.length === 3) return `${p[2]}-${p[1]}-${p[0]}`;
+            return d;
+        }
+
         function apriModifica(index) {
             const r = dbCheckin[index];
-            document.getElementById('edit-index').value = index; document.getElementById('edit-nome').value = r[4];
-            document.getElementById('edit-cognome').value = r[5]; document.getElementById('edit-doc').value = r[6];
-            document.getElementById('edit-nascita').value = r[8]; document.getElementById('edit-luogo').value = r[9];
-            document.getElementById('edit-nazionalita').value = r[10]; document.getElementById('edit-residenza').value = r[11];
+            document.getElementById('edit-index').value = index;
+            document.getElementById('edit-arrivo').value = formattaDataPerInput(r[1]);
+            document.getElementById('edit-partenza').value = formattaDataPerInput(r[2]);
+            document.getElementById('edit-nome').value = r[4];
+            document.getElementById('edit-cognome').value = r[5]; 
+            document.getElementById('edit-doc').value = r[6];
+            document.getElementById('edit-nascita').value = r[8]; 
+            document.getElementById('edit-luogo').value = r[9];
+            document.getElementById('edit-nazionalita').value = r[10]; 
+            document.getElementById('edit-residenza').value = r[11];
             document.getElementById('edit-ospitiExtra').value = r[15] || "";
             document.getElementById('modificaModal').style.display = 'flex';
         }
@@ -919,7 +950,6 @@
             let chk = dbCheckin[index];
             let dReqIn = parseData(chk[1]); let dReqOut = parseData(chk[2]);
             
-            // Controlla la sovrapposizione date SOLO se stai cercando di APPROVARE
             if (approva && dReqIn && dReqOut) {
                 let overlap = false; let overlapNome = "";
                 for (let i = 0; i < dbCheckin.length; i++) {
@@ -948,19 +978,31 @@
 
             const payload = {
                 action: "editDati", row: dbCheckin.length - 1 - index, 
-                nome: document.getElementById('edit-nome').value, cognome: document.getElementById('edit-cognome').value,
-                documento: document.getElementById('edit-doc').value, nascita: document.getElementById('edit-nascita').value,
-                luogoNascita: document.getElementById('edit-luogo').value, nazionalita: document.getElementById('edit-nazionalita').value,
-                residenza: document.getElementById('edit-residenza').value, ospitiExtra: document.getElementById('edit-ospitiExtra').value,
-                approva: approva // Manda al server l'istruzione se approvare o no
+                checkin: document.getElementById('edit-arrivo').value,
+                checkout: document.getElementById('edit-partenza').value, 
+                nome: document.getElementById('edit-nome').value, 
+                cognome: document.getElementById('edit-cognome').value,
+                documento: document.getElementById('edit-doc').value, 
+                nascita: document.getElementById('edit-nascita').value,
+                luogoNascita: document.getElementById('edit-luogo').value, 
+                nazionalita: document.getElementById('edit-nazionalita').value,
+                residenza: document.getElementById('edit-residenza').value, 
+                ospitiExtra: document.getElementById('edit-ospitiExtra').value,
+                approva: approva
             };
 
             fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) }).then(() => { 
                 let rAgg = [...dbCheckin[index]]; 
-                rAgg[4]=payload.nome; rAgg[5]=payload.cognome; rAgg[8]=payload.nascita; 
-                rAgg[9]=payload.luogoNascita; rAgg[10]=payload.nazionalita; rAgg[11]=payload.residenza; rAgg[15]=payload.ospitiExtra;
+                rAgg[1]=payload.checkin; 
+                rAgg[2]=payload.checkout; 
+                rAgg[4]=payload.nome; 
+                rAgg[5]=payload.cognome; 
+                rAgg[8]=payload.nascita; 
+                rAgg[9]=payload.luogoNascita; 
+                rAgg[10]=payload.nazionalita; 
+                rAgg[11]=payload.residenza; 
+                rAgg[15]=payload.ospitiExtra;
                 
-                // Se hai scelto "Salva e Approva", scarica anche il CSV della Questura
                 if (approva) { 
                     rAgg[14] = "Corretto e Approvato"; 
                     generaCSVCompleto(rAgg); 
@@ -979,7 +1021,6 @@
             const LICENZA = "SLBA000982-0018"; let csv = [];
             const fmtS = (s) => String(s).toUpperCase().startsWith('M') ? "1" : "2";
             
-            // TRADUZIONE CODICI CAPOGRUPPO
             let nascitaCapo = getCodiciLuogo(riga[9]);
             let resCapo = getCodiciLuogo(riga[11]);
             let nazCapo = getCodiceNazione(riga[10]);
@@ -1012,7 +1053,6 @@
                     let nazionalitaOspite = blocco.match(/Nazionalità: (.*)/)?.[1] || "";
                     let residenzaOspite = blocco.match(/Residenza: (.*)/)?.[1] || "";
 
-                    // TRADUZIONE CODICI OSPITI
                     let nascitaOsp = getCodiciLuogo(luogoNascitaOspite);
                     let resOsp = getCodiciLuogo(residenzaOspite);
                     let nazOsp = getCodiceNazione(nazionalitaOspite);
@@ -1049,11 +1089,14 @@
             if(p.length !== 3) return s; return p[0].length === 4 ? `${p[2]}/${p[1]}/${p[0]}` : s;
         }
 
-        // --- GESTIONE SESSIONE ---
+        // --- GESTIONE SESSIONE E LOGOUT (CORRETTO) ---
         function esci() {
             localStorage.removeItem('adminSessionExp');
+            localStorage.removeItem('userRole');
+            document.body.className = "";
             document.getElementById('main-content').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('usernameInput').value = ''; 
             document.getElementById('passwordInput').value = '';
             document.getElementById('messaggioErrore').style.display = 'none';
         }
@@ -1062,12 +1105,18 @@
             let exp = localStorage.getItem('adminSessionExp');
             if (exp && Date.now() < parseInt(exp)) {
                 localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000);
+                
+                let ruolo = localStorage.getItem('userRole') || 'base';
+                document.body.className = "role-" + ruolo.toLowerCase();
+                
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
                 caricaDati();
                 controllaCompleanno();
             } else {
                 localStorage.removeItem('adminSessionExp');
+                localStorage.removeItem('userRole');
+                document.body.className = "";
             }
         }
         
@@ -1080,31 +1129,25 @@
             const meseAttuale = oggi.getMonth();
             const annoAttuale = oggi.getFullYear();
             
-            // Calcola quanti giorni ha il mese corrente
             const ultimoGiornoMese = new Date(annoAttuale, meseAttuale + 1, 0).getDate();
             const giorniMancanti = ultimoGiornoMese - giornoAttuale;
 
-            // Recupera dal database locale l'ultimo mese in cui hai cambiato la password
             const ultimoMeseCambio = localStorage.getItem('mese_ultimo_cambio_pwd');
 
             const modalCambio = document.getElementById('modal-cambio-pwd');
             const bannerAvviso = document.getElementById('banner-scadenza-pwd');
             const spanGiorni = document.getElementById('giorni-rimanenti');
 
-            // REGOLA 1: Se è il 1° del mese e NON l'hai ancora cambiata questo mese -> BLOCCA TUTTO
             if (giornoAttuale === 1 && ultimoMeseCambio != meseAttuale) {
                 modalCambio.style.display = 'flex';
-                document.body.style.overflow = 'hidden'; // Blocca lo scorrimento
+                document.body.style.overflow = 'hidden'; 
             } 
-            // REGOLA 2: Se mancano 5 giorni o meno alla fine del mese -> MOSTRA AVVISO
             else if (giorniMancanti <= 4 && giorniMancanti >= 0 && ultimoMeseCambio != meseAttuale + 1) {
-                // (Se giorniMancanti è 4, mancano in realtà 5 giorni al 1° del mese successivo)
                 spanGiorni.innerText = giorniMancanti + 1;
                 bannerAvviso.style.display = 'block';
             }
         }
 
-        // Avvia il controllo appena si carica il pannello Admin
         window.addEventListener('load', controllaScadenzaPassword);
 
 	// ==========================================
@@ -1112,11 +1155,10 @@
         // ==========================================
         function controllaCompleanno() {
             const oggi = new Date();
-            const mese = oggi.getMonth(); // In Javascript Maggio è il mese numero 4 (Gennaio è 0)
+            const mese = oggi.getMonth(); 
             const giorno = oggi.getDate();
             const anno = oggi.getFullYear();
             
-            // Controlla se gli auguri sono già stati fatti quest'anno
             const auguriFatti = localStorage.getItem('auguri_compleanno_' + anno);
 
             if (mese === 4 && giorno === 23 && !auguriFatti) {
@@ -1127,37 +1169,19 @@
 
         function chiudiCompleanno() {
             const anno = new Date().getFullYear();
-            // Salva la memoria così non lo disturba più per tutto il giorno
             localStorage.setItem('auguri_compleanno_' + anno, 'true');
             document.getElementById('schermata-compleanno').style.display = 'none';
         }
 
         function lanciaCoriandoli() {
-            const durata = 5 * 1000; // 5 secondi di festa
+            const durata = 5 * 1000; 
             const fineAnimazione = Date.now() + durata;
-            const coloriStruttura = ['#5e7153', '#f39c12', '#27ae60', '#ffffff']; // Verde, Oro, Bianco
+            const coloriStruttura = ['#5e7153', '#f39c12', '#27ae60', '#ffffff']; 
 
             (function frame() {
-                confetti({
-                    particleCount: 5,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 },
-                    colors: coloriStruttura,
-                    zIndex: 100001
-                });
-                confetti({
-                    particleCount: 5,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 },
-                    colors: coloriStruttura,
-                    zIndex: 100001
-                });
-
-                if (Date.now() < fineAnimazione) {
-                    requestAnimationFrame(frame);
-                }
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: coloriStruttura, zIndex: 100001 });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: coloriStruttura, zIndex: 100001 });
+                if (Date.now() < fineAnimazione) { requestAnimationFrame(frame); }
             }());
         }
 
