@@ -1,0 +1,108 @@
+:root {
+    --colore-principale: #5e7153; 
+    --colore-secondario: #8c9c83; 
+    --colore-sfondo: #f4f7f6;
+    --colore-testo: #333;
+    --colore-card: #ffffff;
+    --giallo-attesa: #f39c12;
+    --verde-ok: #27ae60;
+    --rosso-allerta: #e74c3c;
+    --nero-blocco: #2c3e50; 
+    --blu-info: #3498db;
+}
+
+body.role-base .admin-only { display: none !important; }
+body { font-family: 'Arial', sans-serif; background-color: var(--colore-sfondo); color: var(--colore-testo); margin: 0; padding: 0; }
+
+#login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background-color: var(--colore-principale); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; max-width: 350px; width: 90%; }
+.login-box h1 { font-family: 'Georgia', serif; color: var(--colore-principale); margin-top: 0; margin-bottom: 10px; }
+.login-box p { color: #666; font-size: 14px; margin-bottom: 25px; }
+.password-container { position: relative; width: 100%; margin-bottom: 15px; }
+.password-container input { width: 100%; padding: 12px; padding-right: 40px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; text-align: center; }
+.toggle-password { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; user-select: none; opacity: 0.7; }
+.login-box button { width: 100%; background-color: var(--colore-principale); color: white; border: none; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+
+#main-content { display: none; }
+
+.navbar { background-color: var(--colore-principale); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.navbar h1 { margin: 0; font-family: 'Georgia', serif; font-size: 24px; }
+.container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+
+.tab-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+.tab-button { background: none; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; color: #888; border-radius: 5px; font-size: 14px; transition: 0.3s; font-family: inherit; }
+.tab-button.active { background-color: var(--colore-principale); color: white; }
+
+.header-sezione { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.header-sezione h2 { margin: 0; color: var(--colore-principale); }
+
+/* SCHEDE */
+.grid-prenotazioni { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.card { background: var(--colore-card); border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 4px solid var(--giallo-attesa); transition: transform 0.2s; }
+.card.approvato { border-top-color: var(--verde-ok); }
+.card.bloccato { border-top-color: var(--nero-blocco); opacity: 0.6; }
+.card.richiesta-accettata { border-top-color: var(--blu-info); }
+.card.richiesta-rifiutata { border-top-color: var(--rosso-allerta); }
+.card.archivio { border-top-color: #95a5a6; opacity: 0.7; }
+
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.ospite-nome { font-size: 18px; font-weight: bold; margin: 0; }
+
+.badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; }
+.badge.attesa { background-color: var(--giallo-attesa); }
+.badge.ok { background-color: var(--verde-ok); }
+.badge.nero { background-color: var(--nero-blocco); }
+.badge.blu { background-color: var(--blu-info); }
+.badge.rosso { background-color: var(--rosso-allerta); }
+.badge.grigio { background-color: #95a5a6; }
+
+.card-dettagli { font-size: 14px; color: #666; margin-bottom: 15px; line-height: 1.6; }
+
+.btn-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn-group button, .btn-group a { padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; flex: 1 1 30%; font-family: inherit; display: inline-block; text-align: center; text-decoration: none; }
+.btn-dettagli { background-color: #e0e6ed; color: #333; }
+.btn-approva { background-color: var(--verde-ok); color: white; }
+.btn-rifiuta { background-color: var(--rosso-allerta); color: white; }
+.btn-whatsapp { background-color: #25d366; color: white; }
+.btn-email { background-color: var(--blu-info); color: white; }
+
+/* DASHBOARD & GRAFICO */
+.dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; width: 100%; grid-column: 1 / -1; margin-bottom: 30px; }
+.dash-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; border-top: 4px solid var(--colore-principale); }
+.dash-icon { font-size: 40px; margin-bottom: 10px; }
+.dash-value { font-size: 32px; font-weight: bold; color: var(--colore-principale); margin-bottom: 5px; }
+.dash-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;}
+.grafico-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; }
+
+/* CALENDARIO VISIVO */
+.calendario-wrapper { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.calendario-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.calendario-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
+.giorno-nome { font-weight: bold; color: #666; padding: 10px 0; border-bottom: 2px solid #eee; }
+.giorno-box { padding: 10px 5px; border-radius: 5px; background: #f9f9f9; font-size: 14px; position: relative; overflow: hidden; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-sizing: border-box; }
+.giorno-box.vuoto { background: transparent; border: none; }
+.giorno-box.libero { background: #e8f8f5; color: #27ae60; font-weight: bold; border: 1px solid #27ae60; }
+.giorno-box.occupato-full { background: #fadbd8; color: #c0392b; font-weight: bold; border: 1px solid #e74c3c; cursor: pointer; transition: 0.2s; }
+.giorno-box.occupato-full:hover { background: #f5b7b1; }
+.giorno-box.occupato-pm { color: #c0392b; font-weight: bold; cursor: pointer; border: 1px solid transparent; background: linear-gradient(to right, #e8f8f5 50%, #fadbd8 50%) padding-box, linear-gradient(to right, #27ae60 50%, #e74c3c 50%) border-box; }
+.giorno-box.occupato-am { color: #c0392b; font-weight: bold; cursor: pointer; border: 1px solid transparent; background: linear-gradient(to right, #fadbd8 50%, #e8f8f5 50%) padding-box, linear-gradient(to right, #e74c3c 50%, #27ae60 50%) border-box; }
+.nome-calendario { font-size: 10px; display: block; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: normal; color: inherit; width: 100%; box-sizing: border-box;}
+
+/* UTENTI LISTA */
+.user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+.user-list-item:last-child { border-bottom: none; }
+
+/* MODALI */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; }
+.modal { background: white; width: 90%; max-width: 600px; border-radius: 10px; padding: 30px; max-height: 85vh; overflow-y: auto; position: relative; }
+.chiudi-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; }
+.sezione-dati { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 15px; border: 1px solid #eee; }
+.foto-doc-link { display: inline-block; background: var(--colore-principale); color: white; padding: 8px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; margin-right: 10px; margin-top: 10px; }
+.campo-edit { margin-bottom: 10px; }
+.campo-edit label { display: block; font-size: 12px; color: #666; font-weight: bold; margin-bottom: 3px; }
+.campo-edit input, .campo-edit textarea, .campo-edit select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; font-family: inherit;}
+#loading-message { text-align: center; color: #666; font-style: italic; width: 100%; padding: 20px; grid-column: 1 / -1;}
+.btn-nav-azione { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; }
+.btn-nav-azione:hover { background: white; color: var(--colore-principale); }
+
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
