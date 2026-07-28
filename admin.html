@@ -57,6 +57,13 @@
         <div class="navbar">
             <h1>PadreSergio Admin</h1>
             <div style="display: flex; gap: 15px; align-items: center;">
+                
+                <!-- NUOVO KILL SWITCH: Stato visivo + Bottone Azione -->
+                <div class="admin-only" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 5px 12px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2);">
+                    <span id="kill-switch-status" style="font-size: 13px; font-weight: bold; color: white;">🟢 Sito Attivo</span>
+                    <button id="btn-kill-switch" onclick="toggleKillSwitch()" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s;">Disattiva</button>
+                </div>
+
                 <button class="btn-nav-azione" onclick="apriCambioPasswordVolontario()">🔑 Cambia Password</button>
                 <button class="btn-nav-azione" onclick="esci()">🚪 Esci</button>
             </div>
@@ -69,7 +76,10 @@
                 <button class="tab-button" id="tab-richieste" onclick="cambiaVista('richieste')">📩 Richieste Sito</button>
                 <button class="tab-button" id="tab-calendario" onclick="cambiaVista('calendario')">📅 Calendario</button>
                 <button class="tab-button" id="tab-archivio" onclick="cambiaVista('archivio')">🗄️ Archivio Passati</button>
+                
+                <!-- TAB ADMIN ONLY -->
                 <button class="tab-button admin-only" id="tab-utenti" onclick="cambiaVista('utenti')">👥 Utenti</button>
+                <button class="tab-button admin-only" id="tab-sicurezza" onclick="cambiaVista('sicurezza')">🛡️ Sicurezza</button>
                 <button class="tab-button admin-only" id="tab-impostazioni" onclick="cambiaVista('impostazioni')">⚙️ Impostazioni</button>
             </div>
 
@@ -118,6 +128,31 @@
                 <div class="card">
                     <h3 style="margin-top:0; color: var(--colore-principale);">Utenti Registrati</h3>
                     <div id="lista-utenti-box">Caricamento utenti in corso...</div>
+                </div>
+            </div>
+
+            <!-- CONTENITORE SICUREZZA -->
+            <div id="contenitore-sicurezza" style="display:none;" class="admin-only">
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                        <h3 style="margin:0; color: var(--colore-principale);">Security Audit Log</h3>
+                        <button onclick="svuotaSecurityLog(event)" style="background:var(--rosso-allerta); color:white; border:none; padding:8px 12px; border-radius:5px; font-weight:bold; cursor:pointer;">🗑️ Svuota Log</button>
+                    </div>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Registro in tempo reale degli accessi negati e dei tentativi di effrazione al sistema.</p>
+                    <div id="log-table-container" style="overflow-x:auto;">
+                        <table style="width:100%; border-collapse: collapse; font-size:14px; text-align:left;">
+                            <thead>
+                                <tr style="background:#f4f7f6; color:#333;">
+                                    <th style="padding:10px; border-bottom:2px solid #ddd;">Data e Ora</th>
+                                    <th style="padding:10px; border-bottom:2px solid #ddd;">Evento</th>
+                                    <th style="padding:10px; border-bottom:2px solid #ddd;">Dettagli</th>
+                                </tr>
+                            </thead>
+                            <tbody id="security-log-body">
+                                <tr><td colspan="3" style="padding:10px; text-align:center;">Caricamento in corso...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -213,7 +248,7 @@
         </div>
     </div>
 
-    <!-- MODAL INFO / MODIFICA CHECKIN -->
+    <!-- ALTRE MODALI CHECKIN -->
     <div class="modal-overlay" id="dettagliModal">
         <div class="modal">
             <span class="chiudi-modal" onclick="chiudiModal('dettagliModal')">×</span>
@@ -260,7 +295,38 @@
         </div>
     </div>
 
-    <!-- Collegamento allo script JS -->
+    <!-- MODAL KILL SWITCH -->
+    <div class="modal-overlay" id="killSwitchModal">
+        <div class="modal" style="max-width: 400px; text-align: center;">
+            <span class="chiudi-modal" onclick="chiudiModal('killSwitchModal')">×</span>
+            <h2 style="color: var(--rosso-allerta); margin-top: 0;" id="ks-titolo">🛑 Attenzione!</h2>
+            <p style="font-size: 14px; color: #333; margin-bottom: 20px;" id="ks-messaggio"></p>
+            
+            <div class="campo-edit" style="text-align: left;">
+                <label>Password Amministratore</label>
+                <div class="password-container" style="margin-bottom: 0;">
+                    <input type="password" id="ks-password" placeholder="Inserisci password per confermare" style="text-align: left; font-size: 14px; padding: 10px; padding-right: 35px;">
+                    <span class="toggle-password" onclick="mostraNascondiPwd('ks-password')">👁️</span>
+                </div>
+            </div>
+            
+            <p id="msg-ks" style="font-size:13px; font-weight:bold; margin-top:10px; color:var(--rosso-allerta); display:none;"></p>
+            
+            <input type="hidden" id="ks-nuovo-stato">
+            <button onclick="confermaKillSwitch(event)" style="background:var(--rosso-allerta); color:white; width:100%; padding:15px; border:none; border-radius:5px; margin-top:10px; font-weight:bold; cursor:pointer;" id="btn-conferma-ks">Conferma</button>
+        </div>
+    </div>
+
+    <!-- MODAL CUSTOM PER IL SUCCESSO DEL KILL SWITCH -->
+    <div class="modal-overlay" id="successKillSwitchModal" style="z-index: 100000;">
+        <div class="modal" style="max-width: 350px; text-align: center; padding: 40px 20px;">
+            <div id="success-ks-icon" style="font-size: 50px; margin-bottom: 15px;">✅</div>
+            <h2 style="color: var(--colore-principale); margin-top: 0; font-size: 22px;" id="success-ks-titolo">Fatto</h2>
+            <p style="font-size: 14px; color: #555; margin-bottom: 25px; line-height: 1.5;" id="success-ks-messaggio"></p>
+            <button onclick="chiudiModal('successKillSwitchModal')" style="background:var(--colore-secondario); color:white; width:100%; padding:12px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">OK, Ho Capito</button>
+        </div>
+    </div>
+
     <script src="admin.js" defer></script>
 </body>
 </html>

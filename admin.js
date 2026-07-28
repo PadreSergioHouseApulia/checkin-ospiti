@@ -210,22 +210,175 @@ function cambiaVista(tipo) {
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.getElementById('tab-' + tipo).classList.add('active');
     
-    document.getElementById('contenitore-schede').style.display = (tipo === 'calendario' || tipo === 'utenti' || tipo === 'impostazioni') ? 'none' : 'grid';
-    document.getElementById('contenitore-calendario').style.display = (tipo === 'calendario') ? 'block' : 'none';
-    document.getElementById('contenitore-utenti').style.display = (tipo === 'utenti') ? 'block' : 'none';
-    document.getElementById('contenitore-impostazioni').style.display = (tipo === 'impostazioni') ? 'block' : 'none';
+    const idNascondi = ['contenitore-schede', 'contenitore-calendario', 'contenitore-utenti', 'contenitore-sicurezza', 'contenitore-impostazioni'];
+    idNascondi.forEach(id => document.getElementById(id).style.display = 'none');
 
     const titoli = { 
         dashboard: "Statistiche in Tempo Reale", checkin: "Check-in Attivi", richieste: "Richieste di Prenotazione",
         calendario: "Calendario Completo", archivio: "Archivio Check-in Passati", 
-        utenti: "Gestione Utenti del Sistema", impostazioni: "Impostazioni Globali"
+        utenti: "Gestione Utenti del Sistema", impostazioni: "Impostazioni Globali", sicurezza: "Centro di Sicurezza"
     };
     document.getElementById('titolo-sezione').innerText = titoli[tipo];
 
-    if (tipo === 'calendario') generaCalendario();
-    else if (tipo === 'utenti') caricaUtenti();
-    else if (tipo === 'impostazioni') caricaImpostazioni();
-    else renderizzaSchedeODashboard();
+    if (tipo === 'calendario') {
+        document.getElementById('contenitore-calendario').style.display = 'block';
+        generaCalendario();
+    } else if (tipo === 'utenti') {
+        document.getElementById('contenitore-utenti').style.display = 'block';
+        caricaUtenti();
+    } else if (tipo === 'impostazioni') {
+        document.getElementById('contenitore-impostazioni').style.display = 'block';
+        caricaImpostazioni();
+    } else if (tipo === 'sicurezza') {
+        document.getElementById('contenitore-sicurezza').style.display = 'block';
+        caricaSecurityLogs();
+    } else {
+        document.getElementById('contenitore-schede').style.display = 'grid';
+        renderizzaSchedeODashboard();
+    }
+}
+
+// --- KILL SWITCH (ADMIN ONLY) ---
+function aggiornaUIKillSwitch(stato) {
+    const btn = document.getElementById('btn-kill-switch');
+    const statusSpan = document.getElementById('kill-switch-status');
+    if (!btn || !statusSpan) return;
+    
+    if (stato === "ON") {
+        // Manutenzione Attiva (Sito disattivato)
+        statusSpan.innerHTML = "🔴 Manutenzione";
+        btn.innerHTML = "Attiva Sito";
+        btn.style.backgroundColor = "var(--verde-ok)";
+    } else {
+        // Sito Attivo
+        statusSpan.innerHTML = "🟢 Sito Attivo";
+        btn.innerHTML = "Disattiva";
+        btn.style.backgroundColor = "var(--rosso-allerta)";
+    }
+}
+
+// 1. Questa funzione ora apre la modale invece del vecchio confirm()
+function toggleKillSwitch() {
+    let statoAttuale = impostazioniGlobali["maintenance_mode"] === "ON" ? "ON" : "OFF";
+    let nuovoStato = statoAttuale === "ON" ? "OFF" : "ON";
+    
+    let titolo = nuovoStato === "ON" ? "🛑 Attiva Manutenzione" : "🟢 Ripristina Sito";
+    let messaggio = nuovoStato === "ON" 
+        ? "ATTENZIONE: Il sito pubblico verrà isolato e rifiuterà qualsiasi nuova richiesta o check-in online. Inserisci la tua password di Amministratore per confermare l'isolamento."
+        : "Il sito pubblico tornerà a funzionare normalmente e accetterà check-in e richieste. Inserisci la tua password per confermare la riapertura.";
+    let coloreBtn = nuovoStato === "ON" ? "var(--rosso-allerta)" : "var(--verde-ok)";
+    
+    document.getElementById('ks-titolo').innerText = titolo;
+    document.getElementById('ks-messaggio').innerText = messaggio;
+    document.getElementById('ks-nuovo-stato').value = nuovoStato;
+    document.getElementById('ks-password').value = "";
+    document.getElementById('msg-ks').style.display = 'none';
+    
+    let btnConferma = document.getElementById('btn-conferma-ks');
+    btnConferma.style.background = coloreBtn;
+    btnConferma.innerText = "Conferma Operazione";
+    
+    document.getElementById('killSwitchModal').style.display = 'flex';
+}
+
+// Sostituisci questo blocco in admin.js
+function confermaKillSwitch(event) {
+    const pwd = document.getElementById('ks-password').value;
+    const nuovoStato = document.getElementById('ks-nuovo-stato').value;
+    const currentUser = localStorage.getItem('currentUser');
+    const msgKs = document.getElementById('msg-ks');
+    
+    if(!pwd) {
+        msgKs.innerText = "Devi inserire la password di amministratore.";
+        msgKs.style.display = 'block';
+        return;
+    }
+
+    const btn = event.target;
+    btn.innerText = "⏳ Autenticazione..."; 
+    btn.disabled = true;
+
+    fetch(LINK_GOOGLE_SCRIPT, { 
+        method: "POST", 
+        body: JSON.stringify({ 
+            action: "toggleMaintenance", 
+            state: nuovoStato,
+            username: currentUser,
+            password: pwd
+        }) 
+    })
+    .then(r => r.text())
+    .then(res => {
+        if (res === "PWD_ERRATA") {
+            msgKs.innerText = "❌ Password errata o utente non autorizzato (Devi essere ADMIN).";
+            msgKs.style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = "Conferma Operazione";
+        } else {
+            // Successo: Aggiorniamo le variabili e l'UI in background
+            impostazioniGlobali["maintenance_mode"] = res;
+            aggiornaUIKillSwitch(res);
+            chiudiModal('killSwitchModal');
+            btn.disabled = false;
+            
+            // Popoliamo la nuova Modale Custom di Conferma
+            document.getElementById('success-ks-icon').innerText = res === "ON" ? "🛑" : "🟢";
+            document.getElementById('success-ks-titolo').innerText = res === "ON" ? "Sito Disattivato" : "Sito Online";
+            document.getElementById('success-ks-titolo').style.color = res === "ON" ? "var(--rosso-allerta)" : "var(--verde-ok)";
+            document.getElementById('success-ks-messaggio').innerText = res === "ON" 
+                ? "Il sito è ora in Manutenzione. Le porte pubbliche sono state sbarrate." 
+                : "Il sito è tornato Online. Tornerà a ricevere check-in e richieste.";
+            
+            document.getElementById('successKillSwitchModal').style.display = 'flex';
+        }
+    }).catch(e => {
+        msgKs.innerText = "❌ Errore di connessione al server.";
+        msgKs.style.display = 'block';
+        btn.disabled = false;
+        btn.innerText = "Conferma Operazione";
+    });
+}
+
+// --- SECURITY CENTER (ADMIN) ---
+function caricaSecurityLogs() {
+    document.getElementById('security-log-body').innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center;">Caricamento in corso... ⏳</td></tr>';
+    
+    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "getSecurityLogs" }) })
+    .then(r => r.json())
+    .then(logs => {
+        let tbody = document.getElementById('security-log-body');
+        if (!logs || logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center; color:#27ae60; font-weight:bold;">Nessuna anomalia. Il sistema è pulito e al sicuro. 🟢</td></tr>';
+            return;
+        }
+
+        let html = "";
+        logs.forEach(log => {
+            let timestamp = log[0] || "Sconosciuta";
+            let evento = log[1] || "Sconosciuto";
+            let dettagli = log[2] || "-";
+            let eventBadge = evento.includes("FAIL") ? `<span style="color:var(--rosso-allerta); font-weight:bold;">${evento}</span>` : evento;
+            
+            html += `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding:10px; font-size:13px; color:#666;">${timestamp}</td>
+                    <td style="padding:10px;">${eventBadge}</td>
+                    <td style="padding:10px; font-family:monospace; font-size:13px;">${dettagli}</td>
+                </tr>`;
+        });
+        tbody.innerHTML = html;
+    }).catch(() => document.getElementById('security-log-body').innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center; color:red;">Errore di connessione.</td></tr>');
+}
+
+function svuotaSecurityLog(event) {
+    if(!confirm("Sicuro di voler svuotare il registro di sicurezza? Questa operazione non può essere annullata.")) return;
+    const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
+    
+    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "clearSecurityLogs" }) })
+    .then(() => {
+        btn.innerText = "🗑️ Svuota Log"; btn.disabled = false;
+        caricaSecurityLogs();
+    });
 }
 
 // --- GESTIONE UTENTI (SOLO ADMIN) ---
@@ -333,6 +486,8 @@ function caricaImpostazioni() {
         impostazioniGlobali = imp;
         document.getElementById('conf-wifi-nome').value = imp["wifi_nome"] || "Padresergio House";
         document.getElementById('conf-wifi-pwd').value = imp["wifi_password"] || "PadreSergio2022*";
+        
+        aggiornaUIKillSwitch(imp["maintenance_mode"] || "OFF");
     }).catch(e => console.error("Errore caricamento impostazioni", e));
 }
 
@@ -341,7 +496,8 @@ function salvaImpostazioni(event) {
     
     let nuoveImp = {
         "wifi_nome": document.getElementById('conf-wifi-nome').value,
-        "wifi_password": document.getElementById('conf-wifi-pwd').value
+        "wifi_password": document.getElementById('conf-wifi-pwd').value,
+        "maintenance_mode": impostazioniGlobali["maintenance_mode"] || "OFF"
     };
 
     fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "saveImpostazioni", impostazioni: nuoveImp }) })
@@ -357,7 +513,9 @@ function salvaImpostazioni(event) {
 
 // --- CARICAMENTO DATI ---
 function caricaDati() {
-    if(vistaAttuale !== 'calendario' && vistaAttuale !== 'utenti' && vistaAttuale !== 'impostazioni') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message">Sincronizzazione dati in corso... ⏳</div>';
+    if(!['calendario', 'utenti', 'impostazioni', 'sicurezza'].includes(vistaAttuale)) {
+        document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message">Sincronizzazione dati in corso... ⏳</div>';
+    }
     
     Promise.all([
         fetch(LINK_GOOGLE_SCRIPT).then(r => r.json()),
@@ -366,16 +524,21 @@ function caricaDati() {
     ]).then(([checkins, richieste, imp]) => {
         dbCheckin = checkins.reverse(); 
         dbRichieste = richieste.reverse();
-        if(imp.wifi_password) impostazioniGlobali = imp;
+        if(imp.wifi_password) {
+            impostazioniGlobali = imp;
+            aggiornaUIKillSwitch(imp["maintenance_mode"] || "OFF");
+        }
         renderizzaSchedeODashboard();
     }).catch(() => {
-        if(vistaAttuale !== 'calendario' && vistaAttuale !== 'utenti' && vistaAttuale !== 'impostazioni') document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione al database.</div>';
+        if(!['calendario', 'utenti', 'impostazioni', 'sicurezza'].includes(vistaAttuale)) {
+            document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione al database.</div>';
+        }
     });
 }
 
 // --- RENDERIZZA VISTE ---
 function renderizzaSchedeODashboard() {
-    if (vistaAttuale === 'calendario' || vistaAttuale === 'utenti' || vistaAttuale === 'impostazioni') return;
+    if (['calendario', 'utenti', 'impostazioni', 'sicurezza'].includes(vistaAttuale)) return;
     if (vistaAttuale === 'dashboard') { generaDashboard(); return; }
 
     const cont = document.getElementById('contenitore-schede');
