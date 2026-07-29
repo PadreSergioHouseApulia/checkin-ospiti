@@ -158,18 +158,25 @@ const estraiExif = (file, fieldName) => {
         let label = fieldName.replace('foto_', '').replace(/_/g, ' ').toUpperCase();
         
         if (!file || (file.type !== "image/jpeg" && file.type !== "image/jpg")) {
-            resolve(`[${label}] Formato ${file.type || 'sconosciuto'} (Dati EXIF non disponibili)`);
+            resolve(`[${label}] Formato ${file.type || 'sconosciuto'} (Dati EXIF supportati solo per formato JPG)`);
             return;
         }
 
         try {
+            // Controllo di sicurezza se la libreria non è stata caricata
+            if (typeof EXIF === 'undefined') {
+                resolve(`[${label}] Errore di sistema: Libreria EXIF non disponibile.`);
+                return;
+            }
+
             EXIF.getData(file, function() {
-                let make = EXIF.getTag(this, "Make") || "Sconosciuto";
-                let model = EXIF.getTag(this, "Model") || "";
+                let make = EXIF.getTag(this, "Make");
+                let model = EXIF.getTag(this, "Model");
                 let dateScatto = EXIF.getTag(this, "DateTimeOriginal") || "Non rilevata";
                 let software = EXIF.getTag(this, "Software") || "Originale";
 
-                let dispositivo = make === "Sconosciuto" && model === "" ? "Sconosciuto" : `${make} ${model}`;
+                // Se mancano sia la marca che il modello, i dati sono stati piallati
+                let dispositivo = (!make && !model) ? "Sconosciuto / Metadati rimossi" : `${make || ''} ${model || ''}`.trim();
                 
                 // Tamper Detection (Rilevamento Manomissioni)
                 let tamperStatus = "🟢 Genuina";
@@ -181,7 +188,8 @@ const estraiExif = (file, fieldName) => {
                 resolve(`[${label}]\nScatto: ${dateScatto}\nCamera: ${dispositivo}\nApp: ${software} -> ${tamperStatus}\n`);
             });
         } catch (e) {
-            resolve(`[${label}] Impossibile leggere i dati forensi.`);
+            // Se va in crash, catturiamo l'errore vero e proprio
+            resolve(`[${label}] Impossibile leggere: ${e.message}`);
         }
     });
 };
