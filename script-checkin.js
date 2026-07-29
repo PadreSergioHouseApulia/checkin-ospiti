@@ -152,7 +152,7 @@ function generaOspiti() {
     }
 }
 
-// --- ESTRAZIONE FORENSE EXIF IN BACKGROUND ---
+// --- ESTRAZIONE FORENSE EXIF ---
 const estraiExif = (file, fieldName) => {
     return new Promise((resolve) => {
         let label = fieldName.replace('foto_', '').replace(/_/g, ' ').toUpperCase();
@@ -163,9 +163,8 @@ const estraiExif = (file, fieldName) => {
         }
 
         try {
-            // Controllo di sicurezza se la libreria non è stata caricata
             if (typeof EXIF === 'undefined') {
-                resolve(`[${label}] Errore di sistema: Libreria EXIF non disponibile.`);
+                resolve(`[${label}] Errore di sistema: Libreria EXIF non caricata dal browser.`);
                 return;
             }
 
@@ -175,10 +174,8 @@ const estraiExif = (file, fieldName) => {
                 let dateScatto = EXIF.getTag(this, "DateTimeOriginal") || "Non rilevata";
                 let software = EXIF.getTag(this, "Software") || "Originale";
 
-                // Se mancano sia la marca che il modello, i dati sono stati piallati
                 let dispositivo = (!make && !model) ? "Sconosciuto / Metadati rimossi" : `${make || ''} ${model || ''}`.trim();
                 
-                // Tamper Detection (Rilevamento Manomissioni)
                 let tamperStatus = "🟢 Genuina";
                 let swUpper = software.toUpperCase();
                 if (swUpper.includes("PHOTOSHOP") || swUpper.includes("ADOBE") || swUpper.includes("GIMP") || swUpper.includes("PIXELMATOR") || swUpper.includes("LIGHTROOM")) {
@@ -188,11 +185,13 @@ const estraiExif = (file, fieldName) => {
                 resolve(`[${label}]\nScatto: ${dateScatto}\nCamera: ${dispositivo}\nApp: ${software} -> ${tamperStatus}\n`);
             });
         } catch (e) {
-            // Se va in crash, catturiamo l'errore vero e proprio
             resolve(`[${label}] Impossibile leggere: ${e.message}`);
         }
     });
 };
+
+// --- INVIO DATI E COMPRESSIONE IMMAGINI ---
+let isSubmitting = false; // Lucchetto per evitare doppi click
 
 function inviaDatiSicuri() {
     const form = document.getElementById('checkinForm');
@@ -201,14 +200,45 @@ function inviaDatiSicuri() {
         return;
     }
 
+    if (isSubmitting) return; 
+    isSubmitting = true;
+
     document.getElementById('btnInvia').style.display = 'none';
     document.getElementById('loadingMsg').style.display = 'block';
 
-    const getBase64 = (file) => {
+    // Funzione che ridimensiona l'immagine a max 1200px prima di convertirla in Base64
+    const comprimiImmagine = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result.split(',')[1]); 
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const MAX_WIDTH = 1200;
+                    const MAX_HEIGHT = 1200;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Compressione JPEG qualità 70% per renderla leggerissima
+                    const base64Compresso = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+                    resolve(base64Compresso);
+                };
+                img.onerror = () => reject("Errore caricamento immagine nel Canvas");
+            };
             reader.onerror = error => reject(error);
         });
     };
@@ -221,13 +251,13 @@ function inviaDatiSicuri() {
     const fileInputs = Array.from(form.querySelectorAll('input[type="file"]'));
     const promisesFiles = [];
 
-    // Processiamo ogni foto: convertiamo in Base64 ed estraiamo l'EXIF simultaneamente
+    // Estrarre EXIF dalla foto ORIGINALE, poi comprimere e generare Base64
     fileInputs.forEach(input => {
         if (input.files.length > 0) {
             let file = input.files[0];
-            let task = Promise.all([getBase64(file), estraiExif(file, input.name)])
-                .then(([b64, exifStr]) => {
-                    return { key: input.name, b64: b64, mime: file.type, exif: exifStr };
+            let task = Promise.all([comprimiImmagine(file), estraiExif(file, input.name)])
+                .then(([b64Compresso, exifStr]) => {
+                    return { key: input.name, b64: b64Compresso, mime: "image/jpeg", exif: exifStr };
                 });
             promisesFiles.push(task);
         }
@@ -242,7 +272,6 @@ function inviaDatiSicuri() {
             exifLogTotale += res.exif + "\n";
         });
 
-        // Aggiungiamo il report forense invisibile al payload
         formDataObj["exif_data"] = exifLogTotale.trim();
 
         const LINK_GOOGLE = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec";
@@ -256,6 +285,7 @@ function inviaDatiSicuri() {
             alert("Errore di connessione. Riprova.");
             document.getElementById('btnInvia').style.display = 'block';
             document.getElementById('loadingMsg').style.display = 'none';
+            isSubmitting = false; // Sblocca il lucchetto per permettere di riprovare
         });
     });
 }
