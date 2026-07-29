@@ -50,16 +50,24 @@ async function caricaMenuStati() {
 
 window.addEventListener('DOMContentLoaded', caricaMenuStati);
 
-// --- FUNZIONE SFONDO DINAMICO ---
+// --- FUNZIONE SFONDO DINAMICO CORRETTA ---
 function impostaSfondoDinamico() {
     const ora = new Date().getHours();
-    let immagineUrl = 'assets/Foto sfondo.jpg'; 
+    
+    // Usiamo il %20 al posto degli spazi per evitare che il browser non trovi il file
+    let immagineUrl = 'assets/Foto%20sfondo.jpg'; 
     if (ora >= 17 && ora < 20) {
-        immagineUrl = 'assets/Foto sfondo tramonto.jpg'; 
+        immagineUrl = 'assets/Foto%20sfondo%20tramonto.jpg'; 
     } else if (ora >= 20 || ora < 6) {
-        immagineUrl = 'assets/Foto sfondo notte.jpg'; 
+        immagineUrl = 'assets/Foto%20sfondo%20notte.jpg'; 
     }
+    
+    // Forziamo le regole CSS da JavaScript per essere sicuri che copra tutto lo schermo
     document.body.style.backgroundImage = `url('${immagineUrl}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center center';
+    document.body.style.backgroundAttachment = 'fixed';
+    document.body.style.backgroundRepeat = 'no-repeat';
 }
 
 window.onload = () => {
@@ -152,7 +160,7 @@ function generaOspiti() {
     }
 }
 
-// --- ESTRAZIONE FORENSE EXIF ---
+// --- ESTRAZIONE FORENSE EXIF IN BACKGROUND (POTENZIATA PER IA) ---
 const estraiExif = (file, fieldName) => {
     return new Promise((resolve) => {
         let label = fieldName.replace('foto_', '').replace(/_/g, ' ').toUpperCase();
@@ -174,12 +182,19 @@ const estraiExif = (file, fieldName) => {
                 let dateScatto = EXIF.getTag(this, "DateTimeOriginal") || "Non rilevata";
                 let software = EXIF.getTag(this, "Software") || "Originale";
 
-                let dispositivo = (!make && !model) ? "Sconosciuto / Metadati rimossi" : `${make || ''} ${model || ''}`.trim();
+                let dispositivo = (!make && !model) ? "Nessuna traccia fotocamera" : `${make || ''} ${model || ''}`.trim();
                 
                 let tamperStatus = "🟢 Genuina";
                 let swUpper = software.toUpperCase();
-                if (swUpper.includes("PHOTOSHOP") || swUpper.includes("ADOBE") || swUpper.includes("GIMP") || swUpper.includes("PIXELMATOR") || swUpper.includes("LIGHTROOM")) {
-                    tamperStatus = "🔴 MANOMISSIONE (Fotoritocco Rilevato)";
+                
+                // Lista Nera potenziata per software e generatori di Intelligenza Artificiale
+                const blackList = ["PHOTOSHOP", "ADOBE", "GIMP", "PIXELMATOR", "LIGHTROOM", "CANVA", "SNAPSEED", "FACEAPP", "REMINI", "CAPCUT", "MIDJOURNEY", "DALL-E", "STABLE DIFFUSION", "GENERATIVE", "AI", "DALLE"];
+
+                if (blackList.some(app => swUpper.includes(app))) {
+                    tamperStatus = "🔴 MANOMISSIONE (Fotoritocco o AI Rilevata)";
+                } else if (!make && !model) {
+                    // Se non rileva nessuna fotocamera in un documento d'identità, è un enorme campanello d'allarme
+                    tamperStatus = "🟡 SOSPETTA (Dati Camera piallati / Immagine scaricata)";
                 }
 
                 resolve(`[${label}]\nScatto: ${dateScatto}\nCamera: ${dispositivo}\nApp: ${software} -> ${tamperStatus}\n`);
@@ -191,7 +206,7 @@ const estraiExif = (file, fieldName) => {
 };
 
 // --- INVIO DATI E COMPRESSIONE IMMAGINI ---
-let isSubmitting = false; // Lucchetto per evitare doppi click
+let isSubmitting = false; 
 
 function inviaDatiSicuri() {
     const form = document.getElementById('checkinForm');
@@ -206,7 +221,6 @@ function inviaDatiSicuri() {
     document.getElementById('btnInvia').style.display = 'none';
     document.getElementById('loadingMsg').style.display = 'block';
 
-    // Funzione che ridimensiona l'immagine a max 1200px prima di convertirla in Base64
     const comprimiImmagine = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -233,7 +247,6 @@ function inviaDatiSicuri() {
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Compressione JPEG qualità 70% per renderla leggerissima
                     const base64Compresso = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
                     resolve(base64Compresso);
                 };
@@ -251,7 +264,6 @@ function inviaDatiSicuri() {
     const fileInputs = Array.from(form.querySelectorAll('input[type="file"]'));
     const promisesFiles = [];
 
-    // Estrarre EXIF dalla foto ORIGINALE, poi comprimere e generare Base64
     fileInputs.forEach(input => {
         if (input.files.length > 0) {
             let file = input.files[0];
@@ -285,12 +297,11 @@ function inviaDatiSicuri() {
             alert("Errore di connessione. Riprova.");
             document.getElementById('btnInvia').style.display = 'block';
             document.getElementById('loadingMsg').style.display = 'none';
-            isSubmitting = false; // Sblocca il lucchetto per permettere di riprovare
+            isSubmitting = false; 
         });
     });
 }
 
-// --- BLOCCO DELLE DATE PASSATE PER IL CHECK-IN ---
 document.addEventListener("DOMContentLoaded", function() {
     const dataCheckin = document.querySelector('input[name="checkin"]');
     const dataCheckout = document.querySelector('input[name="checkout"]');
