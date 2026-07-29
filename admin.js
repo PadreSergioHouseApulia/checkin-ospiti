@@ -299,56 +299,108 @@ function svuotaSecurityLog(event) {
     fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "clearSecurityLogs" }) }).then(() => { btn.innerText = "🗑️ Svuota Log"; btn.disabled = false; caricaSecurityLogs(); });
 }
 
+// --- GESTIONE UTENTI (SOLO ADMIN) ---
 function caricaUtenti() {
     document.getElementById('lista-utenti-box').innerHTML = "Caricamento utenti... ⏳";
-    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "getUtenti" }) }).then(r => r.json()).then(utenti => {
+    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "getUtenti" }) })
+    .then(r => r.json())
+    .then(utenti => {
         let html = "";
         utenti.forEach(u => {
             let badgeColor = u[2] === "ADMIN" ? "var(--blu-info)" : "var(--verde-ok)";
-            let limit = u[2] === "ADMIN" ? "3" : "1";
+            let limit = u[4]; // Ora riceve il limite dinamico dal server!
             let slotInfo = `<span style="font-size:11px; color:#666; margin-left:10px;">Dispositivi: ${u[3]}/${limit}</span>`;
             
             let btnSvuotaDisp = `<button onclick="svuotaDispositiviUtente('${u[0]}', event)" style="background:var(--giallo-attesa); color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-right:5px;" title="Rimuove le associazioni Biometriche">📱 Sblocca Slot</button>`;
-            let btnEdit = `<button onclick="apriModificaUtente('${u[0]}', '${u[2]}')" style="background:#e0e6ed; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-right:5px;">✏️ Modifica</button>`;
+            let btnEdit = `<button onclick="apriModificaUtente('${u[0]}', '${u[2]}', ${limit})" style="background:#e0e6ed; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-right:5px;">✏️ Modifica</button>`;
             let btnDelete = u[0] === "admin" ? `<span style="font-size:12px; color:#999; margin-left:10px;">Ineliminabile</span>` : `<button onclick="eliminaUtente('${u[0]}', event)" style="background:var(--rosso-allerta); color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">🗑️ Elimina</button>`;
             
-            html += `<div class="user-list-item"><div><strong>${u[0]}</strong> <span style="background:${badgeColor}; color:white; font-size:10px; padding:3px 8px; border-radius:10px; margin-left:10px;">${u[2]}</span>${slotInfo}</div><div>${btnSvuotaDisp}${btnEdit}${btnDelete}</div></div>`;
+            html += `<div class="user-list-item"><div><strong>${u[0]}</strong> <span style="background:${badgeColor}; color:white; font-size:10px; padding:3px 8px; border-radius:10px; margin-left:10px;">${u[2]}</span>${slotInfo}</div><div style="margin-top:5px;">${btnSvuotaDisp}${btnEdit}${btnDelete}</div></div>`;
         });
         document.getElementById('lista-utenti-box').innerHTML = html;
     }).catch(() => document.getElementById('lista-utenti-box').innerHTML = "Errore di caricamento.");
 }
 
 function aggiungiUtente(event) {
-    const newUser = document.getElementById('new-user').value.trim(); const newPwd = document.getElementById('new-pwd').value; const newPwdConfirm = document.getElementById('new-pwd-confirm').value; const newRole = document.getElementById('new-role').value;
+    const newUser = document.getElementById('new-user').value.trim();
+    const newPwd = document.getElementById('new-pwd').value;
+    const newPwdConfirm = document.getElementById('new-pwd-confirm').value;
+    const newRole = document.getElementById('new-role').value;
+    const newMaxDev = document.getElementById('new-max-dev').value;
+    
     if(!newUser || newPwd.length < 6) return alert("Inserisci username valido e una password di almeno 6 caratteri.");
     if(newPwd !== newPwdConfirm) return alert("Le due password non coincidono!");
+    
     const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
-    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "addUtente", newUser: newUser, newPwd: newPwd, newRole: newRole }) }).then(r => r.text()).then(res => {
+    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "addUtente", newUser: newUser, newPwd: newPwd, newRole: newRole, maxDev: newMaxDev }) })
+    .then(r => r.text()).then(res => {
         btn.innerText = "➕ Crea"; btn.disabled = false;
-        if(res === "ESISTE") alert("Username già in uso!"); else { document.getElementById('new-user').value = ""; document.getElementById('new-pwd').value = ""; document.getElementById('new-pwd-confirm').value = ""; caricaUtenti(); }
+        if(res === "ESISTE") alert("Username già in uso!");
+        else { 
+            document.getElementById('new-user').value = ""; 
+            document.getElementById('new-pwd').value = ""; 
+            document.getElementById('new-pwd-confirm').value = ""; 
+            document.getElementById('new-max-dev').value = "1";
+            caricaUtenti(); 
+        }
     });
 }
 
-function apriModificaUtente(oldName, oldRole) {
-    document.getElementById('edit-user-oldname').value = oldName; document.getElementById('edit-user-newname').value = oldName; document.getElementById('edit-user-pwd').value = ""; document.getElementById('edit-user-pwd-confirm').value = ""; document.getElementById('edit-user-role').value = oldRole;
-    document.getElementById('edit-user-role').disabled = (oldName === "admin"); document.getElementById('modificaUtenteModal').style.display = 'flex';
+function apriModificaUtente(oldName, oldRole, maxDev) {
+    document.getElementById('edit-user-oldname').value = oldName;
+    document.getElementById('edit-user-newname').value = oldName;
+    document.getElementById('edit-user-pwd').value = "";
+    document.getElementById('edit-user-pwd-confirm').value = "";
+    document.getElementById('edit-user-role').value = oldRole;
+    document.getElementById('edit-user-max-dev').value = maxDev; // Inserisce il limite attuale
+    
+    document.getElementById('edit-user-role').disabled = (oldName === "admin");
+    document.getElementById('modificaUtenteModal').style.display = 'flex';
 }
 
 function salvaModificaUtente(event) {
-    const oldName = document.getElementById('edit-user-oldname').value; const newName = document.getElementById('edit-user-newname').value.trim(); const newPwd = document.getElementById('edit-user-pwd').value; const newPwdConfirm = document.getElementById('edit-user-pwd-confirm').value; const newRole = document.getElementById('edit-user-role').value;
+    const oldName = document.getElementById('edit-user-oldname').value;
+    const newName = document.getElementById('edit-user-newname').value.trim();
+    const newPwd = document.getElementById('edit-user-pwd').value;
+    const newPwdConfirm = document.getElementById('edit-user-pwd-confirm').value;
+    const newRole = document.getElementById('edit-user-role').value;
+    const newMaxDev = document.getElementById('edit-user-max-dev').value;
+
     if(!newName) return alert("Il nome utente non può essere vuoto.");
-    if(newPwd) { if(newPwd.length < 6) return alert("La nuova password deve avere almeno 6 caratteri."); if(newPwd !== newPwdConfirm) return alert("Le due password non coincidono!"); }
+    if(newPwd) {
+        if(newPwd.length < 6) return alert("La nuova password deve avere almeno 6 caratteri.");
+        if(newPwd !== newPwdConfirm) return alert("Le due password non coincidono!");
+    }
+
     const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
-    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "editUtente", oldUser: oldName, newUser: newName, newPwd: newPwd, newRole: newRole }) }).then(r => r.text()).then(res => {
+
+    fetch(LINK_GOOGLE_SCRIPT, { 
+        method: "POST", 
+        body: JSON.stringify({ action: "editUtente", oldUser: oldName, newUser: newName, newPwd: newPwd, newRole: newRole, maxDev: newMaxDev }) 
+    })
+    .then(r => r.text()).then(res => {
         btn.innerText = "💾 Salva Utente"; btn.disabled = false;
-        if (res === "ESISTE") alert("Il nuovo nome utente scelto è già in uso da un'altra persona!"); else if (res === "KO") alert("Errore di sicurezza o utente non trovato."); else { chiudiModal('modificaUtenteModal'); caricaUtenti(); }
+        if (res === "ESISTE") alert("Il nuovo nome utente scelto è già in uso da un'altra persona!");
+        else if (res === "KO") alert("Errore di sicurezza o utente non trovato.");
+        else {
+            chiudiModal('modificaUtenteModal');
+            caricaUtenti();
+        }
     });
 }
 
 function eliminaUtente(user, event) {
     if(!confirm("Sicuro di voler eliminare l'utente: " + user + "?")) return;
     const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
-    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "deleteUtente", targetUser: user }) }).then(() => caricaUtenti());
+    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "deleteUtente", targetUser: user }) })
+    .then(() => caricaUtenti());
+}
+
+function svuotaDispositiviUtente(user, event) {
+    if(!confirm(`Vuoi revocare tutti gli accessi biometrici per l'utente ${user}? Dovrà usare la password e registrare di nuovo i dispositivi.`)) return;
+    const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
+    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "clearUserDevices", targetUser: user }) })
+    .then(() => caricaUtenti());
 }
 
 function svuotaDispositiviUtente(user, event) {
