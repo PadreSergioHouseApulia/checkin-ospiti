@@ -66,7 +66,6 @@
             <h1>PadreSergio Admin</h1>
             <div style="display: flex; gap: 15px; align-items: center;">
                 
-                <!-- NUOVO KILL SWITCH: Stato visivo + Bottone Azione -->
                 <div class="admin-only" style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 5px 12px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.2);">
                     <span id="kill-switch-status" style="font-size: 13px; font-weight: bold; color: white;">🟢 Sito Attivo</span>
                     <button id="btn-kill-switch" onclick="toggleKillSwitch()" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s;">Disattiva</button>
@@ -86,7 +85,6 @@
                 <button class="tab-button" id="tab-calendario" onclick="cambiaVista('calendario')">📅 Calendario</button>
                 <button class="tab-button" id="tab-archivio" onclick="cambiaVista('archivio')">🗄️ Archivio Passati</button>
                 
-                <!-- TAB ADMIN ONLY -->
                 <button class="tab-button admin-only" id="tab-utenti" onclick="cambiaVista('utenti')">👥 Utenti</button>
                 <button class="tab-button admin-only" id="tab-sicurezza" onclick="cambiaVista('sicurezza')">🛡️ Sicurezza</button>
                 <button class="tab-button admin-only" id="tab-impostazioni" onclick="cambiaVista('impostazioni')">⚙️ Impostazioni</button>
@@ -130,7 +128,6 @@
                                 <option value="ADMIN">Super Admin</option>
                             </select>
                         </div>
-                        <!-- NUOVO CAMPO -->
                         <div class="campo-edit" style="flex: 0.5; min-width: 80px;">
                             <input type="number" id="new-max-dev" placeholder="Disp." value="1" min="1" max="10" title="Max Dispositivi Biometrici">
                         </div>
@@ -154,7 +151,6 @@
                     </div>
                     <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Registro in tempo reale degli accessi negati. La mappa traccia le coordinate GPS delle connessioni respinte.</p>
                     
-                    <!-- IL RADAR MAPPA -->
                     <div id="threat-map" style="height: 300px; width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; z-index: 1;"></div>
 
                     <div id="log-table-container" style="overflow-x:auto;">
@@ -263,7 +259,6 @@
                     <option value="ADMIN">Super Admin</option>
                 </select>
             </div>
-            <!-- NUOVO CAMPO -->
             <div class="campo-edit" style="text-align: left;">
                 <label>Max Dispositivi Biometrici (Slot)</label>
                 <input type="number" id="edit-user-max-dev" min="1" max="10" placeholder="Es. 3" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
@@ -351,6 +346,36 @@
             <button onclick="chiudiModal('successKillSwitchModal')" style="background:var(--colore-secondario); color:white; width:100%; padding:12px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">OK, Ho Capito</button>
         </div>
     </div>
+
+    <!-- MODALE NOTIFICA CUSTOM (Sostituisce gli alert di Windows) -->
+    <div class="modal-overlay" id="customAlertModal" style="z-index: 200000;">
+        <div class="modal" style="max-width: 350px; text-align: center; padding: 30px 20px;">
+            <div id="alert-custom-icon" style="font-size: 45px; margin-bottom: 10px;">ℹ️</div>
+            <h3 id="alert-custom-titolo" style="color: var(--colore-principale); margin-top: 0; margin-bottom: 10px;">Notifica</h3>
+            <p id="alert-custom-testo" style="font-size: 14px; color: #555; margin-bottom: 20px; line-height: 1.5;"></p>
+            <button onclick="chiudiModal('customAlertModal')" style="background: var(--colore-principale); color: white; width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Gestione globale tastiera (ESC e INVIO)
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    if(modal.id !== 'successKillSwitchModal') modal.style.display = 'none';
+                });
+            }
+            if (event.key === "Enter") {
+                if (document.getElementById('cambioPasswordModal').style.display === 'flex') {
+                    salvaNuovaPassword();
+                } else if (document.getElementById('modificaUtenteModal').style.display === 'flex') {
+                    salvaModificaUtente(event);
+                } else if (document.getElementById('customAlertModal').style.display === 'flex') {
+                    chiudiModal('customAlertModal');
+                }
+            }
+        });
+    </script>
 
     <script src="admin.js" defer></script>
 </body>

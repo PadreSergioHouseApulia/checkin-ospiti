@@ -58,6 +58,20 @@ function getCodiceNazione(nazionalita) {
     return nazionalita; 
 }
 
+// --- MODALE GRAFICA CUSTOM (Sostituisce gli alert) ---
+function mostraAlertCustom(testo, tipo = "info") {
+    let icona = "ℹ️";
+    let titolo = "Notifica";
+    if (tipo === "success") { icona = "✅"; titolo = "Operazione Riuscita"; }
+    else if (tipo === "error") { icona = "❌"; titolo = "Attenzione"; }
+    else if (tipo === "warning") { icona = "⚠️"; titolo = "Avviso di Sicurezza"; }
+
+    document.getElementById('alert-custom-icon').innerText = icona;
+    document.getElementById('alert-custom-titolo').innerText = titolo;
+    document.getElementById('alert-custom-testo').innerText = testo;
+    document.getElementById('customAlertModal').style.display = 'flex';
+}
+
 // --- PASSWORD E LOGIN ---
 function mostraNascondiPwd(id) { 
     let input = document.getElementById(id);
@@ -70,7 +84,6 @@ async function verificaPassword() {
     const btn = document.getElementById('btn-accedi');
     btn.innerText = "Verifica in corso..."; btn.disabled = true;
 
-    // --- ESTRAZIONE TELEMETRIA INVISIBILE ---
     let ip = "Sconosciuto"; let loc = "Sconosciuta"; let coords = "";
     try {
         let geo = await fetch('https://ipinfo.io/json').then(r => r.json());
@@ -103,7 +116,7 @@ async function verificaPassword() {
             document.getElementById('main-content').style.display = 'block';
             btn.innerText = "Accedi"; btn.disabled = false;
             
-            aggiornaUIBiometria(); // Aggiorna stato bottone Biometrico
+            aggiornaUIBiometria(); 
             caricaDati();
             controllaCompleanno();
             controllaScadenzaPassword(); 
@@ -134,19 +147,13 @@ function salvaNuovaPassword(event) {
     const confirmPwd = document.getElementById('pwd-conferma').value;
     const erroreMsg = document.getElementById('msg-pwd');
 
-    if (event) { event.target.innerText = "Attendere..."; event.target.disabled = true; }
-
     if (newPwd.length < 6) {
         erroreMsg.innerText = "La nuova password deve avere almeno 6 caratteri.";
-        erroreMsg.style.display = 'block';
-        if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
-        return;
+        erroreMsg.style.display = 'block'; return;
     }
     if (newPwd !== confirmPwd) {
         erroreMsg.innerText = "Le due nuove password non coincidono!";
-        erroreMsg.style.display = 'block';
-        if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
-        return;
+        erroreMsg.style.display = 'block'; return;
     }
 
     erroreMsg.style.color = "#5e7153";
@@ -161,12 +168,12 @@ function salvaNuovaPassword(event) {
             erroreMsg.style.display = 'none';
             localStorage.setItem('mese_ultimo_cambio_pwd', new Date().getMonth());
             if (isObbligatorio) {
-                alert("✅ Password aggiornata! Ora puoi effettuare il login con la nuova password.");
+                mostraAlertCustom("Password aggiornata! Ora puoi effettuare il login con la nuova password.", "success");
                 document.getElementById('cambioPasswordModal').style.display = 'none';
                 document.getElementById('banner-scadenza-pwd').style.display = 'none';
                 document.getElementById('passwordInput').value = ""; 
             } else {
-                alert("✅ Password aggiornata con successo!");
+                mostraAlertCustom("Password aggiornata con successo!", "success");
                 chiudiModal('cambioPasswordModal');
                 document.getElementById('banner-scadenza-pwd-pre').style.display = 'none';
             }
@@ -175,18 +182,13 @@ function salvaNuovaPassword(event) {
         } else {
             erroreMsg.style.color = "red"; erroreMsg.innerText = "Errore di connessione.";
         }
-        if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
     }).catch(() => {
         erroreMsg.style.color = "red"; erroreMsg.innerText = "Errore di comunicazione col server.";
-        if (event) { event.target.innerText = "💾 Salva Password"; event.target.disabled = false; }
     });
 }
 
 function controllaScadenzaPassword() {
-    const oggi = new Date();
-    const giornoAttuale = oggi.getDate();
-    const meseAttuale = oggi.getMonth();
-    const annoAttuale = oggi.getFullYear();
+    const oggi = new Date(); const giornoAttuale = oggi.getDate(); const meseAttuale = oggi.getMonth(); const annoAttuale = oggi.getFullYear();
     const ultimoGiornoMese = new Date(annoAttuale, meseAttuale + 1, 0).getDate();
     const giorniMancanti = ultimoGiornoMese - giornoAttuale;
     const ultimoMeseCambio = localStorage.getItem('mese_ultimo_cambio_pwd');
@@ -308,8 +310,9 @@ function caricaUtenti() {
         let html = "";
         utenti.forEach(u => {
             let badgeColor = u[2] === "ADMIN" ? "var(--blu-info)" : "var(--verde-ok)";
-            let limit = u[4]; // Ora riceve il limite dinamico dal server!
-            let slotInfo = `<span style="font-size:11px; color:#666; margin-left:10px;">Dispositivi: ${u[3]}/${limit}</span>`;
+            let attivi = u[3]; // Dispositivi attivi salvati
+            let limit = u[4];  // Max dispositivi configurati
+            let slotInfo = `<span style="font-size:11px; color:#666; margin-left:10px;">Dispositivi: ${attivi}/${limit}</span>`;
             
             let btnSvuotaDisp = `<button onclick="svuotaDispositiviUtente('${u[0]}', event)" style="background:var(--giallo-attesa); color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-right:5px;" title="Rimuove le associazioni Biometriche">📱 Sblocca Slot</button>`;
             let btnEdit = `<button onclick="apriModificaUtente('${u[0]}', '${u[2]}', ${limit})" style="background:#e0e6ed; color:#333; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold; margin-right:5px;">✏️ Modifica</button>`;
@@ -328,19 +331,21 @@ function aggiungiUtente(event) {
     const newRole = document.getElementById('new-role').value;
     const newMaxDev = document.getElementById('new-max-dev').value;
     
-    if(!newUser || newPwd.length < 6) return alert("Inserisci username valido e una password di almeno 6 caratteri.");
-    if(newPwd !== newPwdConfirm) return alert("Le due password non coincidono!");
+    if(!newUser || newPwd.length < 6) { mostraAlertCustom("Inserisci uno username valido e una password di almeno 6 caratteri.", "warning"); return; }
+    if(newPwd !== newPwdConfirm) { mostraAlertCustom("Le due password non coincidono!", "warning"); return; }
     
     const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
     fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "addUtente", newUser: newUser, newPwd: newPwd, newRole: newRole, maxDev: newMaxDev }) })
     .then(r => r.text()).then(res => {
         btn.innerText = "➕ Crea"; btn.disabled = false;
-        if(res === "ESISTE") alert("Username già in uso!");
-        else { 
+        if(res === "ESISTE") {
+            mostraAlertCustom("Username già in uso!", "warning");
+        } else { 
             document.getElementById('new-user').value = ""; 
             document.getElementById('new-pwd').value = ""; 
             document.getElementById('new-pwd-confirm').value = ""; 
             document.getElementById('new-max-dev').value = "1";
+            mostraAlertCustom("Utente creato con successo!", "success");
             caricaUtenti(); 
         }
     });
@@ -352,7 +357,7 @@ function apriModificaUtente(oldName, oldRole, maxDev) {
     document.getElementById('edit-user-pwd').value = "";
     document.getElementById('edit-user-pwd-confirm').value = "";
     document.getElementById('edit-user-role').value = oldRole;
-    document.getElementById('edit-user-max-dev').value = maxDev; // Inserisce il limite attuale
+    document.getElementById('edit-user-max-dev').value = maxDev; 
     
     document.getElementById('edit-user-role').disabled = (oldName === "admin");
     document.getElementById('modificaUtenteModal').style.display = 'flex';
@@ -366,24 +371,28 @@ function salvaModificaUtente(event) {
     const newRole = document.getElementById('edit-user-role').value;
     const newMaxDev = document.getElementById('edit-user-max-dev').value;
 
-    if(!newName) return alert("Il nome utente non può essere vuoto.");
+    if(!newName) { mostraAlertCustom("Il nome utente non può essere vuoto.", "warning"); return; }
     if(newPwd) {
-        if(newPwd.length < 6) return alert("La nuova password deve avere almeno 6 caratteri.");
-        if(newPwd !== newPwdConfirm) return alert("Le due password non coincidono!");
+        if(newPwd.length < 6) { mostraAlertCustom("La nuova password deve avere almeno 6 caratteri.", "warning"); return; }
+        if(newPwd !== newPwdConfirm) { mostraAlertCustom("Le due password non coincidono!", "warning"); return; }
     }
 
-    const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
+    let btn = (event && event.target && event.target.tagName === 'BUTTON') ? event.target : document.querySelector('#modificaUtenteModal button');
+    if(btn) { btn.innerText = "⏳"; btn.disabled = true; }
 
     fetch(LINK_GOOGLE_SCRIPT, { 
         method: "POST", 
         body: JSON.stringify({ action: "editUtente", oldUser: oldName, newUser: newName, newPwd: newPwd, newRole: newRole, maxDev: newMaxDev }) 
     })
     .then(r => r.text()).then(res => {
-        btn.innerText = "💾 Salva Utente"; btn.disabled = false;
-        if (res === "ESISTE") alert("Il nuovo nome utente scelto è già in uso da un'altra persona!");
-        else if (res === "KO") alert("Errore di sicurezza o utente non trovato.");
-        else {
+        if(btn) { btn.innerText = "💾 Salva Utente"; btn.disabled = false; }
+        if (res === "ESISTE") {
+            mostraAlertCustom("Il nuovo nome utente scelto è già in uso!", "warning");
+        } else if (res === "KO") {
+            mostraAlertCustom("Errore di sicurezza o utente non trovato.", "error");
+        } else {
             chiudiModal('modificaUtenteModal');
+            mostraAlertCustom("Modifiche salvate con successo!", "success");
             caricaUtenti();
         }
     });
@@ -397,16 +406,13 @@ function eliminaUtente(user, event) {
 }
 
 function svuotaDispositiviUtente(user, event) {
-    if(!confirm(`Vuoi revocare tutti gli accessi biometrici per l'utente ${user}? Dovrà usare la password e registrare di nuovo i dispositivi.`)) return;
+    if(!confirm(`Vuoi revocare tutti gli accessi biometrici per l'utente ${user}?`)) return;
     const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
     fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "clearUserDevices", targetUser: user }) })
-    .then(() => caricaUtenti());
-}
-
-function svuotaDispositiviUtente(user, event) {
-    if(!confirm(`Vuoi revocare tutti gli accessi biometrici per l'utente ${user}? Dovrà usare la password e registrare di nuovo i dispositivi.`)) return;
-    const btn = event.target; btn.innerText = "⏳"; btn.disabled = true;
-    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "clearUserDevices", targetUser: user }) }).then(() => caricaUtenti());
+    .then(() => {
+        mostraAlertCustom(`Slot dispositivi azzerati per ${user}.`, "success");
+        caricaUtenti();
+    });
 }
 
 function caricaImpostazioni() {
@@ -419,7 +425,7 @@ function salvaImpostazioni(event) {
     const btn = event.target; btn.innerText = "Salvataggio... ⏳"; btn.disabled = true;
     let nuoveImp = { "wifi_nome": document.getElementById('conf-wifi-nome').value, "wifi_password": document.getElementById('conf-wifi-pwd').value, "maintenance_mode": impostazioniGlobali["maintenance_mode"] || "OFF" };
     fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "saveImpostazioni", impostazioni: nuoveImp }) }).then(r => r.text()).then(res => {
-        btn.innerText = "💾 Salva Impostazioni"; btn.disabled = false; if(res === "OK") { impostazioniGlobali = nuoveImp; alert("Impostazioni salvate con successo!"); }
+        btn.innerText = "💾 Salva Impostazioni"; btn.disabled = false; if(res === "OK") { impostazioniGlobali = nuoveImp; mostraAlertCustom("Impostazioni salvate con successo!", "success"); }
     });
 }
 
@@ -594,7 +600,7 @@ function mostraAnteprimaCalendario(nome, ospiti, arrivo, partenza, stato) {
 }
 
 function copiaMessaggio(nome, dataArrivo) {
-    const msg = `Ciao ${nome}, ti aspettiamo a PadreSergio House il ${dataArrivo}!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!`; navigator.clipboard.writeText(msg).then(() => alert("Messaggio copiato!"));
+    const msg = `Ciao ${nome}, ti aspettiamo a PadreSergio House il ${dataArrivo}!\n\nIl check-in è disponibile a partire dalle 15:00. Ti inviamo a breve la posizione esatta.\n\nA presto!`; navigator.clipboard.writeText(msg).then(() => mostraAlertCustom("Messaggio copiato negli appunti!", "success"));
 }
 
 function generaLinkMessaggio(nome, arrivo, partenza, telefono, email, tipo, esito) {
@@ -618,7 +624,7 @@ function cambiaStatoRichiesta(index, nuovoStato, event) {
                     let c = dbRichieste[i]; let dIn = parseData(c[5]); let dOut = parseData(c[6]); if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (c[1]||"")+" "+(c[2]||""); break; }
                 }
             }
-            if (overlap) { alert(`⛔ IMPOSSIBILE ACCETTARE: SOVRAPPOSIZIONE DATE!\n\nQuesta richiesta coincide con le date di: ${overlapNome}.\n\nDevi rifiutarla per evitare sovrapposizioni.`); return; }
+            if (overlap) { mostraAlertCustom(`IMPOSSIBILE ACCETTARE: SOVRAPPOSIZIONE DATE!\n\nQuesta richiesta coincide con le date di: ${overlapNome}.`, "warning"); return; }
         }
     }
     const btn = event.target; btn.innerText = "Attendere..."; btn.disabled = true; fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatusRichiesta", row: dbRichieste.length - 1 - index, status: nuovoStato }) }).then(() => caricaDati());
@@ -660,12 +666,16 @@ function approvaEScarica(index, event) {
                 if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (r[1]||"")+" "+(r[2]||""); break; }
             }
         }
-        if (overlap) { alert(`⛔ IMPOSSIBILE PROCEDERE: SOVRAPPOSIZIONE DATE!\n\nQuesto check-in coincide con le date di: ${overlapNome}.\n\nDevi prima liberare le date (rifiutando la vecchia richiesta o bloccando il vecchio check-in) per poter approvare questo.`); return; }
+        if (overlap) { mostraAlertCustom(`IMPOSSIBILE PROCEDERE: SOVRAPPOSIZIONE DATE!\n\nQuesto check-in coincide con le date di: ${overlapNome}.`, "warning"); return; }
     }
     const btn = event.target; btn.innerText = "Salvataggio in corso...💾"; btn.disabled = true; fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Approvato" }) }).then(() => { generaCSVCompleto(dbCheckin[index]); caricaDati(); });
 }
 
-function bloccaCheckin(index, event) { if(!confirm("Sei sicuro di voler bloccare?")) return; const btn = event.target; btn.innerText = "Attendere..."; btn.disabled = true; fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Bloccato" }) }).then(() => caricaDati()); }
+function bloccaCheckin(index, event) { 
+    if(!confirm("Sei sicuro di voler bloccare?")) return; 
+    const btn = event.target; btn.innerText = "Attendere..."; btn.disabled = true; 
+    fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "updateStatus", row: dbCheckin.length - 1 - index, status: "Bloccato" }) }).then(() => caricaDati()); 
+}
 
 function salvaModifiche(event, approva) {
     const index = document.getElementById('edit-index').value; let chk = dbCheckin[index]; let dReqIn = parseData(chk[1]); let dReqOut = parseData(chk[2]);
@@ -681,7 +691,7 @@ function salvaModifiche(event, approva) {
                 if (dIn && dOut && dReqIn < dOut && dReqOut > dIn) { overlap = true; overlapNome = (r[1]||"")+" "+(r[2]||""); break; }
             }
         }
-        if (overlap) { alert(`⛔ IMPOSSIBILE APPROVARE: SOVRAPPOSIZIONE DATE!\n\nI dati coincidono con le date di: ${overlapNome}.\n\nModifica le date o libera il calendario prima di approvare.`); return; }
+        if (overlap) { mostraAlertCustom(`IMPOSSIBILE APPROVARE: SOVRAPPOSIZIONE DATE!\n\nI dati coincidono con le date di: ${overlapNome}.`, "warning"); return; }
     }
     const btn = event.target; const testoOriginale = btn.innerText; btn.innerText = "Salvataggio... ⏳"; btn.disabled = true;
     const payload = {
@@ -721,7 +731,7 @@ function controllaSessione() {
     if (exp && Date.now() < parseInt(exp)) {
         localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000); let ruolo = localStorage.getItem('userRole') || 'base';
         document.body.className = "role-" + ruolo.toLowerCase(); document.getElementById('login-screen').style.display = 'none'; document.getElementById('main-content').style.display = 'block';
-        aggiornaUIBiometria(); // Aggiorna stato bottone Biometrico
+        aggiornaUIBiometria(); 
         caricaDati(); controllaCompleanno(); controllaScadenzaPassword(); 
     } else { esci(); }
 }
@@ -751,7 +761,6 @@ window.addEventListener('load', () => {
     }
 });
 
-// Funzione che gestisce lo stato visivo del bottone nella barra in alto
 function aggiornaUIBiometria() {
     const btn = document.getElementById('btn-registra-bio');
     if (!btn) return;
@@ -772,12 +781,12 @@ function aggiornaUIBiometria() {
 
 async function registraBiometria() {
     if (!window.PublicKeyCredential) {
-        alert("⚠️ Il tuo browser o dispositivo non supporta l'autenticazione biometrica sicura.");
+        mostraAlertCustom("Il tuo browser o dispositivo non supporta l'autenticazione biometrica sicura.", "warning");
         return;
     }
     
     let currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) return alert("Devi essere loggato per abilitare il dispositivo.");
+    if (!currentUser) { mostraAlertCustom("Devi essere loggato per abilitare il dispositivo.", "warning"); return; }
 
     try {
         const token = crypto.randomUUID(); 
@@ -807,20 +816,20 @@ async function registraBiometria() {
             }).then(r => r.text()).then(res => {
                 if (res === "OK") {
                     localStorage.setItem('biometric_token', token);
-                    alert("✅ Dispositivo autorizzato con successo!");
-                    aggiornaUIBiometria(); // Cambia il bottone in Rimuovi
+                    mostraAlertCustom("Dispositivo autorizzato con successo!", "success");
+                    aggiornaUIBiometria(); 
                 } else if (res === "LIMIT_REACHED") {
-                    alert("⛔ Slot dispositivi esauriti!\n\nHai raggiunto il numero massimo di dispositivi consentiti per il tuo ruolo.\nSe vuoi aggiungere questo dispositivo, devi prima liberare uno slot dalla Gestione Utenti.");
+                    mostraAlertCustom("Slot dispositivi esauriti!\n\nHai raggiunto il numero massimo di dispositivi consentiti per il tuo ruolo.", "warning");
                     btn.innerText = testoOriginale;
                 } else {
-                    alert("Errore durante il salvataggio sul server.");
+                    mostraAlertCustom("Errore durante il salvataggio sul server.", "error");
                     btn.innerText = testoOriginale;
                 }
             });
         }
     } catch (err) {
         console.error(err);
-        alert("❌ ERRORE HARDWARE BIOMETRICO:\n\n" + err.message + "\n\nAssicurati che Windows Hello, TouchID o il blocco schermo siano configurati sul dispositivo.");
+        mostraAlertCustom("ERRORE HARDWARE BIOMETRICO:\n\n" + err.message, "error");
     }
 }
 
@@ -828,8 +837,6 @@ function rimuoviBiometria() {
     let token = localStorage.getItem('biometric_token');
     let currentUser = localStorage.getItem('currentUser');
     if(!token || !currentUser) return;
-    
-    if(!confirm("Vuoi revocare l'accesso biometrico per questo dispositivo? Dovrai usare di nuovo la password.")) return;
     
     const btn = document.getElementById('btn-registra-bio');
     btn.innerText = "⏳ Revoca..."; btn.disabled = true;
@@ -839,11 +846,9 @@ function rimuoviBiometria() {
         body: JSON.stringify({ action: "unlinkDevice", username: currentUser, token: token })
     }).then(r => r.text()).then(res => {
         btn.disabled = false;
-        if (res === "OK" || res === "KO") { // Anche se KO lato server, lo rimuoviamo dal client
-            localStorage.removeItem('biometric_token');
-            alert("✅ Dispositivo scollegato. Biometria rimossa.");
-            aggiornaUIBiometria(); // Cambia il bottone in Aggiungi
-        }
+        localStorage.removeItem('biometric_token');
+        mostraAlertCustom("Dispositivo scollegato. Biometria rimossa.", "success");
+        aggiornaUIBiometria(); 
     });
 }
 
@@ -880,10 +885,10 @@ async function eseguiLoginBiometrico() {
                     document.getElementById('main-content').style.display = 'block';
                     btn.innerHTML = `👆 Usa Impronta / FaceID`; 
                     
-                    aggiornaUIBiometria(); // Mette il bottone rosso in alto
+                    aggiornaUIBiometria(); 
                     caricaDati(); controllaScadenzaPassword(); 
                 } else {
-                    alert("Token biometrico revocato dal server o non valido. Dovrai usare la password.");
+                    mostraAlertCustom("Token biometrico revocato dal server o non valido. Usa la password.", "warning");
                     localStorage.removeItem('biometric_token'); 
                     btn.style.display = 'none'; 
                     btn.innerHTML = `👆 Usa Impronta / FaceID`; 
