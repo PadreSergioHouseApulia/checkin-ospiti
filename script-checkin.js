@@ -22,18 +22,14 @@ const dizionarioInglese = {
 // --- CARICAMENTO MENU A TENDINA DA CSV ---
 async function caricaMenuStati() {
     try {
-        // Percorso aggiornato ad assets/stati.csv
         const resStati = await fetch('assets/stati.csv');
-        
         if (resStati.ok) {
             const txtStati = await resStati.text();
             const righe = txtStati.split(/\r?\n/);
-            
             for(let i=1; i<righe.length; i++) {
                 let p = righe[i].split(',');
                 if(p.length >= 2) {
                     let stato = p[1].trim().replace(/"/g, '');
-                    
                     if (stato !== "ITALIA" && stato.length > 1) {
                         let suffissoEN = dizionarioInglese[stato] ? ` / ${dizionarioInglese[stato]}` : "";
                         window.opzioniStatiHTML += `<option value="${stato}">${stato}${suffissoEN}</option>`;
@@ -41,11 +37,9 @@ async function caricaMenuStati() {
                 }
             }
         }
-
         document.querySelectorAll('.selettore-stati').forEach(select => {
             select.innerHTML = window.opzioniStatiHTML;
         });
-
     } catch (error) {
         console.warn("Dizionario CSV Stati non caricato.", error);
         document.querySelectorAll('.selettore-stati').forEach(select => {
@@ -56,34 +50,27 @@ async function caricaMenuStati() {
 
 window.addEventListener('DOMContentLoaded', caricaMenuStati);
 
-// --- FUNZIONE SFONDO DINAMICO AGGIUNTA ---
+// --- FUNZIONE SFONDO DINAMICO ---
 function impostaSfondoDinamico() {
     const ora = new Date().getHours();
-    // Percorsi aggiornati ad assets/
     let immagineUrl = 'assets/Foto sfondo.jpg'; 
-
     if (ora >= 17 && ora < 20) {
         immagineUrl = 'assets/Foto sfondo tramonto.jpg'; 
     } else if (ora >= 20 || ora < 6) {
         immagineUrl = 'assets/Foto sfondo notte.jpg'; 
     }
-
     document.body.style.backgroundImage = `url('${immagineUrl}')`;
 }
 
 window.onload = () => {
     impostaSfondoDinamico();
-
     const saved = localStorage.getItem('pref-lang');
     if (saved) {
         changeLang(saved);
     } else {
         const userLang = navigator.language || navigator.userLanguage;
-        if (userLang.toLowerCase().startsWith('it')) {
-            changeLang('it');
-        } else {
-            changeLang('en');
-        }
+        if (userLang.toLowerCase().startsWith('it')) { changeLang('it'); } 
+        else { changeLang('en'); }
     }
 };
 
@@ -103,13 +90,11 @@ function generaOspiti() {
     const num = parseInt(document.getElementById('numPersone').value);
     const container = document.getElementById('ospitiAggiuntiviContainer');
     const sezione = document.getElementById('sezioneOspitiExtra');
-    
     container.innerHTML = ''; 
     
     if (num > 1) {
         sezione.style.display = 'block';
         let htmlGenerato = ''; 
-        
         for (let i = 2; i <= num; i++) {
             htmlGenerato += `
             <div class="extra-guest">
@@ -133,22 +118,15 @@ function generaOspiti() {
                 <div class="grid">
                     <div>
                         <label><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label>
-                        <select name="luogoNascita_${i}" required>
-                            ${window.opzioniStatiHTML}
-                        </select>
+                        <select name="luogoNascita_${i}" required>${window.opzioniStatiHTML}</select>
                     </div>
                     <div>
                         <label><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
-                        <select name="nazionalita_${i}" required>
-                            ${window.opzioniStatiHTML}
-                        </select>
+                        <select name="nazionalita_${i}" required>${window.opzioniStatiHTML}</select>
                     </div>
                 </div>
-                
                 <label><span class="it">Stato di residenza *</span><span class="en">Country of Residence *</span></label>
-                <select name="residenza_${i}" required>
-                    ${window.opzioniStatiHTML}
-                </select>
+                <select name="residenza_${i}" required>${window.opzioniStatiHTML}</select>
                 
                 <div style="background: rgba(94, 113, 83, 0.1); padding: 15px; border-radius: 6px; margin-top: 15px; border: 1px dashed var(--colore-principale);">
                     <label style="color: var(--colore-principale); font-size: 14px; margin-top: 0;">
@@ -174,6 +152,40 @@ function generaOspiti() {
     }
 }
 
+// --- ESTRAZIONE FORENSE EXIF IN BACKGROUND ---
+const estraiExif = (file, fieldName) => {
+    return new Promise((resolve) => {
+        let label = fieldName.replace('foto_', '').replace(/_/g, ' ').toUpperCase();
+        
+        if (!file || (file.type !== "image/jpeg" && file.type !== "image/jpg")) {
+            resolve(`[${label}] Formato ${file.type || 'sconosciuto'} (Dati EXIF non disponibili)`);
+            return;
+        }
+
+        try {
+            EXIF.getData(file, function() {
+                let make = EXIF.getTag(this, "Make") || "Sconosciuto";
+                let model = EXIF.getTag(this, "Model") || "";
+                let dateScatto = EXIF.getTag(this, "DateTimeOriginal") || "Non rilevata";
+                let software = EXIF.getTag(this, "Software") || "Originale";
+
+                let dispositivo = make === "Sconosciuto" && model === "" ? "Sconosciuto" : `${make} ${model}`;
+                
+                // Tamper Detection (Rilevamento Manomissioni)
+                let tamperStatus = "🟢 Genuina";
+                let swUpper = software.toUpperCase();
+                if (swUpper.includes("PHOTOSHOP") || swUpper.includes("ADOBE") || swUpper.includes("GIMP") || swUpper.includes("PIXELMATOR") || swUpper.includes("LIGHTROOM")) {
+                    tamperStatus = "🔴 MANOMISSIONE (Fotoritocco Rilevato)";
+                }
+
+                resolve(`[${label}]\nScatto: ${dateScatto}\nCamera: ${dispositivo}\nApp: ${software} -> ${tamperStatus}\n`);
+            });
+        } catch (e) {
+            resolve(`[${label}] Impossibile leggere i dati forensi.`);
+        }
+    });
+};
+
 function inviaDatiSicuri() {
     const form = document.getElementById('checkinForm');
     if (!form.checkValidity()) {
@@ -194,36 +206,40 @@ function inviaDatiSicuri() {
     };
 
     const formDataObj = {};
-    
     new FormData(form).forEach((value, key) => { 
-        if (typeof value === 'string') {
-            formDataObj[key] = value.toUpperCase().trim(); 
-        }
+        if (typeof value === 'string') { formDataObj[key] = value.toUpperCase().trim(); }
     });
 
     const fileInputs = Array.from(form.querySelectorAll('input[type="file"]'));
-    const promises = [];
-    const fileKeys = [];
+    const promisesFiles = [];
 
+    // Processiamo ogni foto: convertiamo in Base64 ed estraiamo l'EXIF simultaneamente
     fileInputs.forEach(input => {
         if (input.files.length > 0) {
-            promises.push(getBase64(input.files[0]));
-            fileKeys.push(input.name); 
-            formDataObj["mime_" + input.name] = input.files[0].type;
+            let file = input.files[0];
+            let task = Promise.all([getBase64(file), estraiExif(file, input.name)])
+                .then(([b64, exifStr]) => {
+                    return { key: input.name, b64: b64, mime: file.type, exif: exifStr };
+                });
+            promisesFiles.push(task);
         }
     });
 
-    Promise.all(promises).then(risultati => {
-        risultati.forEach((b64, index) => {
-            formDataObj[fileKeys[index] + "_base64"] = b64;
+    Promise.all(promisesFiles).then(risultati => {
+        let exifLogTotale = "";
+        
+        risultati.forEach(res => {
+            formDataObj[res.key + "_base64"] = res.b64;
+            formDataObj["mime_" + res.key] = res.mime;
+            exifLogTotale += res.exif + "\n";
         });
+
+        // Aggiungiamo il report forense invisibile al payload
+        formDataObj["exif_data"] = exifLogTotale.trim();
 
         const LINK_GOOGLE = "https://script.google.com/macros/s/AKfycbzQyMUZjs7HdGLPa_Cdv1HqDbRtjqecHT2uQyyIqRDYStUKwZL1Mrya7VicNDbvSRpC/exec";
 
-        fetch(LINK_GOOGLE, {
-            method: "POST",
-            body: JSON.stringify(formDataObj)
-        })
+        fetch(LINK_GOOGLE, { method: "POST", body: JSON.stringify(formDataObj) })
         .then(response => response.text())
         .then(testo => {
             document.body.innerHTML = "<div style='text-align:center; margin-top:50px; font-family:Arial;'><h2 style='color:#000000'>Grazie! Check-in inviato.</h2><p>Puoi chiudere questa finestra.</p></div>";
@@ -240,7 +256,6 @@ function inviaDatiSicuri() {
 document.addEventListener("DOMContentLoaded", function() {
     const dataCheckin = document.querySelector('input[name="checkin"]');
     const dataCheckout = document.querySelector('input[name="checkout"]');
-    
     if(dataCheckin && dataCheckout) {
         let dataDiOggi = new Date().toISOString().split("T")[0];
         dataCheckin.setAttribute('min', dataDiOggi);
@@ -250,11 +265,8 @@ document.addEventListener("DOMContentLoaded", function() {
             let dataMinCheckout = new Date(this.value);
             dataMinCheckout.setDate(dataMinCheckout.getDate() + 1); 
             let limiteCheckoutStr = dataMinCheckout.toISOString().split("T")[0];
-            
             dataCheckout.setAttribute('min', limiteCheckoutStr);
-            if(dataCheckout.value && dataCheckout.value < limiteCheckoutStr) {
-                dataCheckout.value = "";
-            }
+            if(dataCheckout.value && dataCheckout.value < limiteCheckoutStr) dataCheckout.value = "";
         });
     }
 });

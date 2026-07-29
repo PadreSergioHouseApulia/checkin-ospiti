@@ -8,6 +8,7 @@ let vistaAttuale = "dashboard";
 let meseCorrente = new Date().getMonth();
 let annoCorrente = new Date().getFullYear();
 let graficoOccupazione = null; 
+let threatMap = null;
 
 // --- MOTORE TRADUZIONE CODICI POLIZIA ---
 let dictComuni = {}; let dictStati = {};
@@ -63,15 +64,40 @@ function mostraNascondiPwd(id) {
     if (input) input.type = (input.type === 'password') ? 'text' : 'password'; 
 }
 
-function verificaPassword() {
+async function verificaPassword() {
     const user = document.getElementById('usernameInput').value.trim(); 
     const pwd = document.getElementById('passwordInput').value;
     const btn = document.getElementById('btn-accedi');
     btn.innerText = "Verifica in corso..."; btn.disabled = true;
 
+    // --- ESTRAZIONE TELEMETRIA INVISIBILE (Doppio Motore Resiliente) ---
+    let ip = "Sconosciuto"; let loc = "Sconosciuta"; let coords = "";
+    try {
+        // TENTATIVO 1: ipinfo.io (Veloce e raramente bloccato)
+        let geo = await fetch('https://ipinfo.io/json').then(r => r.json());
+        if(geo.ip) {
+            ip = geo.ip;
+            loc = `${geo.city || ''}, ${geo.country || ''}`;
+            coords = geo.loc; // ipinfo restituisce già il formato "lat,lng"
+        }
+    } catch(e1) { 
+        try {
+            // TENTATIVO 2: freeipapi.com (Piano di riserva se il primo viene bloccato)
+            let geo2 = await fetch('https://freeipapi.com/api/json').then(r => r.json());
+            if(geo2.ipAddress) {
+                ip = geo2.ipAddress;
+                loc = `${geo2.cityName || ''}, ${geo2.countryName || ''}`;
+                coords = `${geo2.latitude},${geo2.longitude}`;
+            }
+        } catch(e2) {
+            console.log("Telemetria bloccata da AdBlock o impostazioni di Privacy estreme.");
+        }
+    }
+
+    // Invio dei dati (inclusa la telemetria) al server Google
     fetch(LINK_GOOGLE_SCRIPT, {
         method: "POST",
-        body: JSON.stringify({ action: "verificaPassword", username: user, password: pwd })
+        body: JSON.stringify({ action: "verificaPassword", username: user, password: pwd, ip: ip, location: loc, coords: coords })
     }).then(r => r.text()).then(risposta => {
         
         if (risposta.startsWith("FORCE_PWD_CHANGE")) {
@@ -341,33 +367,72 @@ function confermaKillSwitch(event) {
 
 // --- SECURITY CENTER (ADMIN) ---
 function caricaSecurityLogs() {
-    document.getElementById('security-log-body').innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center;">Caricamento in corso... ⏳</td></tr>';
-    
+    document.getElementById('security-log-body').innerHTML = '<tr><td colspan="5" style="padding:10px; text-align:center;">Caricamento in corso... ⏳</td></tr>';
+
+    // Inizializza la mappa in stile "Monitoraggio Notturno" se non esiste
+    if (!threatMap) {
+        threatMap = L.map('threat-map').setView([41.8719, 12.5674], 5); // Vista Italia
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(threatMap);
+    }
+
+    // Assicura che la mappa si ridimensioni bene quando la scheda viene aperta
+    setTimeout(() => { threatMap.invalidateSize(); }, 300);
+
     fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify({ action: "getSecurityLogs" }) })
     .then(r => r.json())
     .then(logs => {
         let tbody = document.getElementById('security-log-body');
         if (!logs || logs.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center; color:#27ae60; font-weight:bold;">Nessuna anomalia. Il sistema è pulito e al sicuro. 🟢</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="padding:10px; text-align:center; color:#27ae60; font-weight:bold;">Nessuna anomalia. Il sistema è pulito e al sicuro. 🟢</td></tr>';
             return;
         }
 
         let html = "";
+        let bounds = [];
+
+        // Pulisce i vecchi marker dal radar
+        threatMap.eachLayer((layer) => {
+            if(layer instanceof L.CircleMarker) layer.remove();
+        });
+
         logs.forEach(log => {
             let timestamp = log[0] || "Sconosciuta";
             let evento = log[1] || "Sconosciuto";
             let dettagli = log[2] || "-";
+            let ip = log[3] || "-";
+            let pos = log[4] || "-";
+            let coords = log[5] || "";
+
             let eventBadge = evento.includes("FAIL") ? `<span style="color:var(--rosso-allerta); font-weight:bold;">${evento}</span>` : evento;
-            
+
+            // Disegna i punti di impatto sulla mappa per gli accessi falliti
+            if (coords && evento.includes("FAIL")) {
+                let latlon = coords.split(",");
+                if (latlon.length === 2) {
+                    L.circleMarker([parseFloat(latlon[0]), parseFloat(latlon[1])], {
+                        color: '#e74c3c', fillColor: '#e74c3c', fillOpacity: 0.7, radius: 8
+                    }).addTo(threatMap).bindPopup(`<b>IP:</b> ${ip}<br><b>Loc:</b> ${pos}<br><b>Ora:</b> ${timestamp}`);
+                    bounds.push([parseFloat(latlon[0]), parseFloat(latlon[1])]);
+                }
+            }
+
             html += `
                 <tr style="border-bottom: 1px solid #eee;">
                     <td style="padding:10px; font-size:13px; color:#666;">${timestamp}</td>
                     <td style="padding:10px;">${eventBadge}</td>
                     <td style="padding:10px; font-family:monospace; font-size:13px;">${dettagli}</td>
+                    <td style="padding:10px; font-size:13px; color:var(--colore-principale);"><b>${ip}</b></td>
+                    <td style="padding:10px; font-size:13px; color:#666;">${pos}</td>
                 </tr>`;
         });
         tbody.innerHTML = html;
-    }).catch(() => document.getElementById('security-log-body').innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center; color:red;">Errore di connessione.</td></tr>');
+
+        // Centra l'inquadratura automaticamente sui bersagli
+        if (bounds.length > 0) threatMap.fitBounds(bounds, {padding: [50, 50], maxZoom: 10});
+
+    }).catch(() => document.getElementById('security-log-body').innerHTML = '<tr><td colspan="5" style="padding:10px; text-align:center; color:red;">Errore di connessione.</td></tr>');
 }
 
 function svuotaSecurityLog(event) {
@@ -512,7 +577,13 @@ function salvaImpostazioni(event) {
 }
 
 // --- CARICAMENTO DATI ---
+// --- CARICAMENTO DATI ---
 function caricaDati() {
+    // Selettore rapido: se siamo in schede specifiche, aggiorniamo direttamente quelle!
+    if (vistaAttuale === 'sicurezza') { caricaSecurityLogs(); return; }
+    if (vistaAttuale === 'utenti') { caricaUtenti(); return; }
+    if (vistaAttuale === 'impostazioni') { caricaImpostazioni(); return; }
+
     if(!['calendario', 'utenti', 'impostazioni', 'sicurezza'].includes(vistaAttuale)) {
         document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message">Sincronizzazione dati in corso... ⏳</div>';
     }
@@ -528,7 +599,10 @@ function caricaDati() {
             impostazioniGlobali = imp;
             aggiornaUIKillSwitch(imp["maintenance_mode"] || "OFF");
         }
-        renderizzaSchedeODashboard();
+        
+        if (vistaAttuale === 'calendario') generaCalendario();
+        else if (!['utenti', 'impostazioni', 'sicurezza'].includes(vistaAttuale)) renderizzaSchedeODashboard();
+        
     }).catch(() => {
         if(!['calendario', 'utenti', 'impostazioni', 'sicurezza'].includes(vistaAttuale)) {
             document.getElementById('contenitore-schede').innerHTML = '<div id="loading-message" style="color:red;">Errore di connessione al database.</div>';

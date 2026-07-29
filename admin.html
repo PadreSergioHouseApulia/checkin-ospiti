@@ -11,6 +11,9 @@
     <link rel="icon" type="image/x-icon" href="icona_admin.ico">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Librerie per la Threat Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -132,13 +135,18 @@
             </div>
 
             <!-- CONTENITORE SICUREZZA -->
+            <!-- CONTENITORE SICUREZZA -->
             <div id="contenitore-sicurezza" style="display:none;" class="admin-only">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                        <h3 style="margin:0; color: var(--colore-principale);">Security Audit Log</h3>
+                        <h3 style="margin:0; color: var(--colore-principale);">Security Audit & Threat Map</h3>
                         <button onclick="svuotaSecurityLog(event)" style="background:var(--rosso-allerta); color:white; border:none; padding:8px 12px; border-radius:5px; font-weight:bold; cursor:pointer;">🗑️ Svuota Log</button>
                     </div>
-                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Registro in tempo reale degli accessi negati e dei tentativi di effrazione al sistema.</p>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Registro in tempo reale degli accessi negati. La mappa traccia le coordinate GPS delle connessioni respinte.</p>
+                    
+                    <!-- IL RADAR MAPPA -->
+                    <div id="threat-map" style="height: 300px; width: 100%; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; z-index: 1;"></div>
+
                     <div id="log-table-container" style="overflow-x:auto;">
                         <table style="width:100%; border-collapse: collapse; font-size:14px; text-align:left;">
                             <thead>
@@ -146,10 +154,12 @@
                                     <th style="padding:10px; border-bottom:2px solid #ddd;">Data e Ora</th>
                                     <th style="padding:10px; border-bottom:2px solid #ddd;">Evento</th>
                                     <th style="padding:10px; border-bottom:2px solid #ddd;">Dettagli</th>
+                                    <th style="padding:10px; border-bottom:2px solid #ddd;">IP Sorgente</th>
+                                    <th style="padding:10px; border-bottom:2px solid #ddd;">Posizione</th>
                                 </tr>
                             </thead>
                             <tbody id="security-log-body">
-                                <tr><td colspan="3" style="padding:10px; text-align:center;">Caricamento in corso...</td></tr>
+                                <tr><td colspan="5" style="padding:10px; text-align:center;">Caricamento in corso...</td></tr>
                             </tbody>
                         </table>
                     </div>
