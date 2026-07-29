@@ -49,9 +49,14 @@
                 <input type="password" id="passwordInput" placeholder="Inserisci Password" onkeypress="gestisciInvio(event)">
                 <span class="toggle-password" onclick="mostraNascondiPwd('passwordInput')">👁️</span>
             </div>
-            
             <button id="btn-accedi" onclick="verificaPassword()">Accedi</button>
+            <!-- NUOVO BOTTONE BIOMETRICO -->
+            <button id="btn-biometria" onclick="eseguiLoginBiometrico()" style="display:none; background: #e0e6ed; color: #333; margin-top:15px; border: 2px dashed #ccc; font-size:16px; padding: 10px; width: 100%; cursor:pointer; font-weight:bold;">
+                👆 Usa Impronta / FaceID
+            </button>
+            
             <div id="messaggioErrore" style="color:red; font-size:13px; display:none; margin-top:10px;">Credenziali errate o server non raggiungibile.</div>
+
         </div>
     </div>
 
@@ -67,6 +72,7 @@
                     <button id="btn-kill-switch" onclick="toggleKillSwitch()" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s;">Disattiva</button>
                 </div>
 
+                <button class="btn-nav-azione" id="btn-registra-bio" onclick="registraBiometria()">👆 Abilita Biometria</button>
                 <button class="btn-nav-azione" onclick="apriCambioPasswordVolontario()">🔑 Cambia Password</button>
                 <button class="btn-nav-azione" onclick="esci()">🚪 Esci</button>
             </div>
@@ -134,7 +140,6 @@
                 </div>
             </div>
 
-            <!-- CONTENITORE SICUREZZA -->
             <!-- CONTENITORE SICUREZZA -->
             <div id="contenitore-sicurezza" style="display:none;" class="admin-only">
                 <div class="card">

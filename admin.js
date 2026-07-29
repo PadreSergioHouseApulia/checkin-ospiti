@@ -1140,3 +1140,132 @@ function lanciaCoriandoli() {
         if (Date.now() < fineAnimazione) { requestAnimationFrame(frame); }
     }());
 }
+
+// ==========================================
+// FASE 3: MOTORE BIOMETRICO (WEBAUTHN)
+// ==========================================
+
+window.addEventListener('load', () => {
+    // Al caricamento, se il browser supporta WebAuthn e abbiamo già un token, mostra il bottone
+    if (localStorage.getItem('biometric_token') && window.PublicKeyCredential) {
+        document.getElementById('btn-biometria').style.display = 'block';
+    }
+});
+
+async function registraBiometria() {
+    if (!window.PublicKeyCredential) {
+        alert("⚠️ Il tuo browser o dispositivo non supporta l'autenticazione biometrica sicura.");
+        return;
+    }
+    
+    let currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) return alert("Devi essere loggato per abilitare il dispositivo.");
+
+    try {
+        const token = crypto.randomUUID(); 
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        
+        const userId = new Uint8Array(16);
+        window.crypto.getRandomValues(userId);
+
+        const pubKey = {
+            challenge: challenge,
+            rp: { 
+                name: "PadreSergio Security",
+                id: window.location.hostname // Diciamo al chip che siamo sul dominio GitHub autorizzato
+            },
+            user: { id: userId, name: currentUser, displayName: currentUser },
+            pubKeyCredParams: [
+                { type: "public-key", alg: -7 },  // ES256
+                { type: "public-key", alg: -257 } // RS256
+            ],
+            // Rimuoviamo authenticatorAttachment per permettere massima compatibilità
+            authenticatorSelection: { userVerification: "preferred" },
+            timeout: 60000,
+            attestation: "none"
+        };
+
+        // Questo invoca il prompt hardware nativo (Impronta/FaceID)
+        const cred = await navigator.credentials.create({ publicKey: pubKey });
+        
+        if (cred) {
+            const btn = document.getElementById('btn-registra-bio');
+            const testoOriginale = btn.innerText;
+            btn.innerText = "⏳ Sincronizzazione...";
+
+            // Salviamo il token su Google
+            fetch(LINK_GOOGLE_SCRIPT, {
+                method: "POST",
+                body: JSON.stringify({ action: "linkDevice", username: currentUser, token: token })
+            }).then(r => r.text()).then(res => {
+                if (res === "OK") {
+                    localStorage.setItem('biometric_token', token);
+                    alert("✅ Dispositivo autorizzato con successo! Al prossimo accesso potrai utilizzare l'Impronta Digitale o il Riconoscimento Facciale.");
+                    btn.innerText = "✅ Biometria Attiva";
+                } else {
+                    btn.innerText = testoOriginale;
+                    alert("Errore durante il salvataggio sul server.");
+                }
+            });
+        }
+    } catch (err) {
+        console.error(err);
+        alert("❌ ERRORE HARDWARE BIOMETRICO:\n\n" + err.message + "\n\nAssicurati che Windows Hello, TouchID o il blocco schermo siano configurati sul dispositivo.");
+    }
+}
+
+async function eseguiLoginBiometrico() {
+    let token = localStorage.getItem('biometric_token');
+    if (!token) return;
+    
+    try {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+
+        const pubKey = {
+            challenge: challenge,
+            timeout: 60000,
+            userVerification: "required"
+        };
+
+        // Inizializza la richiesta di autenticazione al dispositivo
+        const assertion = await navigator.credentials.get({ publicKey: pubKey });
+        
+        if (assertion) {
+            const btn = document.getElementById('btn-biometria');
+            btn.innerText = "⏳ Decriptazione...";
+            
+            // --- DOPPIA TELEMETRIA ANCHE PER IL LOGIN BIOMETRICO ---
+            let ipB = "Sconosciuto"; let locB = "Sconosciuta"; let coordsB = "";
+            try {
+                let geo1 = await fetch('https://ipinfo.io/json').then(r => r.json());
+                if(geo1.ip) { ipB = geo1.ip; locB = `${geo1.city || ''}, ${geo1.country || ''}`; coordsB = geo1.loc; }
+            } catch(e) {}
+
+            fetch(LINK_GOOGLE_SCRIPT, {
+                method: "POST",
+                body: JSON.stringify({ action: "loginBiometrico", token: token, ip: ipB, location: locB, coords: coordsB })
+            }).then(r => r.text()).then(res => {
+                if (res.startsWith("ADMIN") || res.startsWith("BASE")) {
+                    let parts = res.split("|");
+                    localStorage.setItem('adminSessionExp', Date.now() + 5 * 60 * 1000); 
+                    localStorage.setItem('userRole', parts[0]); 
+                    localStorage.setItem('currentUser', parts[1]); 
+                    document.body.className = "role-" + parts[0].toLowerCase(); 
+                    
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'block';
+                    btn.innerHTML = `👆<br><span style="font-size:12px; font-weight:bold;">Usa Impronta / FaceID</span>`; 
+                    caricaDati();
+                    controllaScadenzaPassword(); 
+                } else {
+                    alert("Token biometrico revocato o non valido.");
+                    btn.innerHTML = `👆 Usa Impronta / FaceID`; 
+                }
+            });
+        }
+    } catch (err) {
+        console.log("Login biometrico interrotto:", err);
+    }
+}
