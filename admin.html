@@ -293,24 +293,59 @@
     </div>
 
     <div class="modal-overlay" id="modificaModal">
-        <div class="modal">
-            <span class="chiudi-modal" onclick="chiudiModal('modificaModal')">×</span>
-            <h2 style="color: var(--rosso-allerta); margin-top: 0;">✏️ Correggi Dati</h2>
+        <div class="modal modal-modifica-ospite">
             <input type="hidden" id="edit-index">
-            
-            <div class="campo-edit admin-only"><label>Data Arrivo (Solo Admin)</label><input type="date" id="edit-arrivo"></div>
-            <div class="campo-edit admin-only"><label>Data Partenza (Solo Admin)</label><input type="date" id="edit-partenza"></div>
-            <div class="campo-edit"><label>Nome</label><input type="text" id="edit-nome"></div>
-            <div class="campo-edit"><label>Cognome</label><input type="text" id="edit-cognome"></div>
-            <div class="campo-edit"><label>Documento (Tipo e Numero)</label><input type="text" id="edit-doc"></div>
-            <div class="campo-edit"><label>Data di Nascita</label><input type="text" id="edit-nascita"></div>
-            <div class="campo-edit"><label>Luogo di Nascita</label><input type="text" id="edit-luogo"></div>
-            <div class="campo-edit"><label>Nazionalità</label><input type="text" id="edit-nazionalita"></div>
-            <div class="campo-edit"><label>Residenza</label><input type="text" id="edit-residenza"></div>
-            <div class="campo-edit"><label>Ospiti Extra</label><textarea id="edit-ospitiExtra" rows="8"></textarea></div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="salvaModifiche(event, false)" style="background: var(--colore-secondario); color: white; width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">💾 Solo Salva</button>
-                <button onclick="salvaModifiche(event, true)" style="background: var(--verde-ok); color: white; width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">✅ Salva e Approva</button>
+
+            <!-- HEADER -->
+            <div class="modal-modifica-header">
+                <span>✏️ Modifica Dati Ospite</span>
+                <button class="modal-modifica-close" onclick="chiudiModal('modificaModal')">✕</button>
+            </div>
+
+            <div class="modal-modifica-body">
+
+                <!-- RIGA 1: Periodo (admin) + Dati Anagrafici -->
+                <div class="modal-modifica-row">
+                    <div class="modal-sezione admin-only modal-sezione--arancio">
+                        <div class="modal-sezione-titolo">📅 Periodo di Soggiorno</div>
+                        <div class="campo-edit"><label>Arrivo <span class="badge-admin">Solo Admin</span></label><input type="date" id="edit-arrivo"></div>
+                        <div class="campo-edit"><label>Partenza <span class="badge-admin">Solo Admin</span></label><input type="date" id="edit-partenza"></div>
+                    </div>
+                    <div class="modal-sezione modal-sezione--verde">
+                        <div class="modal-sezione-titolo">👤 Dati Anagrafici</div>
+                        <div class="campo-edit"><label>Nome</label><input type="text" id="edit-nome"></div>
+                        <div class="campo-edit"><label>Cognome</label><input type="text" id="edit-cognome"></div>
+                        <div class="campo-edit"><label>Data di Nascita</label><input type="text" id="edit-nascita" placeholder="es. 1980-06-15"></div>
+                        <div class="campo-edit"><label>Luogo di Nascita</label><input type="text" id="edit-luogo"></div>
+                    </div>
+                </div>
+
+                <!-- RIGA 2: Documento & Residenza -->
+                <div class="modal-sezione modal-sezione--blu">
+                    <div class="modal-sezione-titolo">📄 Documento &amp; Residenza</div>
+                    <div class="modal-modifica-row">
+                        <div class="campo-edit" style="flex:2"><label>Documento (Tipo e Numero)</label><input type="text" id="edit-doc"></div>
+                        <div class="campo-edit" style="flex:1"><label>Nazionalità</label><input type="text" id="edit-nazionalita"></div>
+                        <div class="campo-edit" style="flex:2"><label>Residenza</label><input type="text" id="edit-residenza"></div>
+                    </div>
+                </div>
+
+                <!-- RIGA 3: Ospiti Aggiuntivi -->
+                <div class="modal-sezione modal-sezione--grigio">
+                    <div class="modal-sezione-titolo">👨‍👩‍👧 Ospiti Aggiuntivi
+                        <span style="font-size:12px; font-weight:normal; color:#888; margin-left:8px;">( usa il formato: --- OSPITE 2 --- )</span>
+                    </div>
+                    <div class="campo-edit" style="margin-bottom:0">
+                        <textarea id="edit-ospitiExtra" rows="7" placeholder="--- OSPITE 2 ---&#10;Cognome: ROSSI&#10;Nome: MARIO&#10;Sesso: M&#10;Nascita: 1980-01-01 a ITALIA&#10;Nazionalità: ITALIANA&#10;Residenza: ROMA"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER BOTTONI -->
+            <div class="modal-modifica-footer">
+                <button onclick="salvaModifiche(event, false)" class="btn-modifica-salva">💾 Solo Salva</button>
+                <button onclick="salvaModifiche(event, true)" class="btn-modifica-approva">✅ Salva e Approva</button>
             </div>
         </div>
     </div>

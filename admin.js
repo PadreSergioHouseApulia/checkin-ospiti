@@ -521,21 +521,21 @@ function generaDashboard() {
     let tassoOccupazione = Math.round((nottiOccupateMeseScelto / giorniNelMeseScelto) * 100); if (tassoOccupazione > 100) tassoOccupazione = 100;
 
     cont.innerHTML = `
-        <div class="calendario-header" style="grid-column: 1 / -1; background:white; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05); margin-bottom: -10px;">
-            <button onclick="cambiaMese(-1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">❮ Mese Prec.</button>
-            <h2 style="color: var(--colore-principale); margin: 0; min-width: 150px; text-align: center;">${MESI[meseCorrente]} ${annoCorrente}</h2>
-            <button onclick="cambiaMese(1)" style="padding: 10px; cursor: pointer; border: none; background: #eee; border-radius: 5px; font-weight: bold;">Mese Succ. ❯</button>
+        <div class="dash-nav-mese" style="grid-column: 1 / -1; background: white; padding: 16px 20px; border-radius: 12px; box-shadow: var(--ombra-card); display: flex; justify-content: space-between; align-items: center;">
+            <button onclick="cambiaMese(-1)" style="padding: 10px 18px; cursor: pointer; border: none; background: var(--colore-sfondo); border-radius: 8px; font-weight: bold; color: var(--colore-principale); font-size: 14px; transition: background 0.2s;">❮ Mese Prec.</button>
+            <h2 style="color: var(--colore-principale); margin: 0; font-family: 'Georgia', serif; font-size: 20px;">${MESI[meseCorrente]} ${annoCorrente}</h2>
+            <button onclick="cambiaMese(1)" style="padding: 10px 18px; cursor: pointer; border: none; background: var(--colore-sfondo); border-radius: 8px; font-weight: bold; color: var(--colore-principale); font-size: 14px; transition: background 0.2s;">Mese Succ. ❯</button>
         </div>
-        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="dashboard-grid">
             <div class="dash-card"><div class="dash-icon">📈</div><div class="dash-value">${tassoOccupazione}%</div><div class="dash-label">Occupazione Mensile</div></div>
             <div class="dash-card"><div class="dash-icon">👥</div><div class="dash-value">${ospitiTotaliStorico}</div><div class="dash-label">Ospiti Totali (Storico)</div></div>
             <div class="dash-card"><div class="dash-icon">🛎️</div><div class="dash-value">${prossimiArrivi}</div><div class="dash-label">Arrivi in 7 gg (Da Oggi)</div></div>
         </div>
-        <div class="grafico-container" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); grid-column: 1 / -1; margin-top: 10px;">
+        <div class="grafico-container" style="grid-column: 1 / -1; margin-top: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <button onclick="cambiaMese(-1)" style="padding: 8px 12px; cursor: pointer; border: none; background: #f4f7f6; border-radius: 5px; font-weight: bold; color: var(--colore-principale);">❮ Prec</button>
-                <h3 style="margin: 0; color: var(--colore-principale); text-align: center;">Andamento Mensile (${MESI[meseCorrente]} ${annoCorrente})</h3>
-                <button onclick="cambiaMese(1)" style="padding: 8px 12px; cursor: pointer; border: none; background: #f4f7f6; border-radius: 5px; font-weight: bold; color: var(--colore-principale);">Succ ❯</button>
+                <button onclick="cambiaMese(-1)" style="padding: 8px 14px; cursor: pointer; border: none; background: var(--colore-sfondo); border-radius: 7px; font-weight: bold; color: var(--colore-principale);">❮ Prec</button>
+                <h3 style="margin: 0; color: var(--colore-principale); text-align: center; font-family: 'Georgia', serif;">Andamento Mensile (${MESI[meseCorrente]} ${annoCorrente})</h3>
+                <button onclick="cambiaMese(1)" style="padding: 8px 14px; cursor: pointer; border: none; background: var(--colore-sfondo); border-radius: 7px; font-weight: bold; color: var(--colore-principale);">Succ ❯</button>
             </div>
             <canvas id="occupazioneChart" height="80"></canvas>
         </div>
@@ -699,6 +699,9 @@ function salvaModifiche(event, approva) {
     };
     fetch(LINK_GOOGLE_SCRIPT, { method: "POST", body: JSON.stringify(payload) }).then(() => { 
         let rAgg = [...dbCheckin[index]]; rAgg[1]=payload.checkin; rAgg[2]=payload.checkout; rAgg[4]=payload.nome; rAgg[5]=payload.cognome; rAgg[8]=payload.nascita; rAgg[9]=payload.luogoNascita; rAgg[10]=payload.nazionalita; rAgg[11]=payload.residenza; rAgg[15]=payload.ospitiExtra;
+        // Ricalcola il numero totale ospiti: 1 (capogruppo) + numero di ospiti extra
+        let numExtra = (payload.ospitiExtra || "").split("--- OSPITE").length - 1;
+        rAgg[3] = 1 + numExtra;
         if (approva) { rAgg[14] = "Corretto e Approvato"; generaCSVCompleto(rAgg); } chiudiModal('modificaModal'); caricaDati(); btn.innerText = testoOriginale; btn.disabled = false;
     });
 }
