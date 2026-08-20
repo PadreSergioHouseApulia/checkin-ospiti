@@ -268,12 +268,14 @@
         </div>
     </div>
 
-    <!-- ALTRE MODALI CHECKIN -->
+    <!-- MODAL FOTO/INFO CHECK-IN -->
     <div class="modal-overlay" id="dettagliModal">
-        <div class="modal">
-            <span class="chiudi-modal" onclick="chiudiModal('dettagliModal')">×</span>
-            <h2 style="color: var(--colore-principale); margin-top: 0;" id="modal-titolo">Dettagli</h2>
-            <div id="contenuto-modale"></div>
+        <div class="modal modal-dettagli-ospite">
+            <div class="modal-dettagli-header">
+                <span id="modal-titolo">Dettagli</span>
+                <button class="modal-modifica-close" onclick="chiudiModal('dettagliModal')">✕</button>
+            </div>
+            <div class="modal-dettagli-body" id="contenuto-modale"></div>
         </div>
     </div>
 

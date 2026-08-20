@@ -639,11 +639,72 @@ function chiudiModal(id) { document.getElementById(id).style.display = 'none'; }
 function apriDettagli(index) {
     const riga = dbCheckin[index]; document.getElementById('modal-titolo').innerText = 'Dettagli: ' + riga[4] + ' ' + riga[5];
     let f1 = (riga[12] && riga[12] !== "N/A") ? `<a href="${riga[12]}" target="_blank" class="foto-doc-link">📸 Apri Foto Fronte (Capogruppo)</a>` : ''; let f2 = (riga[13] && riga[13] !== "N/A") ? `<a href="${riga[13]}" target="_blank" class="foto-doc-link">📸 Apri Foto Retro (Capogruppo)</a>` : '';
-    let extraStr = riga[15] || 'Nessuno';
-    if (extraStr !== 'Nessuno') {
-        extraStr = extraStr.replace(/Foto Fronte: (https?:\/\/[^\s]+)/g, '<br><a href="$1" target="_blank" class="foto-doc-link" style="margin-top: 5px;">📸 Apri Foto Fronte</a>'); extraStr = extraStr.replace(/Foto Retro: (https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" class="foto-doc-link" style="margin-top: 5px;">📸 Apri Foto Retro</a><br>'); extraStr = extraStr.replace(/Foto Fronte: N\/A/g, ''); extraStr = extraStr.replace(/Foto Retro: N\/A/g, '');
+    // Costruisce il contenuto del modal Foto/Info con layout moderno a sezioni
+    let exifStr = '';
+    let rawExtra = riga[15] || '';
+
+    // Separa la sezione EXIF dal resto degli ospiti extra
+    const exifSplit = rawExtra.split('--- 🔬 ANALISI FORENSE EXIF ---');
+    let ospitiPart = exifSplit[0].trim();
+    let exifPart = exifSplit.length > 1 ? exifSplit[1].trim() : '';
+
+    // Formatta ospiti extra
+    let extraHtml = '';
+    if (ospitiPart && ospitiPart !== 'Nessuno') {
+        // Converti link foto in bottoni
+        ospitiPart = ospitiPart.replace(/Foto Fronte: (https?:\/\/[^\s\n]+)/g, '<a href="$1" target="_blank" class="btn-foto-ospite">📸 Apri Foto Fronte</a>');
+        ospitiPart = ospitiPart.replace(/Foto Retro: (https?:\/\/[^\s\n]+)/g, '<a href="$1" target="_blank" class="btn-foto-ospite btn-foto-retro">📷 Apri Foto Retro</a>');
+        ospitiPart = ospitiPart.replace(/Foto Fronte: N\/A/g, '').replace(/Foto Retro: N\/A/g, '');
+        // Separa i blocchi ospite
+        const blocchi = ospitiPart.split(/(?=--- OSPITE)/);
+        blocchi.forEach(b => {
+            if (!b.trim()) return;
+            extraHtml += `<div class="ospite-extra-card">${b.replace(/\n/g, '<br>')}</div>`;
+        });
     }
-    document.getElementById('contenuto-modale').innerHTML = `<div class="sezione-dati"><p style="font-size:14px;"><strong>Doc:</strong> ${riga[6]}<br><strong>Nato:</strong> ${riga[8]} a ${riga[9]}<br><strong>Naz:</strong> ${riga[10]} | <strong>Res:</strong> ${riga[11]}</p><div>${f1} ${f2}</div><hr><strong>Extra:</strong><pre style="white-space:pre-wrap; font-size:13px; font-family:inherit;">${extraStr}</pre></div>`; document.getElementById('dettagliModal').style.display = 'flex';
+
+    // Formatta analisi EXIF
+    if (exifPart) {
+        const esif = exifPart
+            .replace(/🟢/g, '<span class="exif-ok">🟢</span>')
+            .replace(/🟡 SOSPETTA/g, '<span class="exif-warn">🟡 SOSPETTA</span>')
+            .replace(/🔴/g, '<span class="exif-err">🔴</span>');
+        exifStr = `
+            <div class="dettagli-sezione dettagli-sezione--viola">
+                <div class="dettagli-sezione-titolo">🔬 Analisi Forense EXIF</div>
+                <pre class="exif-pre">${esif}</pre>
+            </div>`;
+    }
+
+    document.getElementById('contenuto-modale').innerHTML = `
+        <div class="dettagli-sezione dettagli-sezione--verde">
+            <div class="dettagli-sezione-titolo">👤 Dati Anagrafici</div>
+            <div class="dettagli-griglia">
+                <div class="dettagli-campo"><span class="dettagli-label">Documento</span><span class="dettagli-valore">${riga[6] || '—'}</span></div>
+                <div class="dettagli-campo"><span class="dettagli-label">Data di Nascita</span><span class="dettagli-valore">${riga[8] || '—'}</span></div>
+                <div class="dettagli-campo"><span class="dettagli-label">Luogo di Nascita</span><span class="dettagli-valore">${riga[9] || '—'}</span></div>
+                <div class="dettagli-campo"><span class="dettagli-label">Nazionalità</span><span class="dettagli-valore">${riga[10] || '—'}</span></div>
+                <div class="dettagli-campo" style="grid-column:1/-1"><span class="dettagli-label">Residenza</span><span class="dettagli-valore">${riga[11] || '—'}</span></div>
+            </div>
+        </div>
+
+        <div class="dettagli-sezione dettagli-sezione--blu">
+            <div class="dettagli-sezione-titolo">📸 Documento Capogruppo</div>
+            <div class="btn-foto-group">
+                ${f1 ? f1.replace('class="foto-doc-link"', 'class="btn-foto-grande"') : '<span class="foto-na">Foto Fronte non disponibile</span>'}
+                ${f2 ? f2.replace('class="foto-doc-link"', 'class="btn-foto-grande btn-foto-grande--retro"') : '<span class="foto-na">Foto Retro non disponibile</span>'}
+            </div>
+        </div>
+
+        ${extraHtml ? `
+        <div class="dettagli-sezione dettagli-sezione--arancio">
+            <div class="dettagli-sezione-titolo">👨‍👩‍👧 Ospiti Aggiuntivi</div>
+            ${extraHtml}
+        </div>` : ''}
+
+        ${exifStr}
+    `;
+    document.getElementById('dettagliModal').style.display = 'flex';
 }
 
 function formattaDataPerInput(d) { if(!d) return ""; let p = String(d).split('/'); if(p.length === 3) return `${p[2]}-${p[1]}-${p[0]}`; return d; }
