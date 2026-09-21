@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --colore-principale: #5e7153;
     --colore-secondario: #8c9c83;
     --colore-testo: #2d3436;
@@ -259,9 +259,15 @@ button[type="button"]#btnInvia, button {
     box-shadow: 0 4px 15px rgba(94,113,83,0.35);
     transition: opacity 0.2s, transform 0.15s;
 }
-button:hover {
+button:hover:not(:disabled) {
     opacity: 0.92;
     transform: translateY(-1px);
+}
+button[type="button"]#btnInvia:disabled, button:disabled {
+    background: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 #ospitiAggiuntiviContainer { margin-bottom: 20px; }
@@ -280,4 +286,38 @@ button:hover {
     .intro-text { font-size: 13px; padding: 14px 18px; }
     .lang-switch { top: 10px; right: 10px; }
     .lang-switch button { padding: 6px 10px; font-size: 12px; }
+}
+
+/* =========================================
+   WARNING DOC / ANIMAZIONE
+   ========================================= */
+@keyframes pulseWarning {
+    0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+}
+.warning-doc {
+    background: #fff8e1;
+    border: 1px solid #ffeeba;
+    border-left: 5px solid #ffc107;
+    padding: 12px 15px;
+    margin: 12px 0;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #856404;
+    animation: pulseWarning 2s infinite;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    line-height: 1.5;
+}
+.warning-doc .icon-animation {
+    font-size: 26px;
+    animation: flipBook 3s infinite ease-in-out;
+    display: inline-block;
+}
+@keyframes flipBook {
+    0% { transform: rotateY(0deg); }
+    50% { transform: rotateY(180deg); }
+    100% { transform: rotateY(0deg); }
 }

@@ -126,6 +126,15 @@
                     <span class="it">📸 Foto del Documento (Obbligatorio)</span>
                     <span class="en">📸 Document Photos (Mandatory)</span>
                 </label>
+                
+                <div class="warning-doc">
+                    <div class="icon-animation"><svg width="26px" height="26px" viewBox="0 0 24 24" fill="#856404"><path d="M20,2H4C2.89,2 2,2.89 2,4V20C2,21.11 2.89,22 4,22H20C21.11,22 22,21.11 22,20V4C22,2.89 21.11,2 20,2M20,20H4V4H20V20M8,17.25V18H16V17.25C16,16.15 13.83,15.5 12,15.5C10.17,15.5 8,16.15 8,17.25M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10Z"/></svg></div>
+                    <div>
+                        <span class="it"><strong>ATTENZIONE:</strong> Fotografa la <strong>PAGINA INTERNA</strong> con i tuoi dati e la foto (NON la copertina esterna).</span>
+                        <span class="en"><strong>WARNING:</strong> Take a photo of the <strong>INTERNAL PAGE</strong> with your details and photo (NOT the outer cover).</span>
+                    </div>
+                </div>
+
                 <div class="grid" style="margin-top: 10px;">
                     <div>
                         <label style="margin-top:0"><span class="it">Fronte *</span><span class="en">Front *</span></label>
@@ -181,7 +190,7 @@
                 <span class="en">I accept the processing of personal data and attached documents for legal purposes (Italian Police Registration).</span>
             </label>
             
-            <button type="button" onclick="inviaDatiSicuri()" id="btnInvia">
+            <button type="button" onclick="inviaDatiSicuri()" id="btnInvia" disabled>
                 <span class="it">INVIA DATI CHECK-IN</span>
                 <span class="en">SUBMIT CHECK-IN</span>
             </button>
