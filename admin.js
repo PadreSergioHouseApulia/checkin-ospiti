@@ -205,13 +205,14 @@ function cambiaVista(tipo) {
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.getElementById('tab-' + tipo).classList.add('active');
     
-    const idNascondi = ['contenitore-schede', 'contenitore-calendario', 'contenitore-utenti', 'contenitore-sicurezza', 'contenitore-impostazioni'];
+    const idNascondi = ['contenitore-schede', 'contenitore-calendario', 'contenitore-utenti', 'contenitore-sicurezza', 'contenitore-impostazioni', 'contenitore-paytourist'];
     idNascondi.forEach(id => document.getElementById(id).style.display = 'none');
 
     const titoli = { 
         dashboard: "Statistiche in Tempo Reale", checkin: "Check-in Attivi", richieste: "Richieste di Prenotazione",
         calendario: "Calendario Completo", archivio: "Archivio Check-in Passati", 
-        utenti: "Gestione Utenti del Sistema", impostazioni: "Impostazioni Globali", sicurezza: "Centro di Sicurezza"
+        utenti: "Gestione Utenti del Sistema", impostazioni: "Impostazioni Globali", sicurezza: "Centro di Sicurezza",
+        paytourist: "Integrazione PayTourist"
     };
     document.getElementById('titolo-sezione').innerText = titoli[tipo];
 
@@ -219,6 +220,7 @@ function cambiaVista(tipo) {
     else if (tipo === 'utenti') { document.getElementById('contenitore-utenti').style.display = 'block'; caricaUtenti(); } 
     else if (tipo === 'impostazioni') { document.getElementById('contenitore-impostazioni').style.display = 'block'; caricaImpostazioni(); } 
     else if (tipo === 'sicurezza') { document.getElementById('contenitore-sicurezza').style.display = 'block'; caricaSecurityLogs(); } 
+    else if (tipo === 'paytourist') { document.getElementById('contenitore-paytourist').style.display = 'block'; caricaPaytourist(); }
     else { document.getElementById('contenitore-schede').style.display = 'grid'; renderizzaSchedeODashboard(); }
 }
 
@@ -780,6 +782,65 @@ function generaCSVCompleto(riga) {
         });
     }
     const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv.join("\n")], { type: 'text/csv;charset=utf-8;' })); link.download = `PayTourist_${riga[5]}.csv`; link.click();
+}
+
+function caricaPaytourist() {
+    const box = document.getElementById('lista-paytourist-box');
+    if (!box) return;
+    
+    let html = '';
+    // Filtriamo i check-in "Approvati" oppure "Corretto e Approvato"
+    let approvati = [];
+    dbCheckin.forEach((r, idx) => {
+        if (r[14] && r[14].includes("Approvato")) {
+            approvati.push({ riga: r, originalIndex: idx });
+        }
+    });
+
+    if (approvati.length === 0) {
+        box.innerHTML = `<div style="text-align:center; padding:30px; color:#999; font-style:italic;">Nessun check-in approvato al momento.<br>Approva i check-in dalla Dashboard o da Check-in Attivi.</div>`;
+        return;
+    }
+
+    // Ordino per data di arrivo decrescente (i più recenti in alto)
+    approvati.sort((a, b) => {
+        let da = parseData(a.riga[1]); let db = parseData(b.riga[1]);
+        return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+    });
+
+    html += `<div style="overflow-x:auto;"><table style="width:100%; border-collapse: collapse; font-size: 14px; text-align:left;">
+                <thead>
+                    <tr style="background:#f4f7f6; color:#333;">
+                        <th style="padding:10px; border-bottom:2px solid #ddd;">Ospite Principale</th>
+                        <th style="padding:10px; border-bottom:2px solid #ddd;">Periodo</th>
+                        <th style="padding:10px; border-bottom:2px solid #ddd;">Ospiti Tot.</th>
+                        <th style="padding:10px; border-bottom:2px solid #ddd;">Stato</th>
+                        <th style="padding:10px; border-bottom:2px solid #ddd; text-align:right;">Azione</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+    
+    approvati.forEach(item => {
+        const r = item.riga;
+        html += `<tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:10px; font-weight:bold; color:var(--colore-principale); white-space:nowrap;">${r[4]} ${r[5]}</td>
+                    <td style="padding:10px; white-space:nowrap;">${r[1]} - ${r[2]}</td>
+                    <td style="padding:10px;">${r[3]}</td>
+                    <td style="padding:10px; white-space:nowrap;"><span style="background:var(--verde-ok); color:white; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:bold;">${r[14]}</span></td>
+                    <td style="padding:10px; text-align:right;">
+                        <button onclick="scaricaCSVPaytourist(${item.originalIndex})" style="background:#3498db; color:white; border:none; padding:6px 12px; border-radius:5px; font-size:12px; font-weight:bold; cursor:pointer; transition:0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); white-space:nowrap;">📥 Scarica CSV</button>
+                    </td>
+                 </tr>`;
+    });
+    
+    html += `</tbody></table></div>`;
+    box.innerHTML = html;
+}
+
+function scaricaCSVPaytourist(index) {
+    if (dbCheckin[index]) {
+        generaCSVCompleto(dbCheckin[index]);
+    }
 }
 
 function parseData(s) { if(!s) return null; let p = String(s).includes('-') ? String(s).split('-') : (String(s).includes('/') ? String(s).split('/') : []); if(p.length !== 3) return null; return p[0].length === 4 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[2], p[1]-1, p[0]); }
