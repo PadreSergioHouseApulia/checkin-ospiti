@@ -84,6 +84,7 @@
                 <button class="tab-button" id="tab-richieste" onclick="cambiaVista('richieste')">📩 Richieste Sito</button>
                 <button class="tab-button" id="tab-calendario" onclick="cambiaVista('calendario')">📅 Calendario</button>
                 <button class="tab-button" id="tab-archivio" onclick="cambiaVista('archivio')">🗄️ Archivio Passati</button>
+                <button class="tab-button" id="tab-paytourist" onclick="cambiaVista('paytourist')">🏛️ PayTourist</button>
                 
                 <button class="tab-button admin-only" id="tab-utenti" onclick="cambiaVista('utenti')">👥 Utenti</button>
                 <button class="tab-button admin-only" id="tab-sicurezza" onclick="cambiaVista('sicurezza')">🛡️ Sicurezza</button>
@@ -189,6 +190,30 @@
                     </div>
                     
                     <button onclick="salvaImpostazioni(event)" style="padding: 15px; background: var(--colore-principale); color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 15px;">💾 Salva Impostazioni</button>
+                </div>
+            </div>
+
+        <!-- CONTENITORE PAYTOURIST -->
+            <div id="contenitore-paytourist" style="display:none;">
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <h3 style="margin-top:0; color: var(--colore-principale);">🏛️ Hub PayTourist</h3>
+                            <p style="font-size: 14px; color: #666; margin: 0;">Da qui puoi scaricare i file di chi ha completato il check-in e aprirli nel portale Alloggiati/PayTourist.</p>
+                        </div>
+                        <a href="https://monopoli.paytourist.com/login" target="_blank" style="background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(46,204,113,0.3); transition: 0.2s;">
+                            <span>Apri Portale PayTourist</span> 🚀
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top:0; color: var(--colore-principale);">📂 Check-in pronti per PayTourist</h3>
+                    <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Qui trovi tutti i check-in "Approvati". Scarica il file CSV per chi non è ancora stato caricato su PayTourist.</p>
+                    
+                    <div id="lista-paytourist-box">
+                        <!-- Popolato via JS -->
+                    </div>
                 </div>
             </div>
 
