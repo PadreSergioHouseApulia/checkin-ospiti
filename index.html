@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Check-in Online | PadreSergio House Apulia</title>
     
-    <!-- Percorsi per il precaricamento -->
     <link rel="preload" as="image" href="assets/Foto%20sfondo.jpg">
     <link rel="preload" as="image" href="assets/Foto%20copertina.jpg">
     <link rel="preload" as="image" href="assets/Foto%20sfondo%20tramonto.jpg">
@@ -26,22 +25,15 @@
     <meta name="twitter:title" content="Check-in Online - PadreSergio House 🏠">
     <meta name="twitter:description" content="Invia i tuoi dati e documenti per il check-in online a PadreSergio House.">
     
-    <!-- Icona e CSS personalizzato -->
     <link rel="icon" type="image/x-icon" href="assets/icona.ico?v=2">
     <link rel="stylesheet" href="style-checkin.css">
-
-    <!-- Libreria per Analisi Forense EXIF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Tailwind CSS (Il Motore Grafico) -->
     <script src="https://cdn.tailwindcss.com" data-cfasync="false"></script>
     <script data-cfasync="false">
         tailwind.config = {
@@ -100,40 +92,43 @@
                     <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Data Partenza *</span><span class="en">Departure Date *</span></label><input type="date" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="checkout" required></div>
                 </div>
                 <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Numero totale di ospiti (Compresi i bambini) *</span><span class="en">Total number of guests (Children included) *</span></label>
-                <!-- Corretto onchange per la generazione ospiti extra -->
-                <input type="number" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" id="numPersone" name="numPersone" min="1" max="10" value="1" required onchange="generaOspiti()">
+                <!-- oninput genera istantaneamente le caselle extra -->
+                <input type="number" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" id="numPersone" name="numPersone" min="1" max="10" value="1" required oninput="generaOspiti()">
             </div>
 
-            <div class="p-6 md:p-10 border-b border-brand-border">
+            <!-- 2. Dati Capogruppo - Allineato a Ospite Extra -->
+            <div class="p-6 md:p-10 border-b border-brand-border bg-brand-bg">
                 <h2 class="font-serif text-2xl md:text-3xl text-brand-primary mb-8 border-b border-brand-border/50 pb-4 flex items-center gap-3"><span class="it">2. Dati Capogruppo</span><span class="en">2. Main Guest</span></h2>
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Nome (Completo) *</span><span class="en">First Name (Full name) *</span></label><input type="text" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="nomeCapo" required></div>
-                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Cognome (Completo) *</span><span class="en">Last Name (Full surname) *</span></label><input type="text" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="cognomeCapo" required></div>
+                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Nome (Completo) *</span><span class="en">First Name (Full name) *</span></label><input type="text" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="nomeCapo" required></div>
+                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Cognome (Completo) *</span><span class="en">Last Name (Full surname) *</span></label><input type="text" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="cognomeCapo" required></div>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Tipo documento *</span><span class="en">Document Type *</span></label>
-                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text mb-4" name="tipoDocCapo" required>
+                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Tipo documento *</span><span class="en">Document Type *</span></label>
+                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="tipoDocCapo" required>
                             <option value="CARTA D'IDENTITA">Carta d'Identità / ID Card</option>
                             <option value="PASSAPORTO">Passaporto / Passport</option>
                         </select>
                     </div>
-                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Numero documento *</span><span class="en">Document Number *</span></label><input type="text" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="numDocCapo" required></div>
+                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Numero documento *</span><span class="en">Document Number *</span></label><input type="text" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="numDocCapo" required></div>
                 </div>
                 
                 <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Luogo rilascio documento (Stato) *</span><span class="en">Place of Issue (Country) *</span></label>
-                <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text mb-4 selettore-stati" name="rilascioDoc" required>
-                    <option value="" disabled selected>-- Caricamento Stati... --</option>
+                <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text mb-6 selettore-stati" name="rilascioDoc" required>
+                    <option value="" disabled selected>-- Seleziona / Select --</option>
                 </select>
-                
-                <div class="bg-brand-primary/5 p-5 md:p-6 rounded-xl border border-brand-primary/20 mt-6 mb-6">
-                    <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4">
+
+                <div class="bg-brand-primary/5 p-5 md:p-6 rounded-xl border border-brand-primary/20 mb-6">
+                    <label class="block text-xs font-bold text-brand-primary uppercase tracking-wider mb-2">
                         <span class="it">📸 Foto del Documento (Obbligatorio)</span>
                         <span class="en">📸 Document Photos (Mandatory)</span>
                     </label>
                     
                     <div class="warning-doc bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg flex items-start gap-3 my-4 text-amber-800 text-sm">
-                        <div class="icon-animation"><i class="ph-fill ph-warning" style="font-size:24px;"></i></div>
+                        <div class="icon-animation text-2xl"><i class="ph-fill ph-warning"></i></div>
                         <div>
                             <span class="it"><strong>ATTENZIONE:</strong> Fotografa la <strong>PAGINA INTERNA</strong> con i tuoi dati e la foto (NON la copertina esterna).</span>
                             <span class="en"><strong>WARNING:</strong> Take a photo of the <strong>INTERNAL PAGE</strong> with your details and photo (NOT the outer cover).</span>
@@ -154,39 +149,38 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Sesso *</span><span class="en">Gender *</span></label>
-                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text mb-4" name="sessoCapo" required>
+                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Sesso *</span><span class="en">Gender *</span></label>
+                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="sessoCapo" required>
                             <option value="Femmina">Femmina / Female</option>
                             <option value="Maschio">Maschio / Male</option>
                         </select>
                     </div>
-                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Data di nascita *</span><span class="en">Date of Birth *</span></label><input type="date" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="nascitaCapo" required></div>
+                    <div><label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Data di nascita *</span><span class="en">Date of Birth *</span></label><input type="date" class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text" name="nascitaCapo" required></div>
                 </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label>
-                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text mb-4 selettore-stati" name="luogoNascita" required>
-                            <option value="" disabled selected>-- Caricamento Stati... --</option>
+                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Stato di nascita *</span><span class="en">Country of Birth *</span></label>
+                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text selettore-stati" name="luogoNascita" required>
+                            <option value="" disabled selected>-- Seleziona / Select --</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
-                        <!-- Corretto il nome cittadinanza -->
-                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text mb-4 selettore-stati" name="cittadinanza" required>
-                            <option value="" disabled selected>-- Caricamento Stati... --</option>
+                        <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2"><span class="it">Nazionalità *</span><span class="en">Nationality *</span></label>
+                        <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text selettore-stati" name="cittadinanza" required>
+                            <option value="" disabled selected>-- Seleziona / Select --</option>
                         </select>
                     </div>
                 </div>
                 
                 <label class="block text-xs font-bold text-brand-muted uppercase tracking-wider mb-2 mt-4"><span class="it">Stato di residenza *</span><span class="en">Country of Residence *</span></label>
                 <select class="w-full p-4 border border-brand-border rounded-xl bg-white focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all text-brand-text mb-4 selettore-stati" name="residenzaCapo" required>
-                    <option value="" disabled selected>-- Caricamento Stati... --</option>
+                    <option value="" disabled selected>-- Seleziona / Select --</option>
                 </select>
             </div>
 
-            <!-- Contenitori corretti per l'inserimento ospiti extra -->
+            <!-- CONTENITORE OSPITI EXTRA -->
             <div class="p-6 md:p-10 border-b border-brand-border" id="sezioneOspitiExtra" style="display:none;">
-                <h2 class="font-serif text-2xl md:text-3xl text-brand-primary mb-8 border-b border-brand-border/50 pb-4 flex items-center gap-3"><span class="it">3. Altri Ospiti</span><span class="en">3. Other Guests</span></h2>
                 <div id="ospitiAggiuntiviContainer"></div>
             </div>
 
@@ -224,6 +218,6 @@
         });
     </script>
 
-    <script src="script-checkin.js" defer></script>
+    <script src="script-checkin.js?v=11" defer></script>
 </body>
 </html>
