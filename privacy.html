@@ -29,80 +29,206 @@
             }
         }
     </script>
+
+    <!-- CSS per gestione lingua -->
+    <style>
+        body:not(.lang-en) [lang="en"] { display: none !important; }
+        body.lang-en [lang="it"] { display: none !important; }
+        
+        .lang-switch button {
+            background: rgba(255,255,255,0.7);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid #e6e3dc;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .lang-switch button.active {
+            background: #5e7153;
+            color: white;
+            border-color: #5e7153;
+        }
+    </style>
 </head>
 <body class="bg-brand-bg text-brand-text font-sans antialiased leading-relaxed">
-    <div class="max-w-4xl mx-auto px-6 py-12 md:py-20">
-        <a href="index.html" class="inline-flex items-center text-brand-primary hover:underline mb-8 font-medium">
-            &larr; Torna alla Home
-        </a>
+    
+    <div class="max-w-4xl mx-auto px-6 py-12 md:py-20 relative">
+        
+        <!-- Intestazione con pulsante indietro e selettore lingua -->
+        <div class="flex justify-between items-center mb-8">
+            <a href="javascript:history.back()" class="inline-flex items-center text-brand-primary hover:underline font-medium">
+                &larr; <span lang="it">Torna indietro</span><span lang="en">Go back</span>
+            </a>
+            
+            <div class="lang-switch flex gap-2">
+                <button type="button" id="btn-it" class="active" onclick="changeLangPrivacy('it')">🇮🇹 ITA</button>
+                <button type="button" id="btn-en" onclick="changeLangPrivacy('en')">🇬🇧 ENG</button>
+            </div>
+        </div>
         
         <h1 class="font-serif text-4xl md:text-5xl text-brand-primary mb-2">Privacy Policy</h1>
-        <p class="text-brand-muted mb-10 text-sm">Ultimo aggiornamento: Ottobre 2026</p>
+        <p class="text-brand-muted mb-10 text-sm">
+            <span lang="it">Ultimo aggiornamento: Ottobre 2026</span>
+            <span lang="en">Last updated: October 2026</span>
+        </p>
 
         <div class="space-y-8 text-brand-text/90">
+            <!-- INTRODUZIONE -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">Informativa sul Trattamento dei Dati Personali</h2>
-                <p>Ai sensi dell'art. 13 del Regolamento (UE) 2016/679 (GDPR). La presente informativa descrive le modalità di gestione dei dati personali degli utenti che consultano i siti web e utilizzano i servizi di prenotazione e check-in online della struttura ricettiva PadreSergio House.</p>
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">Informativa sul Trattamento dei Dati Personali</span>
+                    <span lang="en">Information on the Processing of Personal Data</span>
+                </h2>
+                <p lang="it">Ai sensi dell'art. 13 del Regolamento (UE) 2016/679 (GDPR). La presente informativa descrive le modalità di gestione dei dati personali degli utenti che consultano i siti web e utilizzano i servizi di prenotazione e check-in online della struttura ricettiva PadreSergio House.</p>
+                <p lang="en">Pursuant to Art. 13 of Regulation (EU) 2016/679 (GDPR). This privacy policy describes the management methods of personal data of users who consult the websites and use the booking and online check-in services of the PadreSergio House accommodation facility.</p>
             </section>
 
+            <!-- 1. TITOLARE -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">1. Titolare del Trattamento</h2>
-                <p>Il Titolare del trattamento dei dati è Vito Demarino, in qualità di gestore della struttura ricettiva PadreSergio House, situata a Monopoli (BA). Per qualsiasi richiesta o per l'esercizio dei propri diritti, l'utente può contattare il Titolare all'indirizzo email: <strong>padresergiohouse@gmail.com</strong> (sostituisci se diversa) o al numero di telefono <strong>+39 338 469 9286</strong>.</p>
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">1. Titolare del Trattamento</span>
+                    <span lang="en">1. Data Controller</span>
+                </h2>
+                <p lang="it">Il Titolare del trattamento dei dati è Vito Demarino, in qualità di gestore della struttura ricettiva PadreSergio House, situata a Monopoli (BA). Per qualsiasi richiesta o per l'esercizio dei propri diritti, l'utente può contattare il Titolare all'indirizzo email: <strong>padresergiohouse@gmail.com</strong> o al numero di telefono <strong>+39 338 469 9286</strong>.</p>
+                <p lang="en">The Data Controller is Vito Demarino, as the manager of the PadreSergio House accommodation facility, located in Monopoli (BA), Italy. For any requests or to exercise their rights, the user can contact the Controller at the email address: <strong>padresergiohouse@gmail.com</strong> or at the phone number <strong>+39 338 469 9286</strong>.</p>
             </section>
 
+            <!-- 2. DATI RACCOLTI -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">2. Tipologia di Dati Raccolti e Finalità</h2>
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">2. Tipologia di Dati Raccolti e Finalità</span>
+                    <span lang="en">2. Types of Data Collected and Purposes</span>
+                </h2>
+                
+                <!-- A. Vetrina -->
                 <div class="mb-4">
-                    <h3 class="font-semibold text-lg mb-2">A. Modulo Richiesta Disponibilità (Sito Vetrina)</h3>
-                    <ul class="list-disc pl-5 space-y-1 text-brand-muted">
+                    <h3 class="font-semibold text-lg mb-2">
+                        <span lang="it">A. Modulo Richiesta Disponibilità (Sito Vetrina)</span>
+                        <span lang="en">A. Availability Request Form (Showcase Website)</span>
+                    </h3>
+                    <ul class="list-disc pl-5 space-y-1 text-brand-muted" lang="it">
                         <li><strong>Dati raccolti:</strong> Nome, cognome, indirizzo email, numero di telefono/WhatsApp, date di soggiorno richieste.</li>
                         <li><strong>Finalità:</strong> Rispondere alle richieste di informazioni, verificare la disponibilità e formulare preventivi.</li>
                         <li><strong>Base Giuridica:</strong> Esecuzione di misure precontrattuali (Art. 6, lett. b, GDPR).</li>
                     </ul>
+                    <ul class="list-disc pl-5 space-y-1 text-brand-muted" lang="en">
+                        <li><strong>Data collected:</strong> First name, last name, email address, phone/WhatsApp number, requested stay dates.</li>
+                        <li><strong>Purposes:</strong> Respond to information requests, check availability, and provide quotes.</li>
+                        <li><strong>Legal Basis:</strong> Execution of pre-contractual measures (Art. 6, let. b, GDPR).</li>
+                    </ul>
                 </div>
+                
+                <!-- B. Check-in -->
                 <div>
-                    <h3 class="font-semibold text-lg mb-2">B. Modulo di Check-in Online (Fast Check-in)</h3>
-                    <ul class="list-disc pl-5 space-y-1 text-brand-muted">
+                    <h3 class="font-semibold text-lg mb-2">
+                        <span lang="it">B. Modulo di Check-in Online (Fast Check-in)</span>
+                        <span lang="en">B. Online Check-in Form (Fast Check-in)</span>
+                    </h3>
+                    <ul class="list-disc pl-5 space-y-1 text-brand-muted" lang="it">
                         <li><strong>Dati raccolti:</strong> Dati anagrafici, cittadinanza, residenza, estremi e foto fronte/retro del documento d'identità.</li>
                         <li><strong>Finalità:</strong> Adempimento dell'obbligo di pubblica sicurezza tramite il portale "Alloggiati Web" (art. 109 T.U.L.P.S.).</li>
                         <li><strong>Base Giuridica:</strong> Adempimento di un obbligo legale (Art. 6, lett. c, GDPR).</li>
                     </ul>
+                    <ul class="list-disc pl-5 space-y-1 text-brand-muted" lang="en">
+                        <li><strong>Data collected:</strong> Personal details, citizenship, residence, ID document details and front/back photos.</li>
+                        <li><strong>Purposes:</strong> Fulfillment of public security obligations via the Italian State portal "Alloggiati Web" (Art. 109 T.U.L.P.S.).</li>
+                        <li><strong>Legal Basis:</strong> Fulfillment of a legal obligation (Art. 6, let. c, GDPR).</li>
+                    </ul>
                 </div>
             </section>
 
+            <!-- 3. MODALITA -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">3. Modalità del Trattamento e Sicurezza</h2>
-                <p>Il trattamento dei dati avviene mediante strumenti informatici. Il transito dei dati, inclusi i documenti d'identità, avviene esclusivamente su connessioni web sicure e crittografate (HTTPS).</p>
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">3. Modalità del Trattamento e Sicurezza</span>
+                    <span lang="en">3. Processing Methods and Security</span>
+                </h2>
+                <p lang="it">Il trattamento dei dati avviene mediante strumenti informatici. Il transito dei dati, inclusi i documenti d'identità, avviene esclusivamente su connessioni web sicure e crittografate (HTTPS).</p>
+                <p lang="en">Data processing is carried out using IT tools. The transit of data, including ID documents, takes place exclusively over secure and encrypted web connections (HTTPS).</p>
             </section>
 
+            <!-- 4. COMUNICAZIONE -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">4. Comunicazione dei Dati</h2>
-                <p>I dati non saranno ceduti a terzi per marketing. Per gli obblighi di legge, i dati e i documenti del Check-in Online saranno trasmessi in via esclusiva alle Autorità di Pubblica Sicurezza (Questura) tramite il portale di Stato.</p>
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">4. Comunicazione dei Dati</span>
+                    <span lang="en">4. Data Communication</span>
+                </h2>
+                <p lang="it">I dati non saranno ceduti a terzi per marketing. Per gli obblighi di legge, i dati e i documenti del Check-in Online saranno trasmessi in via esclusiva alle Autorità di Pubblica Sicurezza (Questura) tramite il portale di Stato.</p>
+                <p lang="en">Data will not be sold to third parties for marketing purposes. For legal obligations, the data and documents from the Online Check-in will be transmitted exclusively to the Public Security Authorities (Police) via the official State portal.</p>
             </section>
 
+            <!-- 5. TERZE PARTI -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">5. Servizi di Terze Parti Integrati</h2>
-                <ul class="list-disc pl-5 space-y-2 text-brand-muted">
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">5. Servizi di Terze Parti Integrati</span>
+                    <span lang="en">5. Integrated Third-Party Services</span>
+                </h2>
+                <ul class="list-disc pl-5 space-y-2 text-brand-muted" lang="it">
                     <li><strong>Cloudflare:</strong> Il nostro sito è protetto da Cloudflare, che filtra il traffico e ottimizza le prestazioni, trattando l'indirizzo IP per motivi di sicurezza (cloudflare.com/privacypolicy).</li>
                     <li><strong>Widget Google Maps:</strong> Mappa interattiva di Google, che può raccogliere l'indirizzo IP e installare cookie tecnici (policies.google.com/privacy).</li>
                     <li><strong>WhatsApp:</strong> Pulsante per il reindirizzamento alla chat, gestito da Meta (whatsapp.com/legal/privacy-policy).</li>
                 </ul>
+                <ul class="list-disc pl-5 space-y-2 text-brand-muted" lang="en">
+                    <li><strong>Cloudflare:</strong> Our website is protected by Cloudflare, which filters traffic and optimizes performance, processing the IP address for security reasons (cloudflare.com/privacypolicy).</li>
+                    <li><strong>Google Maps Widget:</strong> Interactive Google map, which may collect the IP address and install technical cookies (policies.google.com/privacy).</li>
+                    <li><strong>WhatsApp:</strong> Button for chat redirection, managed by Meta (whatsapp.com/legal/privacy-policy).</li>
+                </ul>
             </section>
 
+            <!-- 6. CONSERVAZIONE -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">6. Tempi di Conservazione</h2>
-                <ul class="list-disc pl-5 space-y-2 text-brand-muted">
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">6. Tempi di Conservazione</span>
+                    <span lang="en">6. Retention Period</span>
+                </h2>
+                <ul class="list-disc pl-5 space-y-2 text-brand-muted" lang="it">
                     <li><strong>Contatti e richieste:</strong> Conservati per il tempo necessario a gestire il preventivo e la prenotazione.</li>
                     <li><strong>Dati fiscali:</strong> Conservati per 10 anni come imposto dalla legge.</li>
                     <li><strong>Foto dei documenti d'identità:</strong> Eliminate definitivamente dai nostri sistemi non appena ricevuta conferma di avvenuta trasmissione alla Questura (massimo 24/48 ore dall'arrivo).</li>
                 </ul>
+                <ul class="list-disc pl-5 space-y-2 text-brand-muted" lang="en">
+                    <li><strong>Contacts and requests:</strong> Kept for the time necessary to manage the quote and booking.</li>
+                    <li><strong>Fiscal data:</strong> Kept for 10 years as required by Italian law.</li>
+                    <li><strong>ID photos:</strong> Permanently deleted from our systems as soon as confirmation of transmission to the Police is received (maximum 24/48 hours after arrival).</li>
+                </ul>
             </section>
 
+            <!-- 7. DIRITTI -->
             <section>
-                <h2 class="font-serif text-2xl mb-3 text-brand-primary">7. Diritti dell'Interessato</h2>
-                <p>In conformità agli artt. 15-22 del GDPR, l'utente può chiedere in ogni momento l'accesso, la rettifica, la cancellazione o la limitazione del trattamento dei propri dati personali. L'interessato può inoltre proporre reclamo all'Autorità Garante della Privacy.</p>
+                <h2 class="font-serif text-2xl mb-3 text-brand-primary">
+                    <span lang="it">7. Diritti dell'Interessato</span>
+                    <span lang="en">7. Data Subject's Rights</span>
+                </h2>
+                <p lang="it">In conformità agli artt. 15-22 del GDPR, l'utente può chiedere in ogni momento l'accesso, la rettifica, la cancellazione o la limitazione del trattamento dei propri dati personali. L'interessato può inoltre proporre reclamo all'Autorità Garante della Privacy.</p>
+                <p lang="en">In accordance with Articles 15-22 of the GDPR, the user can request at any time access, rectification, cancellation, or limitation of the processing of their personal data. The data subject can also lodge a complaint with the Data Protection Authority.</p>
             </section>
         </div>
     </div>
+
+    <!-- Script per cambio lingua interno alla pagina -->
+    <script>
+        function changeLangPrivacy(lang) {
+            if (lang === 'en') {
+                document.body.classList.add('lang-en');
+                document.getElementById('btn-en').classList.add('active');
+                document.getElementById('btn-it').classList.remove('active');
+            } else {
+                document.body.classList.remove('lang-en');
+                document.getElementById('btn-it').classList.add('active');
+                document.getElementById('btn-en').classList.remove('active');
+            }
+            // Opzionale: salva la preferenza
+            localStorage.setItem('pref-lang', lang);
+        }
+
+        // Auto-imposta la lingua in base alle preferenze salvate dagli altri siti
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('pref-lang');
+            if (saved === 'en') {
+                changeLangPrivacy('en');
+            }
+        });
+    </script>
 </body>
 </html>
